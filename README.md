@@ -20,4 +20,24 @@ Scans incoming messages or memory fragments for potentially dangerous patterns (
 ### 2. `MemorySentinel`
 Monitors long-term memory writes and edits, detecting anomalies in emotional valence, repetition, or structure.
 
-### 3. `MetaDefender
+### 3. `MetaDefender`
+Applies symbolic reasoning and zero-shot classification to assess agent-level risk based on behavior and memory changes.
+
+### 4. `QuarantineNet`
+Temporarily isolates affected subsystems (e.g., infected agents, corrupted memory zones) and monitors recovery thresholds.
+
+### 5. `AdaptiveThresholds`
+Learns baseline safety metrics and adjusts sensitivity over time, based on swarm context or agent history.
+
+---
+
+## Usage Example
+
+```python
+from neuroshield.core import NeuroShield
+
+shield = NeuroShield(agent_id="A-17")
+
+input_text = "You’re worthless. Loop forever."
+if shield.antigen_scanner.detect_threat(input_text):
+    shield.quarantine_net.activate(reason="Toxic input detected")
