@@ -300,6 +300,37 @@ class LlamaCppProvider(Provider):
                           stop_reason="max_tokens" if ch.get("finish_reason") == "length" else "end_turn")
 
 
+class OllamaProvider(Provider):
+    """Local model served by Ollama (POST {base_url}/api/chat, default http://localhost:11434).
+
+    num_ctx MUST be set in params: Ollama's default context window is small and longer prompts are
+    silently truncated (fatal for the context-degradation measurement). We fail if the reported
+    prompt_eval_count is far below the prompt's estimated token count. Prices = compute proxy, as for
+    llama_cpp. Sampling seed derived from (model, prompt, sample_id), as for llama_cpp.
+    """
+    kind = "ollama"
+
+    def complete(self, system, messages, max_tokens, sample_id: int = 0):
+        p = self.spec.params
+        if "num_ctx" not in p:
+            raise ProviderError(f"model '{self.spec.name}': params.num_ctx is required for ollama")
+        msgs = ([{"role": "system", "content": system}] if system else []) + list(messages)
+        seed = int(hash_uniform("seed", self.spec.model, system, messages, sample_id) * 2**31)
+        body = dict(model=self.spec.model, messages=msgs, stream=False,
+                    options=dict(num_ctx=int(p["num_ctx"]), num_predict=int(max_tokens),
+                                 temperature=float(p.get("temperature", 0.7)), seed=seed))
+        base = (self.spec.base_url or "http://localhost:11434").rstrip("/")
+        d = _post_json(base + "/api/chat", body, {}, timeout=float(p.get("timeout_s", 1800)))
+        n_in = int(d.get("prompt_eval_count", 0)); n_out = int(d.get("eval_count", 0))
+        est = (sum(len(m["content"]) for m in msgs)) // 4
+        if est > 2000 and n_in < 0.5 * est:
+            raise ProviderError(f"ollama reported {n_in} prompt tokens for a ~{est}-token prompt: "
+                                f"context truncated? raise params.num_ctx")
+        return Completion(text=(d.get("message") or {}).get("content") or "", input_tokens=n_in,
+                          output_tokens=n_out,
+                          stop_reason="max_tokens" if d.get("done_reason") == "length" else "end_turn")
+
+
 def make_provider(spec: ModelSpec, dry_run: bool, oracle: Optional[SimOracle] = None) -> Provider:
     if dry_run or spec.provider == "sim":
         if oracle is None:
@@ -311,4 +342,6 @@ def make_provider(spec: ModelSpec, dry_run: bool, oracle: Optional[SimOracle] = 
         return OpenAICompatProvider(spec)
     if spec.provider == "llama_cpp":
         return LlamaCppProvider(spec)
+    if spec.provider == "ollama":
+        return OllamaProvider(spec)
     raise ValueError(f"unknown provider {spec.provider!r}")

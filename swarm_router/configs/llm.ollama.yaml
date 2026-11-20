@@ -1,0 +1,34 @@
+# Ollama on the user's machine (qwen2.5:0.5b = Qwen2.5-0.5B-Instruct Q4_K_M in the Ollama library).
+# PRICES ARE A COMPUTE PROXY, NOT MONEY. num_ctx is required: Ollama silently truncates longer prompts.
+run:
+  budget_usd: 50.0
+  lam: 0.15
+  cost_norm_usd: 0.01
+  max_tokens:
+    planner: 512
+    executor: 768
+    verifier: 512
+  cache_dir: .cache/llm
+  log_dir: results/llm_calls
+  include_seed_in_cache_key: true
+  variant_budget_share: equal
+  team_roles: position
+embeddings:
+  dim: 16
+  projection_seed: 12345
+  provider: hashed
+tasks:
+  builtin: true
+  external_dir: data
+  code_timeout_s: 5.0
+  code_mem_mb: 512
+models:
+- name: qwen05_ollama
+  provider: ollama
+  model: qwen2.5:0.5b
+  base_url: http://localhost:11434
+  price_in_per_1m: 0.5
+  price_out_per_1m: 0.5
+  params:
+    temperature: 0.7
+    num_ctx: 16384
