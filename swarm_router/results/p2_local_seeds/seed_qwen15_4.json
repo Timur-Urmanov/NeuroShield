@@ -1,0 +1,269 @@
+{
+ "experiment": "llm_context_degradation_real",
+ "git_commit": "1c15eac",
+ "argv": [
+  "experiments/llm_context_degradation.py",
+  "--config",
+  "configs/llm.local.yaml",
+  "--real",
+  "--yes",
+  "--budget-usd",
+  "50",
+  "--k",
+  "0,8,32,64",
+  "--n-tasks",
+  "30",
+  "--models",
+  "qwen15",
+  "--seed0",
+  "4",
+  "--seeds",
+  "1",
+  "--out",
+  ".cache/p2_chunks"
+ ],
+ "created": "2026-11-20T22:20:22",
+ "mode": "real",
+ "status": "ok",
+ "seeds": [
+  4
+ ],
+ "K": [
+  0,
+  8,
+  32,
+  64
+ ],
+ "n_tasks": 30,
+ "models": [
+  "qwen15"
+ ],
+ "results": {
+  "qwen15": {
+   "per_seed": [
+    {
+     "seed": 4,
+     "status": "ok",
+     "0": {
+      "success": 0.9,
+      "input_tokens": 120.46666666666667,
+      "n": 30,
+      "max_tokens_stops": 0,
+      "refusals": 0
+     },
+     "8": {
+      "success": 0.9,
+      "input_tokens": 1261.8666666666666,
+      "n": 30,
+      "max_tokens_stops": 0,
+      "refusals": 0
+     },
+     "32": {
+      "success": 0.8666666666666667,
+      "input_tokens": 5218.733333333334,
+      "n": 30,
+      "max_tokens_stops": 0,
+      "refusals": 0
+     },
+     "64": {
+      "success": 0.8333333333333334,
+      "input_tokens": 9858.333333333334,
+      "n": 30,
+      "max_tokens_stops": 0,
+      "refusals": 0
+     },
+     "slope_per_k": -0.0011021505376344052
+    }
+   ],
+   "n_seeds_ok": 1,
+   "summary": {
+    "0": {
+     "success": 0.9,
+     "success_sd": 0.0,
+     "input_tokens": 120.46666666666667,
+     "max_tokens_stops": 0,
+     "refusals": 0
+    },
+    "8": {
+     "success": 0.9,
+     "success_sd": 0.0,
+     "input_tokens": 1261.8666666666666,
+     "max_tokens_stops": 0,
+     "refusals": 0
+    },
+    "32": {
+     "success": 0.8666666666666667,
+     "success_sd": 0.0,
+     "input_tokens": 5218.733333333334,
+     "max_tokens_stops": 0,
+     "refusals": 0
+    },
+    "64": {
+     "success": 0.8333333333333334,
+     "success_sd": 0.0,
+     "input_tokens": 9858.333333333334,
+     "max_tokens_stops": 0,
+     "refusals": 0
+    },
+    "diff_kmax_k0": {
+     "diff": -0.06666666666666665,
+     "sd": 0.0,
+     "effect": false
+    },
+    "slope_per_k": -0.0011021505376344052,
+    "slope_per_k_sd": 0.0
+   }
+  }
+ },
+ "budget": {
+  "limit_usd": 50.0,
+  "spent_usd": 0.7584974999999998
+ },
+ "call_log": ".cache/p2_chunks/llm_calls/llm_context_degradation_real_20261120-205736.jsonl",
+ "config": {
+  "path": "configs/llm.local.yaml",
+  "models": [
+   {
+    "name": "qwen05",
+    "provider": "llama_cpp",
+    "model": ".cache/models/qwen2.5-0.5b-instruct-q4_k_m.gguf",
+    "price_in_per_1m": 0.5,
+    "price_out_per_1m": 0.5,
+    "api_key_env": null,
+    "base_url": null,
+    "params": {
+     "temperature": 0.7,
+     "n_ctx": 16384
+    },
+    "sim": {
+     "acc": {
+      "math": 0.8,
+      "code": 0.8,
+      "text": 0.8
+     },
+     "role_skill": {
+      "none": 0.0,
+      "executor": 0.0,
+      "planner": -0.3,
+      "verifier": -0.3
+     },
+     "out_tokens": {
+      "planner": 200,
+      "executor": 300,
+      "verifier": 80
+     },
+     "plan_bonus": 0.0,
+     "verify_detect": 0.5,
+     "false_reject": 0.1,
+     "no_verdict": 0.0,
+     "context_decay_per_1k": 0.0
+    },
+    "max_tokens_field": "max_tokens",
+    "thinking": false
+   },
+   {
+    "name": "qwen15",
+    "provider": "llama_cpp",
+    "model": ".cache/models/qwen2.5-1.5b-instruct-q4_k_m.gguf",
+    "price_in_per_1m": 1.5,
+    "price_out_per_1m": 1.5,
+    "api_key_env": null,
+    "base_url": null,
+    "params": {
+     "temperature": 0.7,
+     "n_ctx": 16384
+    },
+    "sim": {
+     "acc": {
+      "math": 0.8,
+      "code": 0.8,
+      "text": 0.8
+     },
+     "role_skill": {
+      "none": 0.0,
+      "executor": 0.0,
+      "planner": -0.3,
+      "verifier": -0.3
+     },
+     "out_tokens": {
+      "planner": 200,
+      "executor": 300,
+      "verifier": 80
+     },
+     "plan_bonus": 0.0,
+     "verify_detect": 0.5,
+     "false_reject": 0.1,
+     "no_verdict": 0.0,
+     "context_decay_per_1k": 0.0
+    },
+    "max_tokens_field": "max_tokens",
+    "thinking": false
+   },
+   {
+    "name": "qwen3",
+    "provider": "llama_cpp",
+    "model": ".cache/models/qwen2.5-3b-instruct-q4_k_m.gguf",
+    "price_in_per_1m": 3.0,
+    "price_out_per_1m": 3.0,
+    "api_key_env": null,
+    "base_url": null,
+    "params": {
+     "temperature": 0.7,
+     "n_ctx": 16384
+    },
+    "sim": {
+     "acc": {
+      "math": 0.8,
+      "code": 0.8,
+      "text": 0.8
+     },
+     "role_skill": {
+      "none": 0.0,
+      "executor": 0.0,
+      "planner": -0.3,
+      "verifier": -0.3
+     },
+     "out_tokens": {
+      "planner": 200,
+      "executor": 300,
+      "verifier": 80
+     },
+     "plan_bonus": 0.0,
+     "verify_detect": 0.5,
+     "false_reject": 0.1,
+     "no_verdict": 0.0,
+     "context_decay_per_1k": 0.0
+    },
+    "max_tokens_field": "max_tokens",
+    "thinking": false
+   }
+  ],
+  "run": {
+   "budget_usd": 50.0,
+   "lam": 0.15,
+   "cost_norm_usd": 0.01,
+   "max_tokens": {
+    "planner": 512,
+    "executor": 768,
+    "verifier": 512
+   },
+   "cache_dir": ".cache/llm",
+   "log_dir": "results/llm_calls",
+   "include_seed_in_cache_key": true,
+   "team_roles": "position",
+   "variant_budget_share": "equal"
+  },
+  "embeddings": {
+   "dim": 16,
+   "projection_seed": 12345,
+   "provider": "hashed"
+  },
+  "tasks": {
+   "builtin": true,
+   "external_dir": "data",
+   "code_timeout_s": 5.0,
+   "code_mem_mb": 512
+  }
+ },
+ "note": ""
+}
