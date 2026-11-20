@@ -1,0 +1,251 @@
+{
+ "T": 8000,
+ "variants": {
+  "full": {
+   "pre": 0.619806,
+   "pre_sd": 0.02755637810017857,
+   "post": 0.661114,
+   "post_sd": 0.01949071019742484,
+   "sec": 18.7
+  },
+  "no_sleep": {
+   "pre": 0.6971499999999999,
+   "pre_sd": 0.024152818262057903,
+   "post": 0.743204,
+   "post_sd": 0.014397177987369633,
+   "sec": 17.5
+  },
+  "no_sleep_fat": {
+   "pre": 0.511369,
+   "pre_sd": 0.012721908032995664,
+   "post": 0.5557049999999999,
+   "post_sd": 0.026534774353666538,
+   "sec": 19.7
+  },
+  "no_hormones": {
+   "pre": 0.6042379999999999,
+   "pre_sd": 0.026530394192322143,
+   "post": 0.644454,
+   "post_sd": 0.020842328420788286,
+   "sec": 18.1
+  },
+  "no_coupling": {
+   "pre": 0.5871449999999998,
+   "pre_sd": 0.024264949618740178,
+   "post": 0.6181919999999999,
+   "post_sd": 0.014698737224673417,
+   "sec": 13.4
+  }
+ },
+ "baselines": {
+  "linucb": {
+   "pre": 0.6971269999999998,
+   "post": 0.7437419999999999
+  },
+  "oracle": {
+   "pre": 0.7455,
+   "post": 0.7675000000000001
+  },
+  "best_single": {
+   "pre": 0.6849999999999998,
+   "post": 0.7449999999999999
+  },
+  "random": {
+   "pre": 0.5866666666666667,
+   "post": 0.5666666666666667
+  }
+ },
+ "clusters_seed0": [
+  {
+   "phase": "pre",
+   "size": 10,
+   "members": [
+    0,
+    7,
+    15,
+    20,
+    25,
+    28,
+    32,
+    34,
+    35,
+    39
+   ],
+   "tasks": 555,
+   "dominant_type": 0,
+   "purity": 0.9585585585585585,
+   "model_for_dominant": [
+    397,
+    2,
+    133
+   ]
+  },
+  {
+   "phase": "post",
+   "size": 10,
+   "members": [
+    0,
+    7,
+    15,
+    20,
+    25,
+    28,
+    32,
+    34,
+    35,
+    39
+   ],
+   "tasks": 491,
+   "dominant_type": 0,
+   "purity": 0.9857433808553971,
+   "model_for_dominant": [
+    13,
+    7,
+    464
+   ]
+  },
+  {
+   "phase": "pre",
+   "size": 5,
+   "members": [
+    1,
+    4,
+    5,
+    17,
+    22
+   ],
+   "tasks": 290,
+   "dominant_type": 1,
+   "purity": 0.9758620689655172,
+   "model_for_dominant": [
+    7,
+    129,
+    147
+   ]
+  },
+  {
+   "phase": "post",
+   "size": 5,
+   "members": [
+    1,
+    4,
+    5,
+    17,
+    22
+   ],
+   "tasks": 231,
+   "dominant_type": 1,
+   "purity": 0.9826839826839827,
+   "model_for_dominant": [
+    6,
+    132,
+    89
+   ]
+  },
+  {
+   "phase": "pre",
+   "size": 6,
+   "members": [
+    6,
+    8,
+    12,
+    18,
+    19,
+    33
+   ],
+   "tasks": 310,
+   "dominant_type": 2,
+   "purity": 0.9225806451612903,
+   "model_for_dominant": [
+    3,
+    8,
+    275
+   ]
+  },
+  {
+   "phase": "post",
+   "size": 6,
+   "members": [
+    6,
+    8,
+    12,
+    18,
+    19,
+    33
+   ],
+   "tasks": 248,
+   "dominant_type": 2,
+   "purity": 0.9556451612903226,
+   "model_for_dominant": [
+    1,
+    8,
+    228
+   ]
+  },
+  {
+   "phase": "pre",
+   "size": 2,
+   "members": [
+    9,
+    10
+   ],
+   "tasks": 52,
+   "dominant_type": 1,
+   "purity": 0.8269230769230769,
+   "model_for_dominant": [
+    1,
+    26,
+    16
+   ]
+  },
+  {
+   "phase": "post",
+   "size": 2,
+   "members": [
+    9,
+    10
+   ],
+   "tasks": 75,
+   "dominant_type": 1,
+   "purity": 0.9466666666666667,
+   "model_for_dominant": [
+    3,
+    35,
+    33
+   ]
+  },
+  {
+   "phase": "pre",
+   "size": 2,
+   "members": [
+    27,
+    31
+   ],
+   "tasks": 47,
+   "dominant_type": 2,
+   "purity": 0.5319148936170213,
+   "model_for_dominant": [
+    1,
+    2,
+    22
+   ]
+  },
+  {
+   "phase": "post",
+   "size": 2,
+   "members": [
+    27,
+    31
+   ],
+   "tasks": 76,
+   "dominant_type": 2,
+   "purity": 0.6710526315789473,
+   "model_for_dominant": [
+    0,
+    7,
+    44
+   ]
+  }
+ ],
+ "n_clusters_seed0": 5
+}

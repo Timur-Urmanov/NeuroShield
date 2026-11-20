@@ -1,0 +1,47 @@
+{
+ "W + Курамото": {
+  "pre": 0.697,
+  "post": 0.743,
+  "purity": 0.904,
+  "team_hom": 0.906,
+  "team_size": 2.844,
+  "type0_to_C": 0.959,
+  "post_sd": 0.014
+ },
+ "только W": {
+  "pre": 0.698,
+  "post": 0.741,
+  "purity": 0.899,
+  "team_hom": 0.889,
+  "team_size": 2.984,
+  "type0_to_C": 0.95,
+  "post_sd": 0.013
+ },
+ "только Курамото": {
+  "pre": 0.697,
+  "post": 0.748,
+  "purity": 0.907,
+  "team_hom": 0.895,
+  "team_size": 2.943,
+  "type0_to_C": 0.962,
+  "post_sd": 0.013
+ },
+ "ни того ни другого": {
+  "pre": 0.698,
+  "post": 0.743,
+  "purity": 0.902,
+  "team_hom": 0.895,
+  "team_size": 2.994,
+  "type0_to_C": 0.955,
+  "post_sd": 0.014
+ },
+ "соло (без команд)": {
+  "pre": 0.69,
+  "post": 0.733,
+  "purity": 0.898,
+  "team_hom": NaN,
+  "team_size": 1.0,
+  "type0_to_C": 0.901,
+  "post_sd": 0.01
+ }
+}

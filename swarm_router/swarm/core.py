@@ -1,0 +1,211 @@
+"""Swarm of primitives routing tasks -> team -> model.
+
+A primitive is a cheap stateful agent; it does not "think", it stores:
+  - affinity vector aff (specialisation, competitive learning)
+  - model value estimates Q[m] (long-term QL/nL + optional working memory sW/nW for sleep)
+  - links W to other primitives (learned by reward-prediction-error Hebb)
+  - optional: phase theta (Kuramoto), fatigue F, sleep state
+
+Global slow variables ("hormones"):
+  - dopa = reward prediction error (r - fast running mean)
+  - NE   = stress: recent reward below long-term -> higher choice temperature, faster forgetting
+  - mel  = mean fatigue -> sleep pressure (only with fatigue+sleep)
+
+IMPORTANT: the order of calls to self.rng is the same as in legacy/swarm.py. Changing it breaks the
+bit-exact regression test (tests/test_regression.py). New randomness must use a separate generator.
+"""
+from __future__ import annotations
+
+import numpy as np
+
+from .config import SwarmConfig
+
+
+def circular_order(phases: np.ndarray) -> np.ndarray:
+    """Linear order of points on a circle: cut the circle at the largest gap."""
+    p = np.mod(phases, 2 * np.pi)
+    idx = np.argsort(p)
+    ps = p[idx]
+    gaps = np.diff(np.append(ps, ps[0] + 2 * np.pi))
+    start = (int(np.argmax(gaps)) + 1) % len(ps)
+    return np.roll(idx, -start)
+
+
+class Swarm:
+    def __init__(self, cfg: SwarmConfig, seed: int, M: int, D: int):
+        self.cfg, self.M, self.D = cfg, M, D
+        N = self.N = cfg.N
+        self.rng = r = np.random.default_rng(seed + 1000)
+        self.rng_order = np.random.default_rng(seed + 3000)   # separate stream: random ordering only
+        self.theta = r.uniform(0, 2 * np.pi, N)
+        self.omega = r.normal(1.0, 0.1, N)
+        self.aff = r.normal(size=(N, D)); self.aff /= np.linalg.norm(self.aff, axis=1, keepdims=True)
+        self.QL = np.full((N, M), 0.6); self.nL = np.ones((N, M))
+        self.sW = np.zeros((N, M)); self.nW = np.zeros((N, M))
+        W = r.uniform(0, 0.2, (N, N)); self.W = (W + W.T) / 2; np.fill_diagonal(self.W, 0)
+        self.pos = self.rng_order.uniform(0, 1, N)               # learned ordering scalar (order=position)
+        self.F = np.zeros(N); self.asleep = np.zeros(N, bool); self.timer = np.zeros(N, int)
+        self.r_fast = self.r_slow = 0.5
+        self.NE = 0.0
+
+    # ---------- helpers ----------
+    def Qest(self, idx):
+        return (self.QL[idx] * self.nL[idx] + self.sW[idx]) / (self.nL[idx] + self.nW[idx])
+
+    def order_param(self, mask):
+        if mask.sum() == 0:
+            return 0.0
+        return float(np.abs(np.exp(1j * self.theta[mask]).mean()))
+
+    def consolidate(self, i):
+        """Sleep: working memory -> long-term memory; optionally prune weak links."""
+        n = self.nL[i] + self.nW[i]
+        self.QL[i] = (self.QL[i] * self.nL[i] + self.sW[i]) / n
+        self.nL[i] = np.minimum(n, 100.0)
+        self.sW[i] = 0; self.nW[i] = 0
+        if not (self.cfg.plastic_W and self.cfg.sleep_prune):
+            return
+        weak = self.W[i] < self.cfg.prune_thr
+        self.W[i, weak] = 0; self.W[weak, i] = 0
+
+    def execution_order(self, members: np.ndarray, env) -> np.ndarray:
+        o = self.cfg.order
+        if o == "recruit" or len(members) == 1:
+            return members
+        if o == "random":
+            return self.rng_order.permutation(members)
+        if o == "position":
+            return members[np.argsort(self.pos[members], kind="stable")]
+        if o == "phase":
+            return members[circular_order(self.theta[members])]
+        if o == "oracle":                     # upper bound, uses hidden roles
+            return members[np.argsort(env.role[members], kind="stable")]
+        raise ValueError(o)
+
+    def learn_order(self, exec_order: np.ndarray, dopa: float):
+        """Reward-modulated ordering: consecutive pair (a before b) is pushed apart if dopa > 0,
+        towards a swap if dopa < 0. Identical rule for `position` (scalar) and `phase` (theta)."""
+        if len(exec_order) < 2 or self.cfg.order not in ("position", "phase"):
+            return
+        v = self.pos if self.cfg.order == "position" else self.theta
+        step = self.cfg.order_lr * dopa
+        for a, b in zip(exec_order[:-1], exec_order[1:]):
+            v[a] -= step; v[b] += step
+
+    # ---------- one step = one task ----------
+    def step(self, t: int, env):
+        cfg, N, M = self.cfg, self.N, self.M
+        x, u = env.X[t], env.U[t]
+        awake = ~self.asleep
+        NE = self.NE if cfg.hormones else 0.0
+
+        # 1. bids: how much the task looks like "mine"
+        bids = (self.aff @ x) * (1 - 0.5 * self.F) + 0.02 * self.rng.normal(size=N)
+        bids[~awake] = -np.inf
+        leader = int(np.argmax(bids))
+
+        # 2. team: score = ((1-s) W[leader] + s sim) * phase_gate
+        members = [leader]
+        if cfg.coupling:
+            sim = np.clip(self.aff @ x, 0, None)
+            ph = (1 + np.cos(self.theta - self.theta[leader])) / 2 if cfg.use_phase_filter else 1.0
+            sc = ((1 - cfg.sim_w) * self.W[leader] + cfg.sim_w * sim) * ph
+            sc[~awake] = -1; sc[leader] = -1
+            cand = np.argsort(-sc)[: cfg.team - 1]
+            members += [int(j) for j in cand if sc[j] > cfg.recruit_thr]
+        members = np.array(members)
+
+        # 3. model choice from the team's shared value memory
+        rel = np.clip(self.aff[members] @ x, 0.05, None)
+        Qt = (rel[:, None] * self.Qest(members)).sum(0) / rel.sum()
+        temp = 0.05 * (1 + 2 * NE) if cfg.hormones else 0.06
+        p = np.exp((Qt - Qt.max()) / temp); p /= p.sum()
+        m = int(self.rng.choice(M, p=p))
+
+        # 4. outcome
+        exec_order = self.execution_order(members, env)
+        fat = self.F[members].mean() if cfg.fatigue else 0.0
+        succ = float(u < env.p_success(t, m, exec_order) * (1 - 0.3 * fat))
+        r = env.reward(succ, m, exec_order)
+
+        # 5. hormones
+        dopa = r - self.r_fast
+        self.r_fast += (r - self.r_fast) / 30
+        self.r_slow += (r - self.r_slow) / 400
+        self.NE = float(np.clip((self.r_slow - self.r_fast) / 0.1, 0, 1))
+        mel = self.F[awake].mean() if awake.any() else 0.0
+
+        # 6. learning
+        eta = 0.05 * (1 + NE) if cfg.hormones else 0.05
+        for j in members:
+            if cfg.sleep:
+                self.sW[j, m] += r; self.nW[j, m] += 1
+            else:                                   # online consolidation
+                self.QL[j, m] = (self.QL[j, m] * self.nL[j, m] + r) / (self.nL[j, m] + 1)
+                self.nL[j, m] = min(self.nL[j, m] + 1, 100.0)
+            # competitive learning: pull towards own tasks, harder on success
+            w_pull = (1.0 if j == leader else 0.5) * max(0.0, 0.5 + dopa)
+            self.aff[j] += eta * w_pull * x
+            self.aff[j] /= np.linalg.norm(self.aff[j])
+        if len(members) > 1 and cfg.plastic_W:      # Hebb inside the team
+            for a in members:
+                for b in members:
+                    if a != b:
+                        self.W[a, b] = np.clip(self.W[a, b] + 0.5 * eta * (dopa + cfg.hebb_bias), 0, 1)
+        if cfg.plastic_W:
+            self.W *= (1 - 0.0005)
+        if cfg.sleep:
+            self.sW *= 0.998; self.nW *= 0.998      # working memory leaks
+        if cfg.hormones and NE > 0:                 # stress -> revisit old estimates
+            self.nL = np.maximum(1.0, self.nL * (1 - 0.02 * NE))
+        self.learn_order(exec_order, dopa)
+
+        # 7. fatigue and sleep
+        if cfg.fatigue:
+            self.F[members] += 0.04 * (1 - self.F[members])
+            self.F[awake] *= 0.999
+        if cfg.sleep:
+            woke = self.asleep & (self.timer <= 0)
+            for i in np.where(woke)[0]:
+                self.asleep[i] = False; self.consolidate(i)
+            self.timer[self.asleep] -= 1
+            self.F[self.asleep] *= 0.9
+            thr = 0.6 * (1 - 0.3 * mel) if cfg.hormones else 0.6
+            for i in np.where(~self.asleep & (self.F > thr))[0]:
+                if self.asleep.mean() < 0.3:
+                    self.asleep[i] = True; self.timer[i] = 40
+
+        info = dict(leader=leader, members=members, exec_order=exec_order, m=m, succ=succ)
+
+        # 8. Kuramoto phase dynamics
+        if not cfg.kuramoto:
+            return r, info
+        aw = ~self.asleep
+        R = self.order_param(aw)
+        sigma = 0.1 * (1 + 1.0 * (1 - R)) * (1 + NE) if cfg.hormones else 0.1
+        Kc = 2.0 if cfg.coupling else 0.0
+        diff = np.sin(self.theta[None, :] - self.theta[:, None])
+        coup = Kc / N * ((self.W * aw[None, :]) * diff).sum(1)
+        om = np.where(aw, self.omega, 0.3 * self.omega)
+        self.theta += 0.1 * (om + coup * aw) + np.sqrt(0.1) * sigma * self.rng.normal(size=N)
+        # successful co-workers are pulled to a common phase
+        if len(members) > 1 and dopa > 0:
+            mean_phase = np.angle(np.exp(1j * self.theta[members]).mean())
+            self.theta[members] += 0.1 * np.sin(mean_phase - self.theta[members])
+        return r, info
+
+
+def clusters(W, thr=0.4):
+    N = len(W); seen = np.zeros(N, bool); out = []
+    for s in range(N):
+        if seen[s]:
+            continue
+        stack, comp = [s], []
+        seen[s] = True
+        while stack:
+            i = stack.pop(); comp.append(i)
+            for j in np.where((W[i] > thr) & ~seen)[0]:
+                seen[j] = True; stack.append(j)
+        if len(comp) >= 2:
+            out.append(sorted(comp))
+    return out
