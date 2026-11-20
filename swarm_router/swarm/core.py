@@ -37,6 +37,9 @@ class Swarm:
         self.sW = np.zeros((N, M)); self.nW = np.zeros((N, M))
         W = r.uniform(0, 0.2, (N, N)); self.W = (W + W.T) / 2; np.fill_diagonal(self.W, 0)
         self.pos = self.rng_order.uniform(0, 1, N)               # learned ordering scalar (order=position)
+        self.rng_explore = np.random.default_rng(seed + 4000)  # separate stream: explore="noise" only
+        self.n_co = np.zeros((N, N))                           # co-work counts (explore="ucb")
+        self.t_seen = 0
         self.F = np.zeros(N); self.asleep = np.zeros(N, bool); self.timer = np.zeros(N, int)
         self.r_fast = self.r_slow = 0.5
         self.NE = 0.0
@@ -97,11 +100,20 @@ class Swarm:
         if cfg.coupling:
             sim = np.clip(self.aff @ x, 0, None)
             sc = ((1 - cfg.sim_w) * self.W[leader] + cfg.sim_w * sim) * 1.0
+            if cfg.explore == "ucb":
+                sc = sc + cfg.explore_c * np.sqrt(np.log(self.t_seen + 2) / (self.n_co[leader] + 1))
+            elif cfg.explore == "noise":
+                sc = sc + cfg.explore_c * np.abs(self.rng_explore.normal(size=N))
+            elif cfg.explore != "none":
+                raise ValueError(cfg.explore)
             sc[~free] = -1; sc[leader] = -1
             cand = np.argsort(-sc)[: cfg.team - 1]
             members += [int(j) for j in cand if sc[j] > cfg.recruit_thr]
         members = np.array(members)
         env.commit(t, members)
+        self.t_seen += 1
+        if cfg.explore == "ucb" and len(members) > 1:
+            self.n_co[np.ix_(members, members)] += 1
 
         # 3. model choice from the team's shared value memory
         rel = np.clip(self.aff[members] @ x, 0.05, None)

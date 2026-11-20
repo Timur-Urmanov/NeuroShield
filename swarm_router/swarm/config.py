@@ -18,6 +18,9 @@ class SwarmConfig:
     hebb_bias: float = 0.0        # unconditional Hebbian increment (legacy: 0.3); 0 = reward-only Hebb
     sim_w: float = 0.5            # s in score = (1-s)*W[leader] + s*sim
     recruit_thr: float = 0.25     # minimum recruit score
+    # exploration bonus in recruitment (H7): none | ucb (count-based, directed) | noise (undirected control)
+    explore: str = "none"
+    explore_c: float = 0.1
     hormones: bool = True         # NE stress hormone (temperature + forgetting)
     # kuramoto / phase_filter: removed after H6 (no gain for step ordering, harmful in recruitment)
     fatigue: bool = False         # built-in (artificial) quality degradation of busy primitives

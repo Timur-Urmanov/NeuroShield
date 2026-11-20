@@ -19,8 +19,12 @@ METRICS = ("pre", "post", "cover_end", "q_end", "team_size")
 
 
 def git_commit():
+    """Short HEAD hash, suffixed with '+dirty' if tracked code under swarm/ or experiments/ is modified."""
     try:
-        return subprocess.check_output(["git", "rev-parse", "--short", "HEAD"], cwd=ROOT, text=True).strip()
+        h = subprocess.check_output(["git", "rev-parse", "--short", "HEAD"], cwd=ROOT, text=True).strip()
+        dirty = subprocess.check_output(["git", "status", "--porcelain", "--", "swarm", "experiments"],
+                                        cwd=ROOT, text=True).strip()
+        return h + ("+dirty" if dirty else "")
     except Exception:
         return None
 
