@@ -121,7 +121,9 @@ class AnthropicProvider(Provider):
             return self._raw(body)
         if self._client is None:
             import anthropic
-            self._client = anthropic.Anthropic(api_key=self._key(), max_retries=MAX_TRIES - 1)
+            # base_url is explicit: the SDK would otherwise honour ANTHROPIC_BASE_URL from the environment
+            self._client = anthropic.Anthropic(api_key=self._key(), base_url="https://api.anthropic.com",
+                                               max_retries=MAX_TRIES - 1)
         resp = self._client.messages.create(**body)
         text = "".join(b.text for b in resp.content if getattr(b, "type", "") == "text")
         u = resp.usage

@@ -16,6 +16,8 @@ class SwarmConfig:
     coupling: bool = True         # teams at all (False = solo leader)
     plastic_W: bool = True        # learn pairwise link matrix W
     hebb_bias: float = 0.0        # unconditional Hebbian increment (legacy: 0.3); 0 = reward-only Hebb
+    # W learning rule (H8): hebb_r (default: Hebb on r - EMA(r)) | hebb_succ | mean_r | mean_succ
+    w_rule: str = "hebb_r"
     sim_w: float = 0.5            # s in score = (1-s)*W[leader] + s*sim
     recruit_thr: float = 0.25     # minimum recruit score
     # exploration bonus in recruitment (H7): none | ucb (count-based, directed) | noise (undirected control)

@@ -39,6 +39,9 @@ class Swarm:
         self.pos = self.rng_order.uniform(0, 1, N)               # learned ordering scalar (order=position)
         self.rng_explore = np.random.default_rng(seed + 4000)  # separate stream: explore="noise" only
         self.n_co = np.zeros((N, N))                           # co-work counts (explore="ucb")
+        self.W0 = self.W.copy()                                # prior for w_rule=mean_* (H8)
+        self.nW_pair = np.zeros((N, N)); self.sW_pair = np.zeros((N, N))
+        self.s_fast = 0.5                                      # EMA of success (w_rule=hebb_succ)
         self.t_seen = 0
         self.F = np.zeros(N); self.asleep = np.zeros(N, bool); self.timer = np.zeros(N, int)
         self.r_fast = self.r_slow = 0.5
@@ -156,13 +159,35 @@ class Swarm:
             w_pull = (1.0 if j == leader else 0.5) * max(0.0, 0.5 + dopa)
             self.aff[j] += eta * w_pull * x
             self.aff[j] /= np.linalg.norm(self.aff[j])
-        if len(members) > 1 and cfg.plastic_W:      # Hebb inside the team
-            for a in members:
-                for b in members:
-                    if a != b:
-                        self.W[a, b] = np.clip(self.W[a, b] + 0.5 * eta * (dopa + cfg.hebb_bias), 0, 1)
-        if cfg.plastic_W:
-            self.W *= (1 - 0.0005)
+        rule = cfg.w_rule
+        if rule == "hebb_r":
+            if len(members) > 1 and cfg.plastic_W:      # Hebb inside the team
+                for a in members:
+                    for b in members:
+                        if a != b:
+                            self.W[a, b] = np.clip(self.W[a, b] + 0.5 * eta * (dopa + cfg.hebb_bias), 0, 1)
+            if cfg.plastic_W:
+                self.W *= (1 - 0.0005)
+        elif rule == "hebb_succ":
+            ds = succ - self.s_fast
+            if len(members) > 1 and cfg.plastic_W:
+                for a in members:
+                    for b in members:
+                        if a != b:
+                            self.W[a, b] = np.clip(self.W[a, b] + 0.5 * eta * (ds + cfg.hebb_bias), 0, 1)
+            if cfg.plastic_W:
+                self.W *= (1 - 0.0005)
+        elif rule in ("mean_r", "mean_succ"):
+            if len(members) > 1 and cfg.plastic_W:
+                sig = r if rule == "mean_r" else succ
+                ix = np.ix_(members, members)
+                self.nW_pair[ix] += 1; self.sW_pair[ix] += sig
+                np.fill_diagonal(self.nW_pair, 0); np.fill_diagonal(self.sW_pair, 0)
+                self.W[ix] = (self.sW_pair[ix] + self.W0[ix]) / (self.nW_pair[ix] + 1)
+                np.fill_diagonal(self.W, 0)
+        else:
+            raise ValueError(rule)
+        self.s_fast += (succ - self.s_fast) / 30
         if cfg.sleep:
             self.sW *= 0.998; self.nW *= 0.998      # working memory leaks
         if cfg.hormones and NE > 0:                 # stress -> revisit old estimates
