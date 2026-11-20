@@ -51,6 +51,8 @@ class EnvConfig:
     strong: float = 0.95          # quality of a primitive in its own role
     weak: float = 0.6             # quality in a foreign role
     member_cost: float = 0.0      # reward penalty per extra team member (legacy: 0)
+    role_by_type: bool = False    # strong role of a primitive depends on task type
+    busy: int = 0                 # steps a primitive stays busy after a task (capacity); 0 = unlimited
 
 
 def to_dict(*cfgs) -> dict:

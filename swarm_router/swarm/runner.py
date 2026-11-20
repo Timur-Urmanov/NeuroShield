@@ -48,10 +48,10 @@ def run_swarm(env_cfg: EnvConfig, cfg: SwarmConfig, seed: int, keep=False) -> Tr
         r, info = s.step(t, env)
         R[t], Ms[t], L[t] = r, info["m"], info["leader"]
         TS[t] = len(info["members"])
-        c = env.coverage(info["members"])
+        c = env.coverage(info["members"], t)
         if c is not None:
             COV[t] = float(c)
-        Q[t] = env.team_factor(info["exec_order"])
+        Q[t] = env.team_factor(info["exec_order"], t)
         if keep:
             teams.append(info["exec_order"].tolist())
     return Trace(R, Ms, env.ks, L, TS, COV, Q, teams, s if keep else None)

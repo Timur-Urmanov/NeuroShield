@@ -12,6 +12,10 @@ Team policies (only matter in roles/ordered envs; team size = `team`):
   pair_ucb  - combinatorial bandit over pairs: best pair by UCB, then the third member maximising
               the sum of pair-UCBs with the first two. Learns which *pairs* work, like W does,
               but centrally and with explicit exploration.
+  cluster_pair_ucb - online k-means on x (told the number of task types) + one pair_ucb per cluster.
+  seq_ucb   - order-aware variant: UCB over *directed* pairs (a acts before b); the sequence is grown
+              greedily at the head or tail. Team order = returned order.
+All team policies respect the env's capacity mask (busy primitives).
   oracle    - a team covering all roles (and in the right order for the ordered env)
 """
 from __future__ import annotations
@@ -42,51 +46,104 @@ class LinUCB:
         self.A[m] += np.outer(z, z); self.b[m] += r * z
 
 
+class OnlineClusters:
+    """Online competitive k-means on unit vectors (the baseline is told the number of clusters)."""
+    def __init__(self, C, lr=0.05):
+        self.C, self.lr, self.c = C, lr, []
+
+    def assign(self, x):
+        if len(self.c) < self.C and (not self.c or max(float(c @ x) for c in self.c) < 0.6):
+            self.c.append(x.copy())
+            return len(self.c) - 1
+        j = int(np.argmax([c @ x for c in self.c]))
+        self.c[j] = self.c[j] + self.lr * (x - self.c[j]); self.c[j] /= np.linalg.norm(self.c[j])
+        return j
+
+
 class TeamPolicy:
-    def __init__(self, kind, N, team, rng, env, c=0.3):
+    """kind in solo | random | oracle | agent_ucb | pair_ucb | cluster_pair_ucb."""
+    def __init__(self, kind, N, team, rng, env, c=0.3, n_clusters=3):
         self.kind, self.N, self.team, self.rng, self.env, self.c = kind, N, team, rng, env, c
         self.t = 0
-        if kind == "pair_ucb":
-            self.n = np.zeros((N, N)); self.s = np.zeros((N, N))
+        self.ctx = 0
+        C = n_clusters if kind == "cluster_pair_ucb" else 1
+        self.clusters = OnlineClusters(C) if kind == "cluster_pair_ucb" else None
+        if kind in ("pair_ucb", "cluster_pair_ucb", "seq_ucb"):
+            self.n = np.zeros((C, N, N)); self.s = np.zeros((C, N, N))
         if kind == "agent_ucb":
-            self.n = np.zeros(N); self.s = np.zeros(N)
+            self.n = np.zeros((1, N)); self.s = np.zeros((1, N))
 
     def _ucb(self):
-        with np.errstate(divide="ignore", invalid="ignore"):
-            u = np.where(self.n > 0, self.s / np.maximum(self.n, 1)
-                         + self.c * np.sqrt(np.log(self.t + 2) / np.maximum(self.n, 1)), 1e6)
+        n, s = self.n[self.ctx], self.s[self.ctx]
+        u = np.where(n > 0, s / np.maximum(n, 1) + self.c * np.sqrt(np.log(self.t + 2) / np.maximum(n, 1)), 1e6)
         return u + 1e-9 * self.rng.random(u.shape)       # random tie-break
 
-    def choose(self):
+    def choose(self, t, x, avail=None):
         N, k = self.N, self.team
+        free = np.arange(N) if avail is None else np.where(avail)[0]
+        if self.clusters is not None:
+            self.ctx = self.clusters.assign(x)
         if self.kind == "solo":
-            return np.array([self.rng.integers(N)])
+            return np.array([self.rng.integers(N)]) if avail is None else np.array([self.rng.choice(free)])
         if self.kind == "random":
-            return self.rng.choice(N, size=k, replace=False)
+            return self.rng.choice(N, size=k, replace=False) if avail is None else self.rng.choice(free, size=k, replace=False)
         if self.kind == "oracle":
-            role = self.env.role
-            return np.array([self.rng.choice(np.where(role == j)[0]) for j in range(k)])
+            role = self.env.roles_at(t)
+            team = []
+            for j in range(k):
+                cand = np.setdiff1d(free[role[free] == j], team)
+                if len(cand) == 0:
+                    cand = np.setdiff1d(free, team)
+                team.append(int(self.rng.choice(cand)))
+            return np.array(team)
         if self.kind == "agent_ucb":
-            return np.argsort(-self._ucb())[:k]
-        if self.kind == "pair_ucb":
+            u = self._ucb()
+            if avail is not None:
+                u = np.where(avail, u, -np.inf)
+            return np.argsort(-u)[:k]
+        if self.kind in ("pair_ucb", "cluster_pair_ucb"):
             U = self._ucb(); np.fill_diagonal(U, -np.inf)
+            if avail is not None:
+                U[~avail] = -np.inf; U[:, ~avail] = -np.inf
             a, b = np.unravel_index(int(np.argmax(U)), U.shape)
             team = [a, b]
             while len(team) < k:
                 sc = U[team].sum(0); sc[team] = -np.inf
                 team.append(int(np.argmax(sc)))
             return np.array(team)
+        if self.kind == "seq_ucb":
+            # directed pairs: n[a, b] counts teams where a acts before b
+            U = self._ucb(); np.fill_diagonal(U, -np.inf)
+            if avail is not None:
+                U[~avail] = -np.inf; U[:, ~avail] = -np.inf
+            a, b = np.unravel_index(int(np.argmax(U)), U.shape)
+            seq = [int(a), int(b)]
+            while len(seq) < k:
+                tail = U[seq].sum(0); head = U[:, seq].sum(1)
+                tail[seq] = -np.inf; head[seq] = -np.inf
+                if tail.max() >= head.max():
+                    seq.append(int(np.argmax(tail)))
+                else:
+                    seq.insert(0, int(np.argmax(head)))
+            return np.array(seq)
         raise ValueError(self.kind)
 
     def update(self, team, succ):
         self.t += 1
+        if not hasattr(self, "n"):
+            return
+        n, s = self.n[self.ctx], self.s[self.ctx]
         if self.kind == "agent_ucb":
-            self.n[team] += 1; self.s[team] += succ
-        elif self.kind == "pair_ucb":
+            n[team] += 1; s[team] += succ
+        elif self.kind == "seq_ucb":
+            for i in range(len(team)):
+                for j in range(i + 1, len(team)):
+                    n[team[i], team[j]] += 1; s[team[i], team[j]] += succ
+        elif self.kind in ("pair_ucb", "cluster_pair_ucb"):
             for a in team:
                 for b in team:
                     if a != b:
-                        self.n[a, b] += 1; self.s[a, b] += succ
+                        n[a, b] += 1; s[a, b] += succ
 
 
 def run_router(env_cfg, seed, N=40, model="linucb", team="solo", team_size=3, c=0.3,
@@ -100,8 +157,9 @@ def run_router(env_cfg, seed, N=40, model="linucb", team="solo", team_size=3, c=
     R = np.zeros(T); Q = np.zeros(T); COV = np.full(T, np.nan)
     for t in range(T):
         x, k, u = env.X[t], env.ks[t], env.U[t]
-        members = tp.choose() if tp else np.array([0])
-        q = env.team_factor(members)
+        members = tp.choose(t, x, env.available(t)) if tp else np.array([0])
+        env.commit(t, members)
+        q = env.team_factor(members, t)
         if model == "linucb":
             m = lin.choose(x)
         elif model == "oracle":
@@ -116,8 +174,7 @@ def run_router(env_cfg, seed, N=40, model="linucb", team="solo", team_size=3, c=
             lin.update(x, m, r)
         if tp:
             tp.update(members, succ)
-            c_ = env.coverage(members)
-            COV[t] = float(c_)
+            COV[t] = float(env.coverage(members, t))
         R[t], Q[t] = r, q
     return dict(R=R, q=Q, cover=COV)
 

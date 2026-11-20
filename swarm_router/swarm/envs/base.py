@@ -53,17 +53,24 @@ class SimEnv:
     def acc(self, t: int):
         return ACC0 if t < self.T // 2 else ACC1
 
-    def team_factor(self, members) -> float:
+    def team_factor(self, members, t=None) -> float:
         return 1.0
+
+    # capacity: primitives busy after a task (None = no capacity limit)
+    def available(self, t: int):
+        return None
+
+    def commit(self, t: int, members) -> None:
+        pass
 
     def p_success(self, t: int, m: int, members) -> float:
         """Success probability before the swarm's own (artificial) fatigue penalty."""
-        return self.acc(t)[m, self.ks[t]] * self.team_factor(members)
+        return self.acc(t)[m, self.ks[t]] * self.team_factor(members, t)
 
     def reward(self, succ: float, m: int, members) -> float:
         return succ - self.lam * self.cost[m] - self.member_cost * (len(members) - 1)
 
-    def coverage(self, members):
+    def coverage(self, members, t=None):
         return None
 
     # analytic baselines ---------------------------------------------------

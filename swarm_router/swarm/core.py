@@ -68,7 +68,7 @@ class Swarm:
         weak = self.W[i] < self.cfg.prune_thr
         self.W[i, weak] = 0; self.W[weak, i] = 0
 
-    def execution_order(self, members: np.ndarray, env) -> np.ndarray:
+    def execution_order(self, members: np.ndarray, env, t: int) -> np.ndarray:
         o = self.cfg.order
         if o == "recruit" or len(members) == 1:
             return members
@@ -78,17 +78,22 @@ class Swarm:
             return members[np.argsort(self.pos[members], kind="stable")]
         if o == "phase":
             return members[circular_order(self.theta[members])]
+        if o == "phase_mean":                 # post-hoc readout: linearise around the team's mean phase
+            th = self.theta[members]
+            mu = np.angle(np.exp(1j * th).mean())
+            return members[np.argsort(np.angle(np.exp(1j * (th - mu))), kind="stable")]
         if o == "oracle":                     # upper bound, uses hidden roles
-            return members[np.argsort(env.role[members], kind="stable")]
+            return members[np.argsort(env.roles_at(t)[members], kind="stable")]
         raise ValueError(o)
 
     def learn_order(self, exec_order: np.ndarray, dopa: float):
         """Reward-modulated ordering: consecutive pair (a before b) is pushed apart if dopa > 0,
         towards a swap if dopa < 0. Identical rule for `position` (scalar) and `phase` (theta)."""
-        if len(exec_order) < 2 or self.cfg.order not in ("position", "phase"):
+        if len(exec_order) < 2 or self.cfg.order not in ("position", "phase", "phase_mean"):
             return
         v = self.pos if self.cfg.order == "position" else self.theta
-        step = self.cfg.order_lr * dopa
+        # same step relative to the variable's range: pos lives in ~[0,1], theta on a circle of 2*pi
+        step = self.cfg.order_lr * dopa * (1.0 if self.cfg.order == "position" else 2 * np.pi)
         for a, b in zip(exec_order[:-1], exec_order[1:]):
             v[a] -= step; v[b] += step
 
@@ -97,11 +102,13 @@ class Swarm:
         cfg, N, M = self.cfg, self.N, self.M
         x, u = env.X[t], env.U[t]
         awake = ~self.asleep
+        avail = env.available(t)                     # capacity mask from the env (None = all)
+        free = awake if avail is None else awake & avail
         NE = self.NE if cfg.hormones else 0.0
 
         # 1. bids: how much the task looks like "mine"
         bids = (self.aff @ x) * (1 - 0.5 * self.F) + 0.02 * self.rng.normal(size=N)
-        bids[~awake] = -np.inf
+        bids[~free] = -np.inf
         leader = int(np.argmax(bids))
 
         # 2. team: score = ((1-s) W[leader] + s sim) * phase_gate
@@ -110,10 +117,11 @@ class Swarm:
             sim = np.clip(self.aff @ x, 0, None)
             ph = (1 + np.cos(self.theta - self.theta[leader])) / 2 if cfg.use_phase_filter else 1.0
             sc = ((1 - cfg.sim_w) * self.W[leader] + cfg.sim_w * sim) * ph
-            sc[~awake] = -1; sc[leader] = -1
+            sc[~free] = -1; sc[leader] = -1
             cand = np.argsort(-sc)[: cfg.team - 1]
             members += [int(j) for j in cand if sc[j] > cfg.recruit_thr]
         members = np.array(members)
+        env.commit(t, members)
 
         # 3. model choice from the team's shared value memory
         rel = np.clip(self.aff[members] @ x, 0.05, None)
@@ -123,7 +131,7 @@ class Swarm:
         m = int(self.rng.choice(M, p=p))
 
         # 4. outcome
-        exec_order = self.execution_order(members, env)
+        exec_order = self.execution_order(members, env, t)
         fat = self.F[members].mean() if cfg.fatigue else 0.0
         succ = float(u < env.p_success(t, m, exec_order) * (1 - 0.3 * fat))
         r = env.reward(succ, m, exec_order)

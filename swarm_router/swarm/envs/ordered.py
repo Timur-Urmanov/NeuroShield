@@ -15,12 +15,12 @@ from .roles import N_ROLES, RolesEnv
 class OrderedEnv(RolesEnv):
     kind = "ordered"
 
-    def team_factor(self, members) -> float:
+    def team_factor(self, members, t=None) -> float:
         members = np.asarray(members)
         L = len(members)
         who = members[np.arange(N_ROLES) % L]          # member doing step j
-        return float(np.prod(np.where(self.role[who] == np.arange(N_ROLES), self.strong, self.weak)))
+        return float(np.prod(np.where(self.roles_at(t)[who] == np.arange(N_ROLES), self.strong, self.weak)))
 
-    def correct_order(self, members) -> bool:
+    def correct_order(self, members, t=None) -> bool:
         members = np.asarray(members)
-        return len(members) == N_ROLES and bool(np.all(self.role[members] == np.arange(N_ROLES)))
+        return len(members) == N_ROLES and bool(np.all(self.roles_at(t)[members] == np.arange(N_ROLES)))

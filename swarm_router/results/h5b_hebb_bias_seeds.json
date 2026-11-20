@@ -1,0 +1,364 @@
+{
+ "experiment": "h5b_hebb_bias_seeds",
+ "git_commit": "d508726",
+ "argv": [
+  "experiments/h5b_hebb_bias_seeds.py"
+ ],
+ "created": "2026-11-20T14:56:26",
+ "T": 8000,
+ "seeds": [
+  5,
+  6,
+  7,
+  8,
+  9,
+  10,
+  11,
+  12,
+  13,
+  14,
+  15,
+  16,
+  17,
+  18,
+  19
+ ],
+ "results": {
+  "bias=0": {
+   "kind": "swarm",
+   "env": {
+    "kind": "roles",
+    "T": 8000,
+    "role_fractions": null,
+    "strong": 0.95,
+    "weak": 0.6,
+    "member_cost": 0.0,
+    "role_by_type": false,
+    "busy": 0
+   },
+   "cfg": {
+    "N": 40,
+    "team": 3,
+    "coupling": true,
+    "plastic_W": true,
+    "hebb_bias": 0.0,
+    "sim_w": 0.5,
+    "recruit_thr": 0.25,
+    "hormones": true,
+    "kuramoto": false,
+    "phase_filter": null,
+    "fatigue": false,
+    "sleep": false,
+    "sleep_prune": true,
+    "prune_thr": 0.05,
+    "order": "recruit",
+    "order_lr": 0.1
+   },
+   "per_seed": [
+    {
+     "pre": 0.5328899999999999,
+     "post": 0.56042,
+     "cover_start": 0.601,
+     "cover_end": 0.749,
+     "q_end": 0.7742001249999998,
+     "team_size": 2.969
+    },
+    {
+     "pre": 0.5364849999999999,
+     "post": 0.5730550000000001,
+     "cover_start": 0.488,
+     "cover_end": 0.772,
+     "q_end": 0.7811659999999998,
+     "team_size": 2.9715
+    },
+    {
+     "pre": 0.51757,
+     "post": 0.5608549999999999,
+     "cover_start": 0.606,
+     "cover_end": 0.7965,
+     "q_end": 0.7898026874999998,
+     "team_size": 2.977
+    },
+    {
+     "pre": 0.48071499999999995,
+     "post": 0.55867,
+     "cover_start": 0.327,
+     "cover_end": 0.711,
+     "q_end": 0.7573091249999999,
+     "team_size": 2.9655
+    },
+    {
+     "pre": 0.529875,
+     "post": 0.57455,
+     "cover_start": 0.46,
+     "cover_end": 0.7395,
+     "q_end": 0.7716980624999998,
+     "team_size": 2.972
+    },
+    {
+     "pre": 0.5671849999999999,
+     "post": 0.53472,
+     "cover_start": 0.68,
+     "cover_end": 0.7635,
+     "q_end": 0.7778825624999998,
+     "team_size": 2.965
+    },
+    {
+     "pre": 0.512835,
+     "post": 0.542875,
+     "cover_start": 0.621,
+     "cover_end": 0.771,
+     "q_end": 0.7810496249999999,
+     "team_size": 2.9725
+    },
+    {
+     "pre": 0.5025499999999999,
+     "post": 0.532025,
+     "cover_start": 0.322,
+     "cover_end": 0.67,
+     "q_end": 0.7488469999999998,
+     "team_size": 2.9715
+    },
+    {
+     "pre": 0.4903699999999999,
+     "post": 0.59554,
+     "cover_start": 0.56,
+     "cover_end": 0.7465,
+     "q_end": 0.7731111874999999,
+     "team_size": 2.969
+    },
+    {
+     "pre": 0.501205,
+     "post": 0.5514749999999999,
+     "cover_start": 0.652,
+     "cover_end": 0.781,
+     "q_end": 0.7842083749999997,
+     "team_size": 2.964
+    },
+    {
+     "pre": 0.51879,
+     "post": 0.55441,
+     "cover_start": 0.337,
+     "cover_end": 0.756,
+     "q_end": 0.7750147499999998,
+     "team_size": 2.97
+    },
+    {
+     "pre": 0.5316899999999998,
+     "post": 0.55392,
+     "cover_start": 0.462,
+     "cover_end": 0.743,
+     "q_end": 0.7706091249999998,
+     "team_size": 2.948
+    },
+    {
+     "pre": 0.5357849999999998,
+     "post": 0.5610499999999999,
+     "cover_start": 0.513,
+     "cover_end": 0.6925,
+     "q_end": 0.7516649374999997,
+     "team_size": 2.969
+    },
+    {
+     "pre": 0.5153399999999999,
+     "post": 0.563365,
+     "cover_start": 0.497,
+     "cover_end": 0.7545,
+     "q_end": 0.7755384374999997,
+     "team_size": 2.96
+    },
+    {
+     "pre": 0.5306199999999999,
+     "post": 0.5828,
+     "cover_start": 0.497,
+     "cover_end": 0.8125,
+     "q_end": 0.7948566874999998,
+     "team_size": 2.9725
+    }
+   ],
+   "pre": 0.5202603333333332,
+   "pre_sd": 0.021412382554649674,
+   "post": 0.559982,
+   "post_sd": 0.016978976685469434,
+   "cover_end": 0.7505666666666667,
+   "cover_end_sd": 0.03740505440763447,
+   "q_end": 0.773797245833333,
+   "q_end_sd": 0.012916160741227598,
+   "team_size": 2.9677666666666673,
+   "team_size_sd": 0.0068839011641724825
+  },
+  "bias=0.3": {
+   "kind": "swarm",
+   "env": {
+    "kind": "roles",
+    "T": 8000,
+    "role_fractions": null,
+    "strong": 0.95,
+    "weak": 0.6,
+    "member_cost": 0.0,
+    "role_by_type": false,
+    "busy": 0
+   },
+   "cfg": {
+    "N": 40,
+    "team": 3,
+    "coupling": true,
+    "plastic_W": true,
+    "hebb_bias": 0.3,
+    "sim_w": 0.5,
+    "recruit_thr": 0.25,
+    "hormones": true,
+    "kuramoto": false,
+    "phase_filter": null,
+    "fatigue": false,
+    "sleep": false,
+    "sleep_prune": true,
+    "prune_thr": 0.05,
+    "order": "recruit",
+    "order_lr": 0.1
+   },
+   "per_seed": [
+    {
+     "pre": 0.5394299999999999,
+     "post": 0.587885,
+     "cover_start": 0.758,
+     "cover_end": 0.8575,
+     "q_end": 0.8101683124999999,
+     "team_size": 2.983
+    },
+    {
+     "pre": 0.47734999999999994,
+     "post": 0.542695,
+     "cover_start": 0.416,
+     "cover_end": 0.6455,
+     "q_end": 0.7434023124999998,
+     "team_size": 2.986
+    },
+    {
+     "pre": 0.50598,
+     "post": 0.5669,
+     "cover_start": 0.51,
+     "cover_end": 0.814,
+     "q_end": 0.7975249999999997,
+     "team_size": 2.984
+    },
+    {
+     "pre": 0.38232,
+     "post": 0.45541,
+     "cover_start": 0.284,
+     "cover_end": 0.3445,
+     "q_end": 0.6393464374999999,
+     "team_size": 2.9855
+    },
+    {
+     "pre": 0.366685,
+     "post": 0.48444500000000007,
+     "cover_start": 0.121,
+     "cover_end": 0.415,
+     "q_end": 0.6699946249999998,
+     "team_size": 2.9825
+    },
+    {
+     "pre": 0.540445,
+     "post": 0.545395,
+     "cover_start": 0.665,
+     "cover_end": 0.8265,
+     "q_end": 0.7995781874999998,
+     "team_size": 2.98
+    },
+    {
+     "pre": 0.51828,
+     "post": 0.5798499999999999,
+     "cover_start": 0.493,
+     "cover_end": 0.873,
+     "q_end": 0.8156628749999998,
+     "team_size": 2.9865
+    },
+    {
+     "pre": 0.436125,
+     "post": 0.49642,
+     "cover_start": 0.352,
+     "cover_end": 0.475,
+     "q_end": 0.6898448749999999,
+     "team_size": 2.9845
+    },
+    {
+     "pre": 0.498205,
+     "post": 0.58169,
+     "cover_start": 0.385,
+     "cover_end": 0.7265,
+     "q_end": 0.7684894374999998,
+     "team_size": 2.9795
+    },
+    {
+     "pre": 0.533805,
+     "post": 0.593185,
+     "cover_start": 0.762,
+     "cover_end": 0.8935,
+     "q_end": 0.8215398124999997,
+     "team_size": 2.9775
+    },
+    {
+     "pre": 0.51951,
+     "post": 0.5436749999999999,
+     "cover_start": 0.273,
+     "cover_end": 0.7055,
+     "q_end": 0.7608585624999998,
+     "team_size": 2.983
+    },
+    {
+     "pre": 0.4230749999999999,
+     "post": 0.5019100000000001,
+     "cover_start": 0.166,
+     "cover_end": 0.509,
+     "q_end": 0.6994873749999999,
+     "team_size": 2.978
+    },
+    {
+     "pre": 0.42413999999999996,
+     "post": 0.535025,
+     "cover_start": 0.192,
+     "cover_end": 0.5535,
+     "q_end": 0.7144415624999998,
+     "team_size": 2.9845
+    },
+    {
+     "pre": 0.44177,
+     "post": 0.54358,
+     "cover_start": 0.248,
+     "cover_end": 0.6275,
+     "q_end": 0.7371180624999998,
+     "team_size": 2.979
+    },
+    {
+     "pre": 0.4926999999999999,
+     "post": 0.55847,
+     "cover_start": 0.591,
+     "cover_end": 0.686,
+     "q_end": 0.7566939999999998,
+     "team_size": 2.9855
+    }
+   ],
+   "pre": 0.47332133333333337,
+   "pre_sd": 0.05715988911024266,
+   "post": 0.5411023333333334,
+   "post_sd": 0.04068480954969848,
+   "cover_end": 0.6634999999999999,
+   "cover_end_sd": 0.1745444069570836,
+   "q_end": 0.7482767624999997,
+   "q_end_sd": 0.05638867141838389,
+   "team_size": 2.9825999999999997,
+   "team_size_sd": 0.0030425553170226717
+  }
+ },
+ "comparison": {
+  "a": "bias=0",
+  "b": "bias=0.3",
+  "metric": "post",
+  "diff": 0.018879666666666663,
+  "sd": 0.04166949400026467,
+  "effect": false,
+  "se": 0.010759017087194329,
+  "effect_se": false
+ }
+}

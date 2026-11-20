@@ -28,17 +28,44 @@ def assign_roles(N: int, fractions=None, seed: int = 0) -> np.ndarray:
 class RolesEnv(SimEnv):
     kind = "roles"
 
-    def __init__(self, T, seed, N=40, role_fractions=None, strong=0.95, weak=0.6, member_cost=0.0):
+    def __init__(self, T, seed, N=40, role_fractions=None, strong=0.95, weak=0.6, member_cost=0.0,
+                 role_by_type=False, busy=0):
         super().__init__(T, seed, N, member_cost)
         self.role = assign_roles(N, role_fractions, seed)
         self.strong, self.weak = strong, weak
+        # role_by_type: the strong role of a primitive differs per task type (independent permutation
+        # per type, separate RNG). role_k[k] is the role vector for tasks of type k.
+        self.role_by_type = role_by_type
+        if role_by_type:
+            rr = np.random.default_rng(seed + 2500)
+            self.role_k = np.stack([rr.permutation(self.role) for _ in range(self.K)])
+        else:
+            self.role_k = np.stack([self.role] * self.K)
+        # busy: a primitive that worked on task t is unavailable for tasks t+1 .. t+busy
+        self.busy = busy
+        self.busy_until = np.full(N, -1)
 
-    def team_factor(self, members) -> float:
-        comp = np.where(self.role[members][:, None] == np.arange(N_ROLES)[None], self.strong, self.weak)
+    def roles_at(self, t):
+        if t is None or not self.role_by_type:
+            return self.role
+        return self.role_k[self.ks[t]]
+
+    def team_factor(self, members, t=None) -> float:
+        role = self.roles_at(t)
+        comp = np.where(role[members][:, None] == np.arange(N_ROLES)[None], self.strong, self.weak)
         return float(np.prod(comp.max(0)))
 
-    def coverage(self, members) -> bool:
-        return len(set(self.role[members].tolist())) == N_ROLES
+    def coverage(self, members, t=None) -> bool:
+        return len(set(self.roles_at(t)[members].tolist())) == N_ROLES
+
+    def available(self, t):
+        if not self.busy:
+            return None
+        return self.busy_until < t
+
+    def commit(self, t, members):
+        if self.busy:
+            self.busy_until[np.asarray(members)] = t + self.busy
 
     @property
     def q_full(self) -> float:
