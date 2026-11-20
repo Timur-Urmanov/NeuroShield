@@ -1,4 +1,6 @@
-"""H7: exploration bonus in recruitment (notes/hypotheses.md).
+"""
+NOTE: pinned to w_rule="hebb_r" (the default when this experiment was run; default is mean_succ since H8c).
+H7: exploration bonus in recruitment (notes/hypotheses.md).
 Step 1 (--stage dev): sweep c on dev seeds 100-104 in the base roles cell.
 Step 2 (--stage test --c_ucb X --c_noise Y): chosen c on seeds 0-4 in all H1b cells + ordered env."""
 import argparse, json, os
@@ -15,10 +17,10 @@ CS = (0.02, 0.05, 0.1, 0.2, 0.4)
 if a.stage == "dev":
     seeds = list(range(100, 105))
     env = EnvConfig("roles", a.T)
-    V = {"no bonus": ("swarm", env, SwarmConfig())}
+    V = {"no bonus": ("swarm", env, SwarmConfig(w_rule="hebb_r"))}
     for kind in ("ucb", "noise"):
         for c in CS:
-            V[f"{kind} c={c}"] = ("swarm", env, SwarmConfig(explore=kind, explore_c=c))
+            V[f"{kind} c={c}"] = ("swarm", env, SwarmConfig(w_rule="hebb_r", explore=kind, explore_c=c))
     res = run_variants(V, seeds, a.workers)
     print(table(res))
     best = {k: max([n for n in res if n.startswith(k)], key=lambda n: res[n]["post"]) for k in ("ucb", "noise")}
@@ -32,9 +34,9 @@ else:
         for busy in (0, 8):
             cell = f"role_by_type={rbt}, busy={busy}"
             env = EnvConfig("roles", a.T, role_by_type=rbt, busy=busy)
-            V = {"no bonus": ("swarm", env, SwarmConfig()),
-                 "ucb": ("swarm", env, SwarmConfig(explore="ucb", explore_c=a.c_ucb)),
-                 "noise": ("swarm", env, SwarmConfig(explore="noise", explore_c=a.c_noise))}
+            V = {"no bonus": ("swarm", env, SwarmConfig(w_rule="hebb_r")),
+                 "ucb": ("swarm", env, SwarmConfig(w_rule="hebb_r", explore="ucb", explore_c=a.c_ucb)),
+                 "noise": ("swarm", env, SwarmConfig(w_rule="hebb_r", explore="noise", explore_c=a.c_noise))}
             res = run_variants(V, seeds, a.workers)
             # bandit numbers from H1b (same seeds, same streams)
             for k, v in h1b[cell]["results"].items():
@@ -49,8 +51,8 @@ else:
                 print({k: (round(v, 4) if isinstance(v, float) else v) for k, v in c.items()})
             out[cell] = dict(results=res, best_bandit=best, comparisons=cmp)
     env = EnvConfig("ordered", a.T)
-    V = {"position, no bonus": ("swarm", env, SwarmConfig(order="position")),
-         "position + ucb": ("swarm", env, SwarmConfig(order="position", explore="ucb", explore_c=a.c_ucb)),
+    V = {"position, no bonus": ("swarm", env, SwarmConfig(w_rule="hebb_r", order="position")),
+         "position + ucb": ("swarm", env, SwarmConfig(w_rule="hebb_r", order="position", explore="ucb", explore_c=a.c_ucb)),
          "linucb + seq_ucb c=0.1": ("router", env, dict(model="linucb", team="seq_ucb", c=0.1))}
     res = run_variants(V, seeds, a.workers)
     cmp = [paired(res, "position + ucb", "position, no bonus"), paired(res, "position + ucb", "linucb + seq_ucb c=0.1")]

@@ -1,4 +1,6 @@
-"""H1: swarm W_reward vs centralised baselines in the roles env (notes/hypotheses.md)."""
+"""
+NOTE: pinned to w_rule="hebb_r" (the default when this experiment was run; default is mean_succ since H8c).
+H1: swarm W_reward vs centralised baselines in the roles env (notes/hypotheses.md)."""
 import argparse
 
 from common import base_args, paired, run_variants, save, table
@@ -8,11 +10,11 @@ from swarm.envs import RolesEnv, SimEnv
 ap = base_args(argparse.ArgumentParser()); a = ap.parse_args()
 seeds = list(range(a.seed0, a.seed0 + a.seeds))
 env = EnvConfig("roles", a.T)
-S = SwarmConfig()   # minimal architecture: W_reward, s=0.5, NE on, no kuramoto/fatigue/sleep
+S = SwarmConfig(w_rule="hebb_r")   # minimal architecture: W_reward, s=0.5, NE on, no kuramoto/fatigue/sleep
 V = {
     "swarm W_reward": ("swarm", env, S),
-    "swarm sim-only (no W)": ("swarm", env, SwarmConfig(plastic_W=False)),
-    "swarm solo": ("swarm", env, SwarmConfig(coupling=False, plastic_W=False)),
+    "swarm sim-only (no W)": ("swarm", env, SwarmConfig(w_rule="hebb_r", plastic_W=False)),
+    "swarm solo": ("swarm", env, SwarmConfig(w_rule="hebb_r", coupling=False, plastic_W=False)),
     "linucb + solo": ("router", env, dict(model="linucb", team="solo")),
     "linucb + random3": ("router", env, dict(model="linucb", team="random")),
     "linucb + agent_ucb": ("router", env, dict(model="linucb", team="agent_ucb", c=0.3)),

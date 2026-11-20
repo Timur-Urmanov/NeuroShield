@@ -1,4 +1,6 @@
-"""H1b: roles env with type-dependent roles and/or busy primitives (notes/hypotheses.md)."""
+"""
+NOTE: pinned to w_rule="hebb_r" (the default when this experiment was run; default is mean_succ since H8c).
+H1b: roles env with type-dependent roles and/or busy primitives (notes/hypotheses.md)."""
 import argparse
 
 from common import base_args, paired, run_variants, save, table
@@ -11,8 +13,8 @@ for rbt in (False, True):
     for busy in (0, a.busy):
         env = EnvConfig("roles", a.T, role_by_type=rbt, busy=busy)
         V = {
-            "swarm W_reward": ("swarm", env, SwarmConfig()),
-            "swarm sim-only (no W)": ("swarm", env, SwarmConfig(plastic_W=False)),
+            "swarm W_reward": ("swarm", env, SwarmConfig(w_rule="hebb_r")),
+            "swarm sim-only (no W)": ("swarm", env, SwarmConfig(w_rule="hebb_r", plastic_W=False)),
             "linucb + random3": ("router", env, dict(model="linucb", team="random")),
             "linucb + agent_ucb": ("router", env, dict(model="linucb", team="agent_ucb", c=0.3)),
             **{f"linucb + pair_ucb c={c}": ("router", env, dict(model="linucb", team="pair_ucb", c=c))

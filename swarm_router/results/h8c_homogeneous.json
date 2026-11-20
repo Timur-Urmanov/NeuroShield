@@ -1,0 +1,536 @@
+{
+ "experiment": "h8c_homogeneous",
+ "git_commit": "c389372+dirty",
+ "argv": [
+  "experiments/h8c_homogeneous.py",
+  "--workers",
+  "1"
+ ],
+ "created": "2026-11-20T15:38:28",
+ "T": 8000,
+ "seeds": [
+  0,
+  1,
+  2,
+  3,
+  4
+ ],
+ "results": {
+  "hebb_r": {
+   "kind": "swarm",
+   "env": {
+    "kind": "homogeneous",
+    "T": 8000,
+    "role_fractions": null,
+    "strong": 0.95,
+    "weak": 0.6,
+    "member_cost": 0.0,
+    "role_by_type": false,
+    "busy": 0
+   },
+   "cfg": {
+    "N": 40,
+    "team": 3,
+    "coupling": true,
+    "plastic_W": true,
+    "hebb_bias": 0.0,
+    "w_rule": "hebb_r",
+    "sim_w": 0.5,
+    "recruit_thr": 0.25,
+    "recruit": "learned",
+    "explore": "none",
+    "explore_c": 0.1,
+    "hormones": true,
+    "fatigue": false,
+    "sleep": false,
+    "sleep_prune": true,
+    "prune_thr": 0.05,
+    "order": "recruit",
+    "order_lr": 0.1
+   },
+   "per_seed": [
+    {
+     "pre": 0.7020749999999999,
+     "post": 0.7336999999999999,
+     "cover_start": null,
+     "cover_end": null,
+     "q_end": 1.0,
+     "team_size": 2.977
+    },
+    {
+     "pre": 0.7274099999999999,
+     "post": 0.730365,
+     "cover_start": null,
+     "cover_end": null,
+     "q_end": 1.0,
+     "team_size": 2.966
+    },
+    {
+     "pre": 0.680615,
+     "post": 0.75695,
+     "cover_start": null,
+     "cover_end": null,
+     "q_end": 1.0,
+     "team_size": 2.9815
+    },
+    {
+     "pre": 0.71624,
+     "post": 0.7591600000000001,
+     "cover_start": null,
+     "cover_end": null,
+     "q_end": 1.0,
+     "team_size": 2.9535
+    },
+    {
+     "pre": 0.6832249999999999,
+     "post": 0.744425,
+     "cover_start": null,
+     "cover_end": null,
+     "q_end": 1.0,
+     "team_size": 2.9715
+    }
+   ],
+   "pre": 0.7019129999999999,
+   "pre_sd": 0.02036069945998909,
+   "post": 0.74492,
+   "post_sd": 0.013090836012264483,
+   "q_end": 1.0,
+   "q_end_sd": 0.0,
+   "team_size": 2.9699,
+   "team_size_sd": 0.010859327787667112
+  },
+  "mean_succ": {
+   "kind": "swarm",
+   "env": {
+    "kind": "homogeneous",
+    "T": 8000,
+    "role_fractions": null,
+    "strong": 0.95,
+    "weak": 0.6,
+    "member_cost": 0.0,
+    "role_by_type": false,
+    "busy": 0
+   },
+   "cfg": {
+    "N": 40,
+    "team": 3,
+    "coupling": true,
+    "plastic_W": true,
+    "hebb_bias": 0.0,
+    "w_rule": "mean_succ",
+    "sim_w": 0.5,
+    "recruit_thr": 0.25,
+    "recruit": "learned",
+    "explore": "none",
+    "explore_c": 0.1,
+    "hormones": true,
+    "fatigue": false,
+    "sleep": false,
+    "sleep_prune": true,
+    "prune_thr": 0.05,
+    "order": "recruit",
+    "order_lr": 0.1
+   },
+   "per_seed": [
+    {
+     "pre": 0.6878449999999999,
+     "post": 0.7429649999999999,
+     "cover_start": null,
+     "cover_end": null,
+     "q_end": 1.0,
+     "team_size": 3.0
+    },
+    {
+     "pre": 0.7172099999999998,
+     "post": 0.7361099999999999,
+     "cover_start": null,
+     "cover_end": null,
+     "q_end": 1.0,
+     "team_size": 3.0
+    },
+    {
+     "pre": 0.6623,
+     "post": 0.76117,
+     "cover_start": null,
+     "cover_end": null,
+     "q_end": 1.0,
+     "team_size": 3.0
+    },
+    {
+     "pre": 0.7164449999999999,
+     "post": 0.7651199999999999,
+     "cover_start": null,
+     "cover_end": null,
+     "q_end": 1.0,
+     "team_size": 3.0
+    },
+    {
+     "pre": 0.7000349999999999,
+     "post": 0.744115,
+     "cover_start": null,
+     "cover_end": null,
+     "q_end": 1.0,
+     "team_size": 3.0
+    }
+   ],
+   "pre": 0.6967669999999998,
+   "pre_sd": 0.022822116082870072,
+   "post": 0.7498959999999999,
+   "post_sd": 0.012553742171161569,
+   "q_end": 1.0,
+   "q_end_sd": 0.0,
+   "team_size": 3.0,
+   "team_size_sd": 0.0
+  },
+  "mean_r": {
+   "kind": "swarm",
+   "env": {
+    "kind": "homogeneous",
+    "T": 8000,
+    "role_fractions": null,
+    "strong": 0.95,
+    "weak": 0.6,
+    "member_cost": 0.0,
+    "role_by_type": false,
+    "busy": 0
+   },
+   "cfg": {
+    "N": 40,
+    "team": 3,
+    "coupling": true,
+    "plastic_W": true,
+    "hebb_bias": 0.0,
+    "w_rule": "mean_r",
+    "sim_w": 0.5,
+    "recruit_thr": 0.25,
+    "recruit": "learned",
+    "explore": "none",
+    "explore_c": 0.1,
+    "hormones": true,
+    "fatigue": false,
+    "sleep": false,
+    "sleep_prune": true,
+    "prune_thr": 0.05,
+    "order": "recruit",
+    "order_lr": 0.1
+   },
+   "per_seed": [
+    {
+     "pre": 0.6980149999999998,
+     "post": 0.7234349999999999,
+     "cover_start": null,
+     "cover_end": null,
+     "q_end": 1.0,
+     "team_size": 3.0
+    },
+    {
+     "pre": 0.7205499999999999,
+     "post": 0.7159949999999999,
+     "cover_start": null,
+     "cover_end": null,
+     "q_end": 1.0,
+     "team_size": 3.0
+    },
+    {
+     "pre": 0.685415,
+     "post": 0.750405,
+     "cover_start": null,
+     "cover_end": null,
+     "q_end": 1.0,
+     "team_size": 3.0
+    },
+    {
+     "pre": 0.724345,
+     "post": 0.7633849999999999,
+     "cover_start": null,
+     "cover_end": null,
+     "q_end": 1.0,
+     "team_size": 3.0
+    },
+    {
+     "pre": 0.690325,
+     "post": 0.7413350000000001,
+     "cover_start": null,
+     "cover_end": null,
+     "q_end": 1.0,
+     "team_size": 3.0
+    }
+   ],
+   "pre": 0.70373,
+   "pre_sd": 0.017717823653033694,
+   "post": 0.7389109999999999,
+   "post_sd": 0.0193753330293959,
+   "q_end": 1.0,
+   "q_end_sd": 0.0,
+   "team_size": 3.0,
+   "team_size_sd": 0.0
+  },
+  "no W": {
+   "kind": "swarm",
+   "env": {
+    "kind": "homogeneous",
+    "T": 8000,
+    "role_fractions": null,
+    "strong": 0.95,
+    "weak": 0.6,
+    "member_cost": 0.0,
+    "role_by_type": false,
+    "busy": 0
+   },
+   "cfg": {
+    "N": 40,
+    "team": 3,
+    "coupling": true,
+    "plastic_W": false,
+    "hebb_bias": 0.0,
+    "w_rule": "hebb_r",
+    "sim_w": 0.5,
+    "recruit_thr": 0.25,
+    "recruit": "learned",
+    "explore": "none",
+    "explore_c": 0.1,
+    "hormones": true,
+    "fatigue": false,
+    "sleep": false,
+    "sleep_prune": true,
+    "prune_thr": 0.05,
+    "order": "recruit",
+    "order_lr": 0.1
+   },
+   "per_seed": [
+    {
+     "pre": 0.7020649999999998,
+     "post": 0.73471,
+     "cover_start": null,
+     "cover_end": null,
+     "q_end": 1.0,
+     "team_size": 2.9925
+    },
+    {
+     "pre": 0.7317449999999999,
+     "post": 0.73094,
+     "cover_start": null,
+     "cover_end": null,
+     "q_end": 1.0,
+     "team_size": 2.992
+    },
+    {
+     "pre": 0.6689249999999999,
+     "post": 0.74429,
+     "cover_start": null,
+     "cover_end": null,
+     "q_end": 1.0,
+     "team_size": 2.9965
+    },
+    {
+     "pre": 0.703365,
+     "post": 0.7696499999999998,
+     "cover_start": null,
+     "cover_end": null,
+     "q_end": 1.0,
+     "team_size": 2.9915
+    },
+    {
+     "pre": 0.6862849999999998,
+     "post": 0.736105,
+     "cover_start": null,
+     "cover_end": null,
+     "q_end": 1.0,
+     "team_size": 2.9955
+    }
+   ],
+   "pre": 0.6984769999999999,
+   "pre_sd": 0.0232674218597592,
+   "post": 0.743139,
+   "post_sd": 0.015600470505725066,
+   "q_end": 1.0,
+   "q_end_sd": 0.0,
+   "team_size": 2.9936000000000003,
+   "team_size_sd": 0.002247220505424462
+  },
+  "solo": {
+   "kind": "swarm",
+   "env": {
+    "kind": "homogeneous",
+    "T": 8000,
+    "role_fractions": null,
+    "strong": 0.95,
+    "weak": 0.6,
+    "member_cost": 0.0,
+    "role_by_type": false,
+    "busy": 0
+   },
+   "cfg": {
+    "N": 40,
+    "team": 3,
+    "coupling": false,
+    "plastic_W": false,
+    "hebb_bias": 0.0,
+    "w_rule": "hebb_r",
+    "sim_w": 0.5,
+    "recruit_thr": 0.25,
+    "recruit": "learned",
+    "explore": "none",
+    "explore_c": 0.1,
+    "hormones": true,
+    "fatigue": false,
+    "sleep": false,
+    "sleep_prune": true,
+    "prune_thr": 0.05,
+    "order": "recruit",
+    "order_lr": 0.1
+   },
+   "per_seed": [
+    {
+     "pre": 0.6915099999999998,
+     "post": 0.7251949999999999,
+     "cover_start": null,
+     "cover_end": null,
+     "q_end": 1.0,
+     "team_size": 1.0
+    },
+    {
+     "pre": 0.7205149999999999,
+     "post": 0.71966,
+     "cover_start": null,
+     "cover_end": null,
+     "q_end": 1.0,
+     "team_size": 1.0
+    },
+    {
+     "pre": 0.66804,
+     "post": 0.74103,
+     "cover_start": null,
+     "cover_end": null,
+     "q_end": 1.0,
+     "team_size": 1.0
+    },
+    {
+     "pre": 0.69661,
+     "post": 0.7467999999999999,
+     "cover_start": null,
+     "cover_end": null,
+     "q_end": 1.0,
+     "team_size": 1.0
+    },
+    {
+     "pre": 0.6744749999999999,
+     "post": 0.7328499999999999,
+     "cover_start": null,
+     "cover_end": null,
+     "q_end": 1.0,
+     "team_size": 1.0
+    }
+   ],
+   "pre": 0.69023,
+   "pre_sd": 0.020616377894770922,
+   "post": 0.733107,
+   "post_sd": 0.011110353054696319,
+   "q_end": 1.0,
+   "q_end_sd": 0.0,
+   "team_size": 1.0,
+   "team_size_sd": 0.0
+  },
+  "linucb": {
+   "kind": "router",
+   "env": {
+    "kind": "homogeneous",
+    "T": 8000,
+    "role_fractions": null,
+    "strong": 0.95,
+    "weak": 0.6,
+    "member_cost": 0.0,
+    "role_by_type": false,
+    "busy": 0
+   },
+   "cfg": {
+    "model": "linucb"
+   },
+   "per_seed": [
+    {
+     "pre": 0.7087199999999999,
+     "post": 0.737015,
+     "cover_start": null,
+     "cover_end": null,
+     "q_end": 1.0
+    },
+    {
+     "pre": 0.7206299999999999,
+     "post": 0.735425,
+     "cover_start": null,
+     "cover_end": null,
+     "q_end": 1.0
+    },
+    {
+     "pre": 0.6649949999999999,
+     "post": 0.73177,
+     "cover_start": null,
+     "cover_end": null,
+     "q_end": 1.0
+    },
+    {
+     "pre": 0.71268,
+     "post": 0.766025,
+     "cover_start": null,
+     "cover_end": null,
+     "q_end": 1.0
+    },
+    {
+     "pre": 0.6786099999999999,
+     "post": 0.748475,
+     "cover_start": null,
+     "cover_end": null,
+     "q_end": 1.0
+    }
+   ],
+   "pre": 0.6971269999999998,
+   "pre_sd": 0.024000151978685474,
+   "post": 0.7437419999999999,
+   "post_sd": 0.013934553993580111,
+   "q_end": 1.0,
+   "q_end_sd": 0.0
+  }
+ },
+ "comparisons": [
+  {
+   "a": "mean_succ",
+   "b": "hebb_r",
+   "metric": "post",
+   "diff": 0.004975999999999936,
+   "sd": 0.003480965024242545,
+   "effect": false
+  },
+  {
+   "a": "mean_succ",
+   "b": "linucb",
+   "metric": "post",
+   "diff": 0.006153999999999949,
+   "sd": 0.013515747944527536,
+   "effect": false
+  },
+  {
+   "a": "hebb_r",
+   "b": "linucb",
+   "metric": "post",
+   "diff": 0.0011780000000000124,
+   "sd": 0.013483485547142451,
+   "effect": false
+  },
+  {
+   "a": "mean_succ",
+   "b": "no W",
+   "metric": "post",
+   "diff": 0.006756999999999969,
+   "sd": 0.007684466149317048,
+   "effect": false
+  },
+  {
+   "a": "mean_r",
+   "b": "hebb_r",
+   "metric": "post",
+   "diff": -0.006009000000000042,
+   "sd": 0.007098634903979745,
+   "effect": false
+  }
+ ]
+}

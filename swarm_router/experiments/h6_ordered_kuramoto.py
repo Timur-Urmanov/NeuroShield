@@ -1,4 +1,6 @@
-"""H6: is phase (Kuramoto) useful for ordering steps plan -> execute -> verify? (notes/hypotheses.md)
+"""
+NOTE: pinned to w_rule="hebb_r" (the default when this experiment was run; default is mean_succ since H8c).
+H6: is phase (Kuramoto) useful for ordering steps plan -> execute -> verify? (notes/hypotheses.md)
 
 The phase variants (phase_static, phase_kuramoto, phase_kuramoto_filter, posthoc phase_mean_*) need the
 Kuramoto code, removed after this experiment: run them with `git checkout d2d10b0`. Their numbers are in
@@ -13,10 +15,10 @@ seeds = list(range(a.seed0, a.seed0 + a.seeds))
 env = EnvConfig("ordered", a.T)
 B = {}
 V = {
-    "recruit": SwarmConfig(order="recruit", **B),
-    "random": SwarmConfig(order="random", **B),
-    "position": SwarmConfig(order="position", **B),
-    "oracle": SwarmConfig(order="oracle", **B),
+    "recruit": SwarmConfig(w_rule="hebb_r", order="recruit", **B),
+    "random": SwarmConfig(w_rule="hebb_r", order="random", **B),
+    "position": SwarmConfig(w_rule="hebb_r", order="position", **B),
+    "oracle": SwarmConfig(w_rule="hebb_r", order="oracle", **B),
 }
 res = run_variants({k: ("swarm", env, v) for k, v in V.items()}, seeds, a.workers)
 res["linucb + pair_ucb c=0.03 (order = selection order)"] = run_variants(

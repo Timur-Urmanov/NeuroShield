@@ -16,8 +16,9 @@ class SwarmConfig:
     coupling: bool = True         # teams at all (False = solo leader)
     plastic_W: bool = True        # learn pairwise link matrix W
     hebb_bias: float = 0.0        # unconditional Hebbian increment (legacy: 0.3); 0 = reward-only Hebb
-    # W learning rule (H8): hebb_r (default: Hebb on r - EMA(r)) | hebb_succ | mean_r | mean_succ
-    w_rule: str = "hebb_r"
+    # W learning rule (H8): mean_succ (default since H8c: per-pair mean success) | mean_r |
+    #   hebb_r (Hebb on r - EMA(r); default up to H8, used by every experiment before H8c) | hebb_succ
+    w_rule: str = "mean_succ"
     sim_w: float = 0.5            # s in score = (1-s)*W[leader] + s*sim
     recruit_thr: float = 0.25     # minimum recruit score
     # exploration bonus in recruitment (H7): none | ucb (count-based, directed) | noise (undirected control)
@@ -42,7 +43,7 @@ class SwarmConfig:
 
 # Defaults of the original swarm.py constructor minus Kuramoto. Legacy rows with kuramoto=True are
 # reproducible only with legacy/swarm.py or git commit d2d10b0.
-LEGACY = SwarmConfig(fatigue=True, sleep=True, hebb_bias=0.3)
+LEGACY = SwarmConfig(fatigue=True, sleep=True, hebb_bias=0.3, w_rule="hebb_r")
 
 
 @dataclass(frozen=True)
