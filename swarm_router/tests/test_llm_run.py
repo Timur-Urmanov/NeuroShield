@@ -78,3 +78,74 @@ def test_context_and_role_scripts_dry(tmp_path):
                                         "--cache-dir", str(tmp_path / "c")])
     d2 = json.load(open(p2))
     assert d2["status"] == "ok" and set(d2["summary"]) == {"none", "executor", "planner", "verifier"}
+
+
+# ---------------------------------------------------------------- review fixes
+def test_real_requires_explicit_budget(tmp_path, monkeypatch, capsys):
+    from swarm.llm.estimate import SPEND_ENV, confirm_real, spend_authorised
+    monkeypatch.delenv(SPEND_ENV, raising=False)
+    assert not spend_authorised(5.0, False)[0]
+    assert spend_authorised(5.0, True)[0]
+    monkeypatch.setenv(SPEND_ENV, "4.99")
+    assert not spend_authorised(5.0, False)[0]
+    monkeypatch.setenv(SPEND_ENV, "5")
+    assert spend_authorised(5.0, False)[0]
+    monkeypatch.delenv(SPEND_ENV)
+    assert not confirm_real(lambda: None, yes=True, budget_usd=5.0, budget_explicit=False, isatty=False)
+    assert not confirm_real(lambda: None, yes=False, budget_usd=5.0, budget_explicit=True, isatty=False)
+    assert confirm_real(lambda: None, yes=True, budget_usd=5.0, budget_explicit=True, isatty=False)
+    # --real --yes alone: aborts before building any client (no results file, no call log)
+    out = _load("llm_run").main(["--real", "--yes", "--n-tasks", "3", "--seeds", "1", "--out", str(tmp_path),
+                                 "--cache-dir", str(tmp_path / "c")])
+    assert out is None and not list(tmp_path.iterdir())
+    assert "aborting without any API call" in capsys.readouterr().out
+
+
+def test_estimates_have_both_columns(capsys):
+    _load("llm_run").main(["--estimate", "--n-tasks", "30", "--seeds", "2"])
+    _load("llm_context_degradation").main(["--estimate"])
+    _load("llm_role_spread").main(["--estimate"])
+    out = capsys.readouterr().out
+    assert out.count("USD opt") == 3 and out.count("USD cons") == 3 and "embeddings" in out
+
+
+def test_error_keeps_partial_results(tmp_path, monkeypatch):
+    import swarm.envs.llm as envmod
+    real = envmod.run_team
+    n = {"i": 0}
+
+    def flaky(*a, **k):
+        n["i"] += 1
+        if n["i"] == 7:
+            raise RuntimeError("simulated provider failure")
+        return real(*a, **k)
+    monkeypatch.setattr(envmod, "run_team", flaky)
+    path = _load("llm_run").main(["--n-tasks", "10", "--seeds", "2", "--out", str(tmp_path),
+                                  "--cache-dir", str(tmp_path / "c"), "--name", "e"])
+    d = json.load(open(path))
+    sw = d["variants"]["swarm"]
+    assert sw["per_seed"][0]["status"].startswith("error: RuntimeError")
+    assert sw["per_seed"][0]["n_done"] == 6 and sw.get("partial")
+    assert d["status"] == "partial" and "linucb" in d["variants"]        # later variants still ran
+
+
+def test_variant_share_stops_only_that_variant(tmp_path):
+    path = _load("llm_run").main(["--n-tasks", "15", "--seeds", "1", "--budget-usd", "0.06", "--out", str(tmp_path),
+                                  "--cache-dir", str(tmp_path / "c"), "--name", "s"])
+    d = json.load(open(path))
+    sts = {k: v["per_seed"][0]["status"] for k, v in d["variants"].items()}
+    assert any(s.startswith("stopped_budget[share]") for s in sts.values())
+    assert list(d["variants"])[0] == "swarm"
+    assert d["budget"]["spent_usd"] <= 0.06
+    for k, v in d["variants"].items():
+        assert v["per_seed"][0]["charged_usd"] <= v["share_usd"] + 1e-12
+
+
+def test_pilot_dry(tmp_path, capsys):
+    path = _load("llm_run").main(["--pilot", "6", "--pilot-only", "--n-tasks", "30", "--seeds", "2", "--out",
+                                  str(tmp_path), "--cache-dir", str(tmp_path / "c"), "--name", "p"])
+    d = json.load(open(path))
+    assert d["status"] == "pilot_only"
+    assert set(d["pilot"]) == {"opus", "sonnet", "haiku"}
+    assert set(d["pilot"]["opus"]) == {"executor", "planner", "verifier"}
+    assert "after pilot" in capsys.readouterr().out

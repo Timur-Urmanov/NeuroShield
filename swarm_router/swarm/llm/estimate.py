@@ -105,6 +105,10 @@ class Estimator:
 
     def variant_shares(self, labels, budget_usd):
         spec = self.cfg.run.get("variant_budget_share", "equal")
+        if spec == "estimate":         # proportional to each variant's conservative estimate
+            w = {l: self.per_task(l, "cons")[1] for l in labels}
+            tot = sum(w.values()) or 1.0
+            return {l: budget_usd * w[l] / tot for l in labels}
         if spec in (None, "equal") or not isinstance(spec, dict):
             return {l: budget_usd / len(labels) for l in labels}
         fixed = {l: float(spec[l]) for l in labels if l in spec}
@@ -140,7 +144,7 @@ class Estimator:
             tot["opt"] += r["usd_opt"]; tot["cons"] += r["usd_cons"]; tot["hi"] += r["usd_cons_hi"]
             flag = "" if r["usd_cons"] <= r["share"] else " !"
             print(f"| {l:<16} | {r['calls']:>6.0f} | {eo:>12.5f} | {ec:>13.5f} | {r['usd_opt']:>9.4f} | "
-                  f"{r['usd_cons']:>9.4f} | {r['usd_cons_hi']:>12.4f} | {r['share']:>6.2f}{flag:<1} |")
+                  f"{r['usd_cons']:>9.4f} | {r['usd_cons_hi']:>12.4f} | {r['share']:>5.2f}{flag:<2} |")
         emb_n = N
         emb = self.embed_usd(emb_n)
         print(f"| {'embeddings':<16} | {emb_n:>6} | {'':>12} | {'':>13} | {emb:>9.4f} | {emb:>9.4f} | "

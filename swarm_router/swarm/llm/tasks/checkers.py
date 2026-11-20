@@ -52,16 +52,30 @@ def check_math(output: str, answer: float, rel_tol: float = 1e-6, abs_tol: float
 _FENCE = re.compile(r"```[ \t]*([A-Za-z0-9_+-]*)[^\n]*\n(.*?)```", re.S)
 
 
+def _defs_only(code: str) -> bool:
+    import ast
+    try:
+        tree = ast.parse(code)
+    except SyntaxError:
+        return False
+    ok = (ast.Import, ast.ImportFrom, ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)
+    return bool(tree.body) and all(isinstance(n, ok) for n in tree.body)
+
+
 def extract_code(output: str, entry_point: str = "") -> str:
-    """The fenced python block that defines `entry_point` (last such block), else all python blocks
-    concatenated (so helper + usage blocks still run), else the last fenced block, else the raw text."""
+    """The fenced python block that defines `entry_point` (last such block, preceded by any other blocks
+    that contain only imports/defs/classes, i.e. helpers; usage-example blocks are dropped), else all
+    python blocks concatenated, else the last fenced block, else the raw text."""
     blocks = _FENCE.findall(output or "")
     py = [b for lang, b in blocks if lang.lower() in ("python", "py", "python3", "")]
     if entry_point:
         pat = re.compile(rf"^\s*(?:async\s+)?def\s+{re.escape(entry_point)}\s*\(", re.M)
         defs = [b for b in py if pat.search(b)]
         if defs:
-            return defs[-1]
+            main = defs[-1]
+            # keep other blocks that only define helpers/imports (no top-level calls such as usage examples)
+            helpers = [b for b in py if b is not main and not pat.search(b) and _defs_only(b)]
+            return "\n\n".join(helpers + [main])
     if py:
         return "\n\n".join(py)
     if blocks:

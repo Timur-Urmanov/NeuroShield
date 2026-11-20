@@ -63,3 +63,51 @@ def test_code_memory_limit():
 def test_builtin_reference_passes_and_wrong_fails(task):
     assert check(task, SimOracle.render(task, True, 0.3)), task.id
     assert not check(task, SimOracle.render(task, False, 0.3)), task.id
+
+
+# ---------------------------------------------------------------- review fixes: parsing edge cases
+def test_math_final_answer_marker_first():
+    assert check_math("Final answer: 7\n(Note: 35 sold out of 42.)", 7)
+    assert check_math("The trip takes 90 minutes.\nFinal answer: 1.5 hours (90 minutes)", 1.5)
+    assert not check_math("Final answer: 1.5 hours (90 minutes)", 90)
+    assert check_math("FINAL ANSWER: 12", 12)
+
+
+def test_math_number_formats():
+    assert check_math("3/4", 0.75)
+    assert check_math("Final answer: 3/4 cup", 0.75)
+    assert check_math("−7", -7)                  # Unicode minus
+    assert check_math("Final answer: −4 degrees", -4)
+    assert check_math("1e3", 1000)
+    assert check_math("Final answer: 2.5E-1", 0.25)
+    assert not check_math("1e3", 1)
+
+
+def test_text_answer_prefix_word():
+    t = Task(id="v", kind="text", prompt="p", answer="Vienna")
+    assert check_text("Final answer: Vienna", t)
+    assert check_text("The answer: Vienna", t)
+    assert check_text("**Final Answer:** Vienna", t)
+    assert not check_text("Final answer: Berlin", t)
+
+
+def test_code_picks_block_with_entry_point():
+    out = ("Solution:\n```python\ndef add(a, b):\n    return a + b\n```\nUsage:\n```python\n"
+           "print(add(2, 3))\nassert add(1, 1) == 3  # wrong example\n```")
+    assert check_code(out, CODE)
+    helper = "```python\ndef _h(a, b):\n    return a + b\n```\n```python\ndef add(a, b):\n    return _h(a, b)\n```"
+    assert check_code(helper, CODE)                    # defs-only helper block is kept
+    usage_first = "```python\nassert add(1, 1) == 3\n```\n```python\ndef add(a, b):\n    return a + b\n```"
+    assert check_code(usage_first, CODE)               # usage block (top-level code) is dropped
+    split = "```python\nimport math\n```\n```python\nX = 0\n```"
+    from swarm.llm.tasks.checkers import extract_code
+    assert extract_code(split, "add") == "import math\n\n\nX = 0\n"
+
+
+def test_plausible_wrong_code_is_a_mutant():
+    from swarm.llm.tasks.mutate import wrong_code
+    for t in POOL:
+        if t.kind == "code":
+            w = wrong_code(t)
+            assert "*args, **kwargs" not in w, t.id           # a real mutant, not the stub
+            assert not check(t, f"```python\n{w}\n```"), t.id

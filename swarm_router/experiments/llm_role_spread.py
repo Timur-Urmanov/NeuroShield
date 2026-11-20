@@ -20,6 +20,7 @@ from __future__ import annotations
 import argparse
 import os
 import sys
+import traceback
 
 import numpy as np
 
@@ -40,20 +41,20 @@ ROLES = ("none", "executor", "planner", "verifier")
 
 def estimate(cfg, pool, models, ex_model, n, seeds, budget):
     e = Estimator(cfg, pool)
-    print(f"Cost estimate: role spread, {n} tasks x {seeds} seeds, models={models}, fixed executor={ex_model}")
     exs = cfg.model(ex_model)
-    tot = 0.0
-    print(f"| {'model':<8} | {'calls':>6} | {'USD':>9} |")
-    print("|" + "-" * 10 + "|" + "-" * 8 + "|" + "-" * 11 + "|")
+    rows = []
     for name in models:
-        s = cfg.model(name); o = s.sim["out_tokens"]
-        usd = 2 * s.usd(e.in_exec, o["executor"])                                 # none + executor
-        usd += s.usd(e.in_plan, o["planner"]) + exs.usd(e.in_exec + o["planner"], exs.sim["out_tokens"]["executor"])
-        usd += 2 * s.usd(e.in_ver0 + o["executor"], o["verifier"])               # 2 candidates
-        usd *= n * seeds; tot += usd
-        print(f"| {name:<8} | {6 * n * seeds:>6} | {usd:>9.4f} |")
-    print(f"TOTAL ≈ {tot:.4f} USD (no cache; output = sim.out_tokens assumption); budget limit {budget:.2f} USD")
-    return tot
+        spec = cfg.model(name)
+        usd = {}
+        for mode in ("opt", "cons"):
+            o = lambda r: e.out_tokens(spec, r, mode)
+            u = 2 * spec.usd(e.in_exec, o("executor"))                                       # none + executor
+            u += spec.usd(e.in_plan, o("planner")) + exs.usd(e.in_exec + o("planner"), e.out_tokens(exs, "executor", mode))
+            u += 2 * spec.usd(e.in_ver0 + 100, o("verifier"))       # 2 fixed candidates (~100 tokens each)
+            usd[mode] = u * n * seeds
+        rows.append((name, 6 * n * seeds, usd["opt"], usd["cons"]))
+    return e.print_rows(f"Cost estimate: role spread, {n} tasks x {seeds} seeds, models={models}, fixed executor="
+                        f"{ex_model} (no embeddings used)", rows, budget)
 
 
 def main(argv=None):
@@ -70,48 +71,64 @@ def main(argv=None):
     if a.estimate:
         estimate(cfg, pool, models, ex_model, a.n_tasks, len(seeds), budget); return None
     if a.real and not confirm_real(lambda: estimate(cfg, pool, models, ex_model, a.n_tasks, len(seeds), budget),
-                                   a.yes):
+                                   a.yes, budget, a.budget_usd is not None):
         return None
     client, check_fn, log_path = make_client(a, cfg, pool, budget, name)
     mt = cfg.run["max_tokens"]
     sid = lambda sd: sd if cfg.run["include_seed_in_cache_key"] else 0
     status, per_seed = "ok", []
 
-    def solve(m, system, task, sd, plan=None, tag=""):
-        c = client.call(m, system, [{"role": "user", "content": executor_message(task, plan)}], mt["executor"],
-                        sample_id=sid(sd), tag=tag)
-        return float(check_fn(task, c.text))
+    counts = {m: dict(max_tokens_stops=0, refusals=0, no_verdict=0, verdicts=0) for m in models}
 
-    try:
-        for sd in seeds:
+    def call(m, system, um, max_tokens, sd, tag):
+        c = client.call(m, system, [{"role": "user", "content": um}], max_tokens, sample_id=sid(sd), tag=tag)
+        counts[m]["max_tokens_stops"] += int(c.stop_reason == "max_tokens")
+        counts[m]["refusals"] += int(c.stop_reason == "refusal")
+        return c
+
+    def solve(m, system, task, sd, plan=None, tag=""):
+        return float(check_fn(task, call(m, system, executor_message(task, plan), mt["executor"], sd, tag).text))
+
+    for sd in seeds:
+        row, seed_status = {r: {} for r in ROLES}, "ok"
+        try:
             tasks = make_stream(pool, a.n_tasks, sd)
-            row = {r: {} for r in ROLES}
             for m in models:
                 row["none"][m] = float(np.mean([solve(m, None, t, sd, tag="spread_none") for t in tasks]))
                 row["executor"][m] = float(np.mean([solve(m, ROLE_PROMPTS["executor"], t, sd, tag="spread_exec")
                                                     for t in tasks]))
                 ps = []
                 for t in tasks:
-                    plan = client.call(m, ROLE_PROMPTS["planner"], [{"role": "user", "content": planner_message(t)}],
-                                       mt["planner"], sample_id=sid(sd), tag="spread_plan").text
+                    plan = call(m, ROLE_PROMPTS["planner"], planner_message(t), mt["planner"], sd, "spread_plan").text
                     ps.append(solve(ex_model, ROLE_PROMPTS["executor"], t, sd, plan=plan, tag="spread_plan_exec"))
                 row["planner"][m] = float(np.mean(ps))
                 acc_ok, rej_bad = [], []
                 for t in tasks:
                     u = hash_uniform("cand", t.id)
                     for correct in (True, False):
+                        # plausible wrong candidate: failing AST mutant / off-by-one / distractor entity
                         cand = SimOracle.render(t, correct, u)
-                        v = client.call(m, ROLE_PROMPTS["verifier"],
-                                        [{"role": "user", "content": verifier_message(t, cand)}], mt["verifier"],
-                                        sample_id=sid(sd), tag="spread_verify")
-                        (acc_ok if correct else rej_bad).append(float(parse_verdict(v.text) == correct))
+                        v = call(m, ROLE_PROMPTS["verifier"], verifier_message(t, cand), mt["verifier"], sd,
+                                 "spread_verify")
+                        verdict = parse_verdict(v.text)
+                        counts[m]["verdicts"] += 1
+                        counts[m]["no_verdict"] += int(verdict == "none")
+                        accepted = verdict != "revise"            # 'none' -> default action accept
+                        (acc_ok if correct else rej_bad).append(float(accepted == correct))
                 row["verifier"][m] = float((np.mean(acc_ok) + np.mean(rej_bad)) / 2)
-            per_seed.append(dict(seed=sd, **row))
-    except BudgetExceeded as e:
-        status = f"stopped_budget: {e}"
-        print(status)
+        except BudgetExceeded as e:
+            seed_status = status = f"stopped_budget: {e}"
+        except Exception as e:                                  # noqa: BLE001 - keep the partial seed
+            seed_status = f"error: {type(e).__name__}: {e}"
+            status = status if status != "ok" else "partial"
+            traceback.print_exc()
+        per_seed.append(dict(seed=sd, status=seed_status, **row))
+        if seed_status != "ok":
+            print(f"seed {sd}: {seed_status}")
+            if seed_status.startswith("stopped_budget"):
+                break
 
-    summary = summarize(per_seed, models)
+    summary = summarize([r for r in per_seed if r["status"] == "ok"], models)
     print(f"\n| {'role':<9} | " + " | ".join(f"{m:<15}" for m in models) + " | spread (max-min)  | ranks")
     for r in ROLES:
         s = summary.get(r)
@@ -121,11 +138,15 @@ def main(argv=None):
         flag = "SPREAD" if s["spread_detected"] else "none detected"
         print(f"| {r:<9} | {cells} | {s['spread']:.3f} ± {s['spread_sd']:.3f} {flag} | {'>'.join(s['rank'])}")
     print(f"(planner cell = success of fixed executor '{ex_model}' with that model's plan; "
-          f"verifier cell = balanced accuracy)")
+          f"verifier cell = balanced accuracy, no-verdict counted as accept)")
+    for m in models:
+        c = counts[m]
+        print(f"  {m}: truncated {c['max_tokens_stops']}, refusals {c['refusals']}, "
+              f"no-verdict {c['no_verdict']}/{c['verdicts']} verifier replies")
     payload = dict(mode="real" if a.real else "dry_run", status=status, seeds=seeds, n_tasks=a.n_tasks,
-                   models=models, executor_model=ex_model, per_seed=per_seed, summary=summary,
+                   models=models, executor_model=ex_model, per_seed=per_seed, counts=counts, summary=summary,
                    rank_changes_across_roles=len({tuple(s["rank"]) for s in summary.values()}) > 1,
-                   budget=dict(limit_usd=budget, spent_usd=client.budget.spent), call_log=log_path,
+                   budget=dict(limit_usd=budget, spent_usd=client.run_budget.spent), call_log=log_path,
                    config=config_dict(cfg),
                    note="" if a.real else "dry-run: role effects are the invented sim.role_skill/plan_bonus/verify_*")
     path = save(name, payload, a.out, argv=sys.argv if argv is None else [os.path.basename(__file__), *argv])

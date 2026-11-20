@@ -22,7 +22,8 @@ run:
   # seeds includes model sampling noise. false: identical prompts share one cached response across
   # seeds (cheap; seeds then vary task order + router randomness only).
   include_seed_in_cache_key: true
-  # per-variant budget: "equal" = limit / n_variants, or a mapping {variant_label: fraction}
+  # per-variant budget: "equal" = limit / n_variants, "estimate" = proportional to each variant's
+  # conservative cost estimate, or a mapping {variant_label: fraction}
   # (labels: swarm, linucb, single:<name>, pipeline:<name>); unspecified variants share the rest.
   variant_budget_share: equal
   # how team members map to roles: "position" (exec order -> planner/executor/verifier by team size)

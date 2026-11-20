@@ -229,8 +229,11 @@ def main(argv=None):
                     break
             client.budget = run_budget
             ok = [r for r in rows if r["status"] == "ok"]
+            partial = not ok
+            agg_rows = ok or [r for r in rows if r["n_done"] > 0]      # no complete seed: report the partial one
             res[label] = dict(variant=variant, model=None if m is None else cfg.names[m], per_seed=rows,
-                              share_usd=share, n_seeds_ok=len(ok), **mean_sd(ok, METRICS), **item_sem(rows),
+                              share_usd=share, n_seeds_ok=len(ok), partial=partial,
+                              **mean_sd(agg_rows, METRICS), **item_sem(rows),
                               max_tokens_stops=sum(r["max_tokens_stops"] for r in rows),
                               refusals=sum(r["refusals"] for r in rows),
                               verdicts={v: sum(r["verdicts"][v] for r in rows) for v in ("accept", "revise", "none")})
@@ -264,9 +267,9 @@ def main(argv=None):
 
 def print_table(res, best):
     cols = ("reward", "success", "usd_per_task", "calls_per_task", "team_size")
-    print(f"\n| {'variant':<20} | " + " | ".join(f"{c:<17}" for c in cols)
+    print(f"\n| {'variant':<30} | " + " | ".join(f"{c:<17}" for c in cols)
           + " | SEM items (n) | trunc/refus/no-verdict |")
-    print("|" + "-" * 22 + "|" + "|".join("-" * 19 for _ in cols) + "|" + "-" * 15 + "|" + "-" * 24 + "|")
+    print("|" + "-" * 32 + "|" + "|".join("-" * 19 for _ in cols) + "|" + "-" * 15 + "|" + "-" * 24 + "|")
     for n, r in res.items():
         cells = []
         for c in cols:
@@ -277,11 +280,11 @@ def print_table(res, best):
             else:
                 cells.append(f"{r[c]:.3f} ± {r[c + '_sd']:.3f}".ljust(17))
         sem = f"{r['reward_sem_items']:.3f} ({r['n_items']})" if "reward_sem_items" in r else "—"
-        mark = " *" if best and n == f"single:{best}" else ""
+        mark = (" *" if best and n == f"single:{best}" else "") + (" (partial)" if r.get("partial") else "")
         cnt = f"{r['max_tokens_stops']}/{r['refusals']}/{r['verdicts']['none']}"
-        print(f"| {n + mark:<20} | " + " | ".join(cells) + f" | {sem:<13} | {cnt:<22} |")
+        print(f"| {n + mark:<30} | " + " | ".join(cells) + f" | {sem:<13} | {cnt:<22} |")
     print("(± = sd over seeds; SEM items = sd of per-item mean reward / sqrt(n distinct items); "
-          "* = best single, chosen post hoc; trunc = calls stopped at max_tokens; no-verdict counted as accept)")
+          "* = best single, chosen post hoc; (partial) = no complete seed, numbers from the stopped one; trunc = calls stopped at max_tokens; no-verdict counted as accept)")
 
 
 if __name__ == "__main__":
