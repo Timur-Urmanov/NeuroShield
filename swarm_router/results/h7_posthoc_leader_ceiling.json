@@ -1,0 +1,1310 @@
+{
+ "experiment": "h7_posthoc_leader_ceiling",
+ "git_commit": "357d33e+dirty",
+ "argv": [
+  "experiments/h7_posthoc_leader_ceiling.py"
+ ],
+ "created": "2026-11-20T15:13:31",
+ "T": 8000,
+ "seeds": [
+  0,
+  1,
+  2,
+  3,
+  4
+ ],
+ "cells": {
+  "role_by_type=False, busy=0": {
+   "results": {
+    "swarm learned": {
+     "kind": "swarm",
+     "env": {
+      "kind": "roles",
+      "T": 8000,
+      "role_fractions": null,
+      "strong": 0.95,
+      "weak": 0.6,
+      "member_cost": 0.0,
+      "role_by_type": false,
+      "busy": 0
+     },
+     "cfg": {
+      "N": 40,
+      "team": 3,
+      "coupling": true,
+      "plastic_W": true,
+      "hebb_bias": 0.0,
+      "sim_w": 0.5,
+      "recruit_thr": 0.25,
+      "recruit": "learned",
+      "explore": "none",
+      "explore_c": 0.1,
+      "hormones": true,
+      "fatigue": false,
+      "sleep": false,
+      "sleep_prune": true,
+      "prune_thr": 0.05,
+      "order": "recruit",
+      "order_lr": 0.1
+     },
+     "per_seed": [
+      {
+       "pre": 0.518625,
+       "post": 0.55323,
+       "cover_start": 0.664,
+       "cover_end": 0.7465,
+       "q_end": 0.7719141874999998,
+       "team_size": 2.972
+      },
+      {
+       "pre": 0.49999499999999997,
+       "post": 0.5758899999999999,
+       "cover_start": 0.414,
+       "cover_end": 0.7895,
+       "q_end": 0.7873920624999997,
+       "team_size": 2.971
+      },
+      {
+       "pre": 0.449905,
+       "post": 0.5839,
+       "cover_start": 0.692,
+       "cover_end": 0.7845,
+       "q_end": 0.7850146874999997,
+       "team_size": 2.982
+      },
+      {
+       "pre": 0.495745,
+       "post": 0.55824,
+       "cover_start": 0.476,
+       "cover_end": 0.756,
+       "q_end": 0.7761119999999998,
+       "team_size": 2.968
+      },
+      {
+       "pre": 0.5075,
+       "post": 0.5536700000000001,
+       "cover_start": 0.343,
+       "cover_end": 0.7555,
+       "q_end": 0.7759540624999998,
+       "team_size": 2.965
+      }
+     ],
+     "pre": 0.49435399999999996,
+     "pre_sd": 0.026321892599127435,
+     "post": 0.564986,
+     "post_sd": 0.014039235378039604,
+     "cover_end": 0.7664000000000001,
+     "cover_end_sd": 0.019262658175859305,
+     "q_end": 0.7792773999999998,
+     "q_end_sd": 0.0065963141784943415,
+     "team_size": 2.9716,
+     "team_size_sd": 0.006426507605223972
+    },
+    "swarm oracle-recruit": {
+     "kind": "swarm",
+     "env": {
+      "kind": "roles",
+      "T": 8000,
+      "role_fractions": null,
+      "strong": 0.95,
+      "weak": 0.6,
+      "member_cost": 0.0,
+      "role_by_type": false,
+      "busy": 0
+     },
+     "cfg": {
+      "N": 40,
+      "team": 3,
+      "coupling": true,
+      "plastic_W": true,
+      "hebb_bias": 0.0,
+      "sim_w": 0.5,
+      "recruit_thr": 0.25,
+      "recruit": "oracle",
+      "explore": "none",
+      "explore_c": 0.1,
+      "hormones": true,
+      "fatigue": false,
+      "sleep": false,
+      "sleep_prune": true,
+      "prune_thr": 0.05,
+      "order": "recruit",
+      "order_lr": 0.1
+     },
+     "per_seed": [
+      {
+       "pre": 0.5853499999999999,
+       "post": 0.608915,
+       "cover_start": 1.0,
+       "cover_end": 1.0,
+       "q_end": 0.8573749999999998,
+       "team_size": 3.0
+      },
+      {
+       "pre": 0.6095049999999999,
+       "post": 0.6090350000000001,
+       "cover_start": 1.0,
+       "cover_end": 1.0,
+       "q_end": 0.8573749999999998,
+       "team_size": 3.0
+      },
+      {
+       "pre": 0.55397,
+       "post": 0.62444,
+       "cover_start": 1.0,
+       "cover_end": 1.0,
+       "q_end": 0.8573749999999998,
+       "team_size": 3.0
+      },
+      {
+       "pre": 0.5568599999999999,
+       "post": 0.658505,
+       "cover_start": 1.0,
+       "cover_end": 1.0,
+       "q_end": 0.8573749999999998,
+       "team_size": 3.0
+      },
+      {
+       "pre": 0.584365,
+       "post": 0.60048,
+       "cover_start": 1.0,
+       "cover_end": 1.0,
+       "q_end": 0.8573749999999998,
+       "team_size": 3.0
+      }
+     ],
+     "pre": 0.5780099999999999,
+     "pre_sd": 0.022975208105695123,
+     "post": 0.620275,
+     "post_sd": 0.023054876653324334,
+     "cover_end": 1.0,
+     "cover_end_sd": 0.0,
+     "q_end": 0.8573749999999997,
+     "q_end_sd": 1.2412670766236366e-16,
+     "team_size": 3.0,
+     "team_size_sd": 0.0
+    },
+    "linucb + oracle team": {
+     "kind": "router",
+     "env": {
+      "kind": "roles",
+      "T": 8000,
+      "role_fractions": null,
+      "strong": 0.95,
+      "weak": 0.6,
+      "member_cost": 0.0,
+      "role_by_type": false,
+      "busy": 0
+     },
+     "cfg": {
+      "model": "linucb",
+      "team": "oracle"
+     },
+     "per_seed": [
+      {
+       "pre": 0.5872499999999999,
+       "post": 0.6027449999999999,
+       "cover_start": 1.0,
+       "cover_end": 1.0,
+       "q_end": 0.8573749999999998
+      },
+      {
+       "pre": 0.5973799999999999,
+       "post": 0.6047349999999999,
+       "cover_start": 1.0,
+       "cover_end": 1.0,
+       "q_end": 0.8573749999999998
+      },
+      {
+       "pre": 0.5513349999999998,
+       "post": 0.6102299999999999,
+       "cover_start": 1.0,
+       "cover_end": 1.0,
+       "q_end": 0.8573749999999998
+      },
+      {
+       "pre": 0.5696249999999999,
+       "post": 0.66358,
+       "cover_start": 1.0,
+       "cover_end": 1.0,
+       "q_end": 0.8573749999999998
+      },
+      {
+       "pre": 0.5818949999999999,
+       "post": 0.610405,
+       "cover_start": 1.0,
+       "cover_end": 1.0,
+       "q_end": 0.8573749999999998
+      }
+     ],
+     "pre": 0.5774969999999999,
+     "pre_sd": 0.01772156687485623,
+     "post": 0.618339,
+     "post_sd": 0.025513202317623728,
+     "cover_end": 1.0,
+     "cover_end_sd": 0.0,
+     "q_end": 0.8573749999999997,
+     "q_end_sd": 1.2412670766236366e-16
+    },
+    "linucb + pair_ucb c=0.03": {
+     "kind": "router",
+     "env": {
+      "kind": "roles",
+      "T": 8000,
+      "role_fractions": null,
+      "strong": 0.95,
+      "weak": 0.6,
+      "member_cost": 0.0,
+      "role_by_type": false,
+      "busy": 0
+     },
+     "cfg": {
+      "model": "linucb",
+      "team": "pair_ucb",
+      "c": 0.03
+     },
+     "per_seed": [
+      {
+       "pre": 0.5902549999999999,
+       "post": 0.59154,
+       "cover_start": 0.622,
+       "cover_end": 1.0,
+       "q_end": 0.8573749999999998
+      },
+      {
+       "pre": 0.590915,
+       "post": 0.61168,
+       "cover_start": 0.592,
+       "cover_end": 0.999,
+       "q_end": 0.8570591249999998
+      },
+      {
+       "pre": 0.5392349999999999,
+       "post": 0.62801,
+       "cover_start": 0.574,
+       "cover_end": 1.0,
+       "q_end": 0.8573749999999998
+      },
+      {
+       "pre": 0.5739249999999999,
+       "post": 0.648705,
+       "cover_start": 0.609,
+       "cover_end": 1.0,
+       "q_end": 0.8573749999999998
+      },
+      {
+       "pre": 0.5786199999999999,
+       "post": 0.5965199999999999,
+       "cover_start": 0.568,
+       "cover_end": 0.995,
+       "q_end": 0.8557956249999997
+      }
+     ],
+     "pre": 0.5745899999999999,
+     "pre_sd": 0.021086470781048215,
+     "post": 0.6152909999999999,
+     "post_sd": 0.023493446533022787,
+     "cover_end": 0.9987999999999999,
+     "cover_end_sd": 0.002167948338867882,
+     "q_end": 0.8569959499999997,
+     "q_end_sd": 0.0006848006815399141
+    }
+   },
+   "comparisons": [
+    {
+     "a": "swarm oracle-recruit",
+     "b": "linucb + pair_ucb c=0.03",
+     "metric": "post",
+     "diff": 0.004984000000000055,
+     "sd": 0.008791357545908348,
+     "effect": false
+    },
+    {
+     "a": "swarm oracle-recruit",
+     "b": "linucb + oracle team",
+     "metric": "post",
+     "diff": 0.0019360000000000932,
+     "sd": 0.009539441414464497,
+     "effect": false
+    },
+    {
+     "a": "swarm oracle-recruit",
+     "b": "swarm learned",
+     "metric": "post",
+     "diff": 0.05528900000000003,
+     "sd": 0.0264706468092489,
+     "effect": true
+    }
+   ]
+  },
+  "role_by_type=False, busy=8": {
+   "results": {
+    "swarm learned": {
+     "kind": "swarm",
+     "env": {
+      "kind": "roles",
+      "T": 8000,
+      "role_fractions": null,
+      "strong": 0.95,
+      "weak": 0.6,
+      "member_cost": 0.0,
+      "role_by_type": false,
+      "busy": 8
+     },
+     "cfg": {
+      "N": 40,
+      "team": 3,
+      "coupling": true,
+      "plastic_W": true,
+      "hebb_bias": 0.0,
+      "sim_w": 0.5,
+      "recruit_thr": 0.25,
+      "recruit": "learned",
+      "explore": "none",
+      "explore_c": 0.1,
+      "hormones": true,
+      "fatigue": false,
+      "sleep": false,
+      "sleep_prune": true,
+      "prune_thr": 0.05,
+      "order": "recruit",
+      "order_lr": 0.1
+     },
+     "per_seed": [
+      {
+       "pre": 0.433965,
+       "post": 0.47521,
+       "cover_start": 0.194,
+       "cover_end": 0.4975,
+       "q_end": 0.6738100624999999,
+       "team_size": 2.7485
+      },
+      {
+       "pre": 0.40163,
+       "post": 0.46591499999999997,
+       "cover_start": 0.177,
+       "cover_end": 0.5115,
+       "q_end": 0.6751400624999999,
+       "team_size": 2.708
+      },
+      {
+       "pre": 0.349715,
+       "post": 0.46804499999999993,
+       "cover_start": 0.191,
+       "cover_end": 0.3955,
+       "q_end": 0.6464785624999998,
+       "team_size": 2.845
+      },
+      {
+       "pre": 0.4194399999999999,
+       "post": 0.503395,
+       "cover_start": 0.16,
+       "cover_end": 0.512,
+       "q_end": 0.6727044999999999,
+       "team_size": 2.686
+      },
+      {
+       "pre": 0.386985,
+       "post": 0.457625,
+       "cover_start": 0.18,
+       "cover_end": 0.4215,
+       "q_end": 0.6544918124999999,
+       "team_size": 2.782
+      }
+     ],
+     "pre": 0.39834699999999995,
+     "pre_sd": 0.03247499472671241,
+     "post": 0.474038,
+     "post_sd": 0.01756767471807242,
+     "cover_end": 0.4676,
+     "cover_end_sd": 0.05503680586661983,
+     "q_end": 0.6645249999999999,
+     "q_end_sd": 0.013154228555956628,
+     "team_size": 2.7539000000000002,
+     "team_size_sd": 0.06291899554188708
+    },
+    "swarm oracle-recruit": {
+     "kind": "swarm",
+     "env": {
+      "kind": "roles",
+      "T": 8000,
+      "role_fractions": null,
+      "strong": 0.95,
+      "weak": 0.6,
+      "member_cost": 0.0,
+      "role_by_type": false,
+      "busy": 8
+     },
+     "cfg": {
+      "N": 40,
+      "team": 3,
+      "coupling": true,
+      "plastic_W": true,
+      "hebb_bias": 0.0,
+      "sim_w": 0.5,
+      "recruit_thr": 0.25,
+      "recruit": "oracle",
+      "explore": "none",
+      "explore_c": 0.1,
+      "hormones": true,
+      "fatigue": false,
+      "sleep": false,
+      "sleep_prune": true,
+      "prune_thr": 0.05,
+      "order": "recruit",
+      "order_lr": 0.1
+     },
+     "per_seed": [
+      {
+       "pre": 0.57296,
+       "post": 0.607275,
+       "cover_start": 1.0,
+       "cover_end": 1.0,
+       "q_end": 0.8573749999999998,
+       "team_size": 3.0
+      },
+      {
+       "pre": 0.5901,
+       "post": 0.6058399999999999,
+       "cover_start": 1.0,
+       "cover_end": 1.0,
+       "q_end": 0.8573749999999998,
+       "team_size": 3.0
+      },
+      {
+       "pre": 0.5344,
+       "post": 0.61327,
+       "cover_start": 1.0,
+       "cover_end": 1.0,
+       "q_end": 0.8573749999999998,
+       "team_size": 3.0
+      },
+      {
+       "pre": 0.5512349999999999,
+       "post": 0.663505,
+       "cover_start": 1.0,
+       "cover_end": 1.0,
+       "q_end": 0.8573749999999998,
+       "team_size": 3.0
+      },
+      {
+       "pre": 0.559155,
+       "post": 0.60713,
+       "cover_start": 1.0,
+       "cover_end": 1.0,
+       "q_end": 0.8573749999999998,
+       "team_size": 3.0
+      }
+     ],
+     "pre": 0.5615699999999999,
+     "pre_sd": 0.021181043116428433,
+     "post": 0.619404,
+     "post_sd": 0.024820706929900304,
+     "cover_end": 1.0,
+     "cover_end_sd": 0.0,
+     "q_end": 0.8573749999999997,
+     "q_end_sd": 1.2412670766236366e-16,
+     "team_size": 3.0,
+     "team_size_sd": 0.0
+    },
+    "linucb + oracle team": {
+     "kind": "router",
+     "env": {
+      "kind": "roles",
+      "T": 8000,
+      "role_fractions": null,
+      "strong": 0.95,
+      "weak": 0.6,
+      "member_cost": 0.0,
+      "role_by_type": false,
+      "busy": 8
+     },
+     "cfg": {
+      "model": "linucb",
+      "team": "oracle"
+     },
+     "per_seed": [
+      {
+       "pre": 0.5872499999999999,
+       "post": 0.6027449999999999,
+       "cover_start": 1.0,
+       "cover_end": 1.0,
+       "q_end": 0.8573749999999998
+      },
+      {
+       "pre": 0.5973799999999999,
+       "post": 0.6047349999999999,
+       "cover_start": 1.0,
+       "cover_end": 1.0,
+       "q_end": 0.8573749999999998
+      },
+      {
+       "pre": 0.5513349999999998,
+       "post": 0.6102299999999999,
+       "cover_start": 1.0,
+       "cover_end": 1.0,
+       "q_end": 0.8573749999999998
+      },
+      {
+       "pre": 0.5696249999999999,
+       "post": 0.66358,
+       "cover_start": 1.0,
+       "cover_end": 1.0,
+       "q_end": 0.8573749999999998
+      },
+      {
+       "pre": 0.5818949999999999,
+       "post": 0.610405,
+       "cover_start": 1.0,
+       "cover_end": 1.0,
+       "q_end": 0.8573749999999998
+      }
+     ],
+     "pre": 0.5774969999999999,
+     "pre_sd": 0.01772156687485623,
+     "post": 0.618339,
+     "post_sd": 0.025513202317623728,
+     "cover_end": 1.0,
+     "cover_end_sd": 0.0,
+     "q_end": 0.8573749999999997,
+     "q_end_sd": 1.2412670766236366e-16
+    },
+    "linucb + pair_ucb c=0.1": {
+     "kind": "router",
+     "env": {
+      "kind": "roles",
+      "T": 8000,
+      "role_fractions": null,
+      "strong": 0.95,
+      "weak": 0.6,
+      "member_cost": 0.0,
+      "role_by_type": false,
+      "busy": 8
+     },
+     "cfg": {
+      "model": "linucb",
+      "team": "pair_ucb",
+      "c": 0.1
+     },
+     "per_seed": [
+      {
+       "pre": 0.5745899999999999,
+       "post": 0.6088450000000001,
+       "cover_start": 0.487,
+       "cover_end": 0.997,
+       "q_end": 0.8564273749999998
+      },
+      {
+       "pre": 0.5777649999999999,
+       "post": 0.6144149999999999,
+       "cover_start": 0.51,
+       "cover_end": 0.9705,
+       "q_end": 0.8480566874999997
+      },
+      {
+       "pre": 0.49687499999999996,
+       "post": 0.61403,
+       "cover_start": 0.458,
+       "cover_end": 1.0,
+       "q_end": 0.8573749999999998
+      },
+      {
+       "pre": 0.5238550000000001,
+       "post": 0.65618,
+       "cover_start": 0.391,
+       "cover_end": 0.9975,
+       "q_end": 0.8565853124999998
+      },
+      {
+       "pre": 0.5689699999999999,
+       "post": 0.592635,
+       "cover_start": 0.491,
+       "cover_end": 0.9615,
+       "q_end": 0.8452138124999998
+      }
+     ],
+     "pre": 0.548411,
+     "pre_sd": 0.03615462027874163,
+     "post": 0.617221,
+     "post_sd": 0.023507916592075937,
+     "cover_end": 0.9853000000000002,
+     "cover_end_sd": 0.017939481597861177,
+     "q_end": 0.8527316374999998,
+     "q_end_sd": 0.005666633749724395
+    }
+   },
+   "comparisons": [
+    {
+     "a": "swarm oracle-recruit",
+     "b": "linucb + pair_ucb c=0.1",
+     "metric": "post",
+     "diff": 0.0021829999999999792,
+     "sd": 0.008895312389118198,
+     "effect": false
+    },
+    {
+     "a": "swarm oracle-recruit",
+     "b": "linucb + oracle team",
+     "metric": "post",
+     "diff": 0.0010650000000000492,
+     "sd": 0.003001818199025437,
+     "effect": false
+    },
+    {
+     "a": "swarm oracle-recruit",
+     "b": "swarm learned",
+     "metric": "post",
+     "diff": 0.14536599999999997,
+     "sd": 0.010500688310772768,
+     "effect": true
+    }
+   ]
+  },
+  "role_by_type=True, busy=0": {
+   "results": {
+    "swarm learned": {
+     "kind": "swarm",
+     "env": {
+      "kind": "roles",
+      "T": 8000,
+      "role_fractions": null,
+      "strong": 0.95,
+      "weak": 0.6,
+      "member_cost": 0.0,
+      "role_by_type": true,
+      "busy": 0
+     },
+     "cfg": {
+      "N": 40,
+      "team": 3,
+      "coupling": true,
+      "plastic_W": true,
+      "hebb_bias": 0.0,
+      "sim_w": 0.5,
+      "recruit_thr": 0.25,
+      "recruit": "learned",
+      "explore": "none",
+      "explore_c": 0.1,
+      "hormones": true,
+      "fatigue": false,
+      "sleep": false,
+      "sleep_prune": true,
+      "prune_thr": 0.05,
+      "order": "recruit",
+      "order_lr": 0.1
+     },
+     "per_seed": [
+      {
+       "pre": 0.47867,
+       "post": 0.523165,
+       "cover_start": 0.436,
+       "cover_end": 0.668,
+       "q_end": 0.7431279999999998,
+       "team_size": 2.968
+      },
+      {
+       "pre": 0.5425149999999999,
+       "post": 0.54545,
+       "cover_start": 0.649,
+       "cover_end": 0.752,
+       "q_end": 0.7748484999999998,
+       "team_size": 2.966
+      },
+      {
+       "pre": 0.4813299999999999,
+       "post": 0.5561199999999998,
+       "cover_start": 0.504,
+       "cover_end": 0.7135,
+       "q_end": 0.7631860624999998,
+       "team_size": 2.9825
+      },
+      {
+       "pre": 0.479475,
+       "post": 0.5802749999999999,
+       "cover_start": 0.442,
+       "cover_end": 0.699,
+       "q_end": 0.7531196249999998,
+       "team_size": 2.9675
+      },
+      {
+       "pre": 0.4986499999999999,
+       "post": 0.529575,
+       "cover_start": 0.45,
+       "cover_end": 0.711,
+       "q_end": 0.7593041249999999,
+       "team_size": 2.9695
+      }
+     ],
+     "pre": 0.49612799999999996,
+     "pre_sd": 0.027199261157244647,
+     "post": 0.5469169999999999,
+     "post_sd": 0.022718417253409118,
+     "cover_end": 0.7086999999999999,
+     "cover_end_sd": 0.030223335355317744,
+     "q_end": 0.7587172624999999,
+     "q_end_sd": 0.011778052207290321,
+     "team_size": 2.9707,
+     "team_size_sd": 0.006713791775144614
+    },
+    "swarm oracle-recruit": {
+     "kind": "swarm",
+     "env": {
+      "kind": "roles",
+      "T": 8000,
+      "role_fractions": null,
+      "strong": 0.95,
+      "weak": 0.6,
+      "member_cost": 0.0,
+      "role_by_type": true,
+      "busy": 0
+     },
+     "cfg": {
+      "N": 40,
+      "team": 3,
+      "coupling": true,
+      "plastic_W": true,
+      "hebb_bias": 0.0,
+      "sim_w": 0.5,
+      "recruit_thr": 0.25,
+      "recruit": "oracle",
+      "explore": "none",
+      "explore_c": 0.1,
+      "hormones": true,
+      "fatigue": false,
+      "sleep": false,
+      "sleep_prune": true,
+      "prune_thr": 0.05,
+      "order": "recruit",
+      "order_lr": 0.1
+     },
+     "per_seed": [
+      {
+       "pre": 0.5862549999999999,
+       "post": 0.610165,
+       "cover_start": 1.0,
+       "cover_end": 1.0,
+       "q_end": 0.8573749999999998,
+       "team_size": 3.0
+      },
+      {
+       "pre": 0.6085649999999999,
+       "post": 0.61019,
+       "cover_start": 1.0,
+       "cover_end": 1.0,
+       "q_end": 0.8573749999999998,
+       "team_size": 3.0
+      },
+      {
+       "pre": 0.5504549999999999,
+       "post": 0.617165,
+       "cover_start": 1.0,
+       "cover_end": 1.0,
+       "q_end": 0.8573749999999998,
+       "team_size": 3.0
+      },
+      {
+       "pre": 0.5584949999999999,
+       "post": 0.6597299999999999,
+       "cover_start": 1.0,
+       "cover_end": 1.0,
+       "q_end": 0.8573749999999998,
+       "team_size": 3.0
+      },
+      {
+       "pre": 0.5843599999999999,
+       "post": 0.60311,
+       "cover_start": 1.0,
+       "cover_end": 1.0,
+       "q_end": 0.8573749999999998,
+       "team_size": 3.0
+      }
+     ],
+     "pre": 0.5776259999999999,
+     "pre_sd": 0.02335212260159663,
+     "post": 0.6200720000000001,
+     "post_sd": 0.022719593031126206,
+     "cover_end": 1.0,
+     "cover_end_sd": 0.0,
+     "q_end": 0.8573749999999997,
+     "q_end_sd": 1.2412670766236366e-16,
+     "team_size": 3.0,
+     "team_size_sd": 0.0
+    },
+    "linucb + oracle team": {
+     "kind": "router",
+     "env": {
+      "kind": "roles",
+      "T": 8000,
+      "role_fractions": null,
+      "strong": 0.95,
+      "weak": 0.6,
+      "member_cost": 0.0,
+      "role_by_type": true,
+      "busy": 0
+     },
+     "cfg": {
+      "model": "linucb",
+      "team": "oracle"
+     },
+     "per_seed": [
+      {
+       "pre": 0.5872499999999999,
+       "post": 0.6027449999999999,
+       "cover_start": 1.0,
+       "cover_end": 1.0,
+       "q_end": 0.8573749999999998
+      },
+      {
+       "pre": 0.5973799999999999,
+       "post": 0.6047349999999999,
+       "cover_start": 1.0,
+       "cover_end": 1.0,
+       "q_end": 0.8573749999999998
+      },
+      {
+       "pre": 0.5513349999999998,
+       "post": 0.6102299999999999,
+       "cover_start": 1.0,
+       "cover_end": 1.0,
+       "q_end": 0.8573749999999998
+      },
+      {
+       "pre": 0.5696249999999999,
+       "post": 0.66358,
+       "cover_start": 1.0,
+       "cover_end": 1.0,
+       "q_end": 0.8573749999999998
+      },
+      {
+       "pre": 0.5818949999999999,
+       "post": 0.610405,
+       "cover_start": 1.0,
+       "cover_end": 1.0,
+       "q_end": 0.8573749999999998
+      }
+     ],
+     "pre": 0.5774969999999999,
+     "pre_sd": 0.01772156687485623,
+     "post": 0.618339,
+     "post_sd": 0.025513202317623728,
+     "cover_end": 1.0,
+     "cover_end_sd": 0.0,
+     "q_end": 0.8573749999999997,
+     "q_end_sd": 1.2412670766236366e-16
+    },
+    "linucb + cluster_pair_ucb c=0.1": {
+     "kind": "router",
+     "env": {
+      "kind": "roles",
+      "T": 8000,
+      "role_fractions": null,
+      "strong": 0.95,
+      "weak": 0.6,
+      "member_cost": 0.0,
+      "role_by_type": true,
+      "busy": 0
+     },
+     "cfg": {
+      "model": "linucb",
+      "team": "cluster_pair_ucb",
+      "c": 0.1
+     },
+     "per_seed": [
+      {
+       "pre": 0.569715,
+       "post": 0.60349,
+       "cover_start": 0.242,
+       "cover_end": 0.935,
+       "q_end": 0.8362446249999999
+      },
+      {
+       "pre": 0.5605199999999999,
+       "post": 0.59765,
+       "cover_start": 0.26,
+       "cover_end": 0.935,
+       "q_end": 0.8362446249999999
+      },
+      {
+       "pre": 0.48571999999999993,
+       "post": 0.62227,
+       "cover_start": 0.222,
+       "cover_end": 0.95,
+       "q_end": 0.8412819999999998
+      },
+      {
+       "pre": 0.52704,
+       "post": 0.63045,
+       "cover_start": 0.261,
+       "cover_end": 0.972,
+       "q_end": 0.8480317499999999
+      },
+      {
+       "pre": 0.518095,
+       "post": 0.588425,
+       "cover_start": 0.254,
+       "cover_end": 0.9525,
+       "q_end": 0.8405754374999997
+      }
+     ],
+     "pre": 0.532218,
+     "pre_sd": 0.033894553507901534,
+     "post": 0.6084569999999999,
+     "post_sd": 0.01744444309801834,
+     "cover_end": 0.9489000000000001,
+     "cover_end_sd": 0.015282342752340002,
+     "q_end": 0.8404756874999999,
+     "q_end_sd": 0.004836267935399024
+    }
+   },
+   "comparisons": [
+    {
+     "a": "swarm oracle-recruit",
+     "b": "linucb + cluster_pair_ucb c=0.1",
+     "metric": "post",
+     "diff": 0.011614999999999997,
+     "sd": 0.012512940801426342,
+     "effect": false
+    },
+    {
+     "a": "swarm oracle-recruit",
+     "b": "linucb + oracle team",
+     "metric": "post",
+     "diff": 0.0017330000000000511,
+     "sd": 0.006817820949541011,
+     "effect": false
+    },
+    {
+     "a": "swarm oracle-recruit",
+     "b": "swarm learned",
+     "metric": "post",
+     "diff": 0.07315500000000004,
+     "sd": 0.010594606528795635,
+     "effect": true
+    }
+   ]
+  },
+  "role_by_type=True, busy=8": {
+   "results": {
+    "swarm learned": {
+     "kind": "swarm",
+     "env": {
+      "kind": "roles",
+      "T": 8000,
+      "role_fractions": null,
+      "strong": 0.95,
+      "weak": 0.6,
+      "member_cost": 0.0,
+      "role_by_type": true,
+      "busy": 8
+     },
+     "cfg": {
+      "N": 40,
+      "team": 3,
+      "coupling": true,
+      "plastic_W": true,
+      "hebb_bias": 0.0,
+      "sim_w": 0.5,
+      "recruit_thr": 0.25,
+      "recruit": "learned",
+      "explore": "none",
+      "explore_c": 0.1,
+      "hormones": true,
+      "fatigue": false,
+      "sleep": false,
+      "sleep_prune": true,
+      "prune_thr": 0.05,
+      "order": "recruit",
+      "order_lr": 0.1
+     },
+     "per_seed": [
+      {
+       "pre": 0.38035,
+       "post": 0.443255,
+       "cover_start": 0.199,
+       "cover_end": 0.3895,
+       "q_end": 0.6322143124999999,
+       "team_size": 2.7215
+      },
+      {
+       "pre": 0.40754499999999994,
+       "post": 0.45150999999999997,
+       "cover_start": 0.22,
+       "cover_end": 0.4405,
+       "q_end": 0.6522141874999998,
+       "team_size": 2.728
+      },
+      {
+       "pre": 0.358125,
+       "post": 0.4438,
+       "cover_start": 0.214,
+       "cover_end": 0.348,
+       "q_end": 0.6300779999999999,
+       "team_size": 2.8665
+      },
+      {
+       "pre": 0.37741499999999994,
+       "post": 0.47894499999999995,
+       "cover_start": 0.211,
+       "cover_end": 0.4365,
+       "q_end": 0.6472599375,
+       "team_size": 2.731
+      },
+      {
+       "pre": 0.37639999999999996,
+       "post": 0.44887,
+       "cover_start": 0.189,
+       "cover_end": 0.4125,
+       "q_end": 0.6442674374999999,
+       "team_size": 2.757
+      }
+     ],
+     "pre": 0.379967,
+     "pre_sd": 0.017727111510339157,
+     "post": 0.45327599999999996,
+     "post_sd": 0.014761810271778985,
+     "cover_end": 0.40540000000000004,
+     "cover_end_sd": 0.038069672969438556,
+     "q_end": 0.6412067749999999,
+     "q_end_sd": 0.009642167494267027,
+     "team_size": 2.7608,
+     "team_size_sd": 0.06061208625348573
+    },
+    "swarm oracle-recruit": {
+     "kind": "swarm",
+     "env": {
+      "kind": "roles",
+      "T": 8000,
+      "role_fractions": null,
+      "strong": 0.95,
+      "weak": 0.6,
+      "member_cost": 0.0,
+      "role_by_type": true,
+      "busy": 8
+     },
+     "cfg": {
+      "N": 40,
+      "team": 3,
+      "coupling": true,
+      "plastic_W": true,
+      "hebb_bias": 0.0,
+      "sim_w": 0.5,
+      "recruit_thr": 0.25,
+      "recruit": "oracle",
+      "explore": "none",
+      "explore_c": 0.1,
+      "hormones": true,
+      "fatigue": false,
+      "sleep": false,
+      "sleep_prune": true,
+      "prune_thr": 0.05,
+      "order": "recruit",
+      "order_lr": 0.1
+     },
+     "per_seed": [
+      {
+       "pre": 0.5602249999999999,
+       "post": 0.61544,
+       "cover_start": 1.0,
+       "cover_end": 1.0,
+       "q_end": 0.8573749999999998,
+       "team_size": 3.0
+      },
+      {
+       "pre": 0.5822549999999999,
+       "post": 0.6029350000000001,
+       "cover_start": 1.0,
+       "cover_end": 1.0,
+       "q_end": 0.8573749999999998,
+       "team_size": 3.0
+      },
+      {
+       "pre": 0.5386499999999999,
+       "post": 0.6243,
+       "cover_start": 0.999,
+       "cover_end": 1.0,
+       "q_end": 0.8573749999999998,
+       "team_size": 3.0
+      },
+      {
+       "pre": 0.554685,
+       "post": 0.66203,
+       "cover_start": 1.0,
+       "cover_end": 1.0,
+       "q_end": 0.8573749999999998,
+       "team_size": 3.0
+      },
+      {
+       "pre": 0.57719,
+       "post": 0.607035,
+       "cover_start": 1.0,
+       "cover_end": 1.0,
+       "q_end": 0.8573749999999998,
+       "team_size": 3.0
+      }
+     ],
+     "pre": 0.5626009999999999,
+     "pre_sd": 0.01761446472362985,
+     "post": 0.622348,
+     "post_sd": 0.02365134472921147,
+     "cover_end": 1.0,
+     "cover_end_sd": 0.0,
+     "q_end": 0.8573749999999997,
+     "q_end_sd": 1.2412670766236366e-16,
+     "team_size": 3.0,
+     "team_size_sd": 0.0
+    },
+    "linucb + oracle team": {
+     "kind": "router",
+     "env": {
+      "kind": "roles",
+      "T": 8000,
+      "role_fractions": null,
+      "strong": 0.95,
+      "weak": 0.6,
+      "member_cost": 0.0,
+      "role_by_type": true,
+      "busy": 8
+     },
+     "cfg": {
+      "model": "linucb",
+      "team": "oracle"
+     },
+     "per_seed": [
+      {
+       "pre": 0.5872499999999999,
+       "post": 0.6027449999999999,
+       "cover_start": 1.0,
+       "cover_end": 1.0,
+       "q_end": 0.8573749999999998
+      },
+      {
+       "pre": 0.598355,
+       "post": 0.6047449999999999,
+       "cover_start": 1.0,
+       "cover_end": 1.0,
+       "q_end": 0.8573749999999998
+      },
+      {
+       "pre": 0.5436799999999999,
+       "post": 0.6214400000000001,
+       "cover_start": 1.0,
+       "cover_end": 1.0,
+       "q_end": 0.8573749999999998
+      },
+      {
+       "pre": 0.5712399999999999,
+       "post": 0.655375,
+       "cover_start": 1.0,
+       "cover_end": 1.0,
+       "q_end": 0.8573749999999998
+      },
+      {
+       "pre": 0.5818949999999999,
+       "post": 0.6130449999999998,
+       "cover_start": 1.0,
+       "cover_end": 1.0,
+       "q_end": 0.8573749999999998
+      }
+     ],
+     "pre": 0.5764839999999999,
+     "pre_sd": 0.020779366388318978,
+     "post": 0.61947,
+     "post_sd": 0.021394402305276106,
+     "cover_end": 1.0,
+     "cover_end_sd": 0.0,
+     "q_end": 0.8573749999999997,
+     "q_end_sd": 1.2412670766236366e-16
+    },
+    "linucb + pair_ucb c=0.1": {
+     "kind": "router",
+     "env": {
+      "kind": "roles",
+      "T": 8000,
+      "role_fractions": null,
+      "strong": 0.95,
+      "weak": 0.6,
+      "member_cost": 0.0,
+      "role_by_type": true,
+      "busy": 8
+     },
+     "cfg": {
+      "model": "linucb",
+      "team": "pair_ucb",
+      "c": 0.1
+     },
+     "per_seed": [
+      {
+       "pre": 0.5215,
+       "post": 0.5534749999999999,
+       "cover_start": 0.298,
+       "cover_end": 0.755,
+       "q_end": 0.7799856249999998
+      },
+      {
+       "pre": 0.5048849999999999,
+       "post": 0.5232149999999999,
+       "cover_start": 0.303,
+       "cover_end": 0.72,
+       "q_end": 0.7667354999999998
+      },
+      {
+       "pre": 0.45208499999999996,
+       "post": 0.5490949999999999,
+       "cover_start": 0.298,
+       "cover_end": 0.701,
+       "q_end": 0.7629283749999998
+      },
+      {
+       "pre": 0.4866249999999999,
+       "post": 0.5695899999999999,
+       "cover_start": 0.292,
+       "cover_end": 0.7385,
+       "q_end": 0.7747736874999999
+      },
+      {
+       "pre": 0.44867999999999997,
+       "post": 0.52509,
+       "cover_start": 0.295,
+       "cover_end": 0.712,
+       "q_end": 0.7660039999999997
+      }
+     ],
+     "pre": 0.4827549999999999,
+     "pre_sd": 0.032045449559960915,
+     "post": 0.5440929999999999,
+     "post_sd": 0.01974932802654309,
+     "cover_end": 0.7253000000000001,
+     "cover_end_sd": 0.021516272911450095,
+     "q_end": 0.7700854374999997,
+     "q_end_sd": 0.007055089608695216
+    }
+   },
+   "comparisons": [
+    {
+     "a": "swarm oracle-recruit",
+     "b": "linucb + pair_ucb c=0.1",
+     "metric": "post",
+     "diff": 0.0782550000000001,
+     "sd": 0.011086513766734802,
+     "effect": true
+    },
+    {
+     "a": "swarm oracle-recruit",
+     "b": "linucb + oracle team",
+     "metric": "post",
+     "diff": 0.0028780000000000693,
+     "sd": 0.00727346942662161,
+     "effect": false
+    },
+    {
+     "a": "swarm oracle-recruit",
+     "b": "swarm learned",
+     "metric": "post",
+     "diff": 0.16907200000000003,
+     "sd": 0.013847683741333747,
+     "effect": true
+    }
+   ]
+  }
+ }
+}
