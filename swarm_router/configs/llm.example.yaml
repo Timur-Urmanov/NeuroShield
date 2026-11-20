@@ -15,12 +15,16 @@ run:
   max_tokens:                  # per role; also used by the budget guard as the worst-case output
     planner: 1024
     executor: 2048
-    verifier: 512
+    verifier: 2048
   cache_dir: .cache/llm        # sqlite response cache (gitignored)
   log_dir: results/llm_calls   # one jsonl per run: every call, tokens, cost, cache hit
-  # false: identical prompts share one cached response across seeds (cheap; seeds then vary
-  # task order + router randomness only, i.e. common random numbers). true: one sample per seed.
-  include_seed_in_cache_key: false
+  # true (default for the headline llm_run comparison): one model sample per seed, so the sd over
+  # seeds includes model sampling noise. false: identical prompts share one cached response across
+  # seeds (cheap; seeds then vary task order + router randomness only).
+  include_seed_in_cache_key: true
+  # per-variant budget: "equal" = limit / n_variants, or a mapping {variant_label: fraction}
+  # (labels: swarm, linucb, single:<name>, pipeline:<name>); unspecified variants share the rest.
+  variant_budget_share: equal
   # how team members map to roles: "position" (exec order -> planner/executor/verifier by team size)
   team_roles: position
 
@@ -33,7 +37,7 @@ embeddings:
   # base_url: https://api.voyageai.com/v1
   # model: voyage-3.5-lite
   # api_key_env: VOYAGE_API_KEY
-  # price_in_per_1m: 0.02
+  # price_in_per_1m: 0.02      # REQUIRED and > 0 for a real provider (estimate + budget guard)
 
 tasks:
   builtin: true                # swarm/llm/tasks/data/{math,code,text}.jsonl (~20 each)
@@ -51,6 +55,7 @@ models:
     # Extra Messages API params, passed through verbatim. Opus 5.5: thinking cannot be disabled;
     # effort is the only depth control (default medium) -> low keeps thinking (billed as output) small.
     # No temperature/top_p: rejected on current models / API version.
+    thinking: true             # adaptive thinking is on by default (billed as output tokens)
     params: {output_config: {effort: low}}
     sim:
       acc: {math: 0.93, code: 0.90, text: 0.86}
@@ -59,6 +64,7 @@ models:
       plan_bonus: 0.04         # executor success bonus when given this model's plan
       verify_detect: 0.75      # P(reject | wrong answer)
       false_reject: 0.05       # P(reject | correct answer)
+      no_verdict: 0.02         # P(verifier reply has no VERDICT line)
       context_decay_per_1k: 0.003
   - name: sonnet
     provider: anthropic
@@ -66,6 +72,7 @@ models:
     api_key_env: ANTHROPIC_API_KEY
     price_in_per_1m: 2.0
     price_out_per_1m: 10.0
+    thinking: true             # adaptive thinking is on by default (billed as output tokens)
     params: {output_config: {effort: low}}
     sim:
       acc: {math: 0.90, code: 0.86, text: 0.87}
@@ -74,6 +81,7 @@ models:
       plan_bonus: 0.03
       verify_detect: 0.65
       false_reject: 0.06
+      no_verdict: 0.03
       context_decay_per_1k: 0.005
   - name: haiku
     provider: anthropic
@@ -81,6 +89,7 @@ models:
     api_key_env: ANTHROPIC_API_KEY
     price_in_per_1m: 0.10      # <=100K-token prompts
     price_out_per_1m: 0.50
+    thinking: true             # adaptive thinking is on by default (billed as output tokens)
     params: {output_config: {effort: low}}
     sim:
       acc: {math: 0.78, code: 0.70, text: 0.84}
@@ -89,6 +98,7 @@ models:
       plan_bonus: 0.01
       verify_detect: 0.45
       false_reject: 0.10
+      no_verdict: 0.06
       context_decay_per_1k: 0.010
   # --- OpenAI-compatible chat endpoint (any vendor exposing /v1/chat/completions):
   # - name: other
@@ -99,5 +109,6 @@ models:
   #   max_tokens_field: max_completion_tokens   # some servers want max_tokens
   #   price_in_per_1m: 0.0
   #   price_out_per_1m: 0.0
+  #   thinking: false
   #   params: {}
   #   sim: {acc: {math: 0.8, code: 0.8, text: 0.8}}

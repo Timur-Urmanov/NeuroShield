@@ -60,10 +60,11 @@ def revision_message(feedback: str) -> str:
 _VERDICT = re.compile(r"VERDICT\s*:\s*(ACCEPT|REVISE)", re.I)
 
 
-def parse_verdict(text: str) -> bool:
-    """True = accept. Last VERDICT line wins; no verdict -> accept (do not spend a revision on noise)."""
+def parse_verdict(text: str) -> str:
+    """'accept' | 'revise' | 'none' (no VERDICT line). Last VERDICT line wins.
+    The team treats 'none' like accept (no revision is spent on noise) but it is counted separately."""
     m = _VERDICT.findall(text or "")
-    return not (m and m[-1].upper() == "REVISE")
+    return m[-1].lower() if m else "none"
 
 
 @dataclass
@@ -76,9 +77,14 @@ class TeamResult:
     n_cache_hits: int = 0
     revised: bool = False
     roles: list = field(default_factory=list)
+    verdict: Optional[str] = None     # accept | revise | none (no verdict line) | None (no verifier)
+    n_max_tokens: int = 0             # calls that stopped at max_tokens (truncated)
+    n_refusals: int = 0               # calls with stop_reason == refusal
     transcript: list = field(default_factory=list)   # [(role, user_msg, reply)]
 
     def add(self, call, role, user_msg):
+        self.n_max_tokens += int(call.stop_reason == "max_tokens")
+        self.n_refusals += int(call.stop_reason == "refusal")
         self.usd_nominal += call.usd_nominal
         self.usd_charged += call.usd_charged
         self.n_calls += 1
@@ -108,7 +114,8 @@ def run_team(client, model: str, task, roles: list, max_tokens: dict, sample_id:
         v = client.call(model, ROLE_PROMPTS["verifier"], [{"role": "user", "content": vm}],
                         max_tokens["verifier"], sample_id=sample_id, tag="verifier")
         res.add(v, "verifier", vm)
-        if not parse_verdict(v.text):
+        res.verdict = parse_verdict(v.text)
+        if res.verdict == "revise":
             rm = revision_message(v.text)
             conv2 = conv + [{"role": "assistant", "content": answer or "(empty)"}, {"role": "user", "content": rm}]
             c2 = client.call(model, ROLE_PROMPTS["executor"], conv2, max_tokens["executor"],

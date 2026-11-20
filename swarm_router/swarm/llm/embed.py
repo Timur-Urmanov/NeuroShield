@@ -105,10 +105,29 @@ class OpenAICompatEmbedder:
         return _project(V, self.dim, self.seed)
 
 
+def embedding_price(emb_cfg: dict) -> float:
+    """USD per 1M input tokens of the configured embeddings provider (0 for hashed).
+    A real provider without a positive price is a config error: the budget guard would treat its
+    calls as free."""
+    prov = emb_cfg.get("provider", "hashed")
+    if prov == "hashed":
+        return 0.0
+    price = emb_cfg.get("price_in_per_1m")
+    try:
+        price = float(price)
+    except (TypeError, ValueError):
+        price = 0.0
+    if not price > 0:
+        raise ValueError(f"embeddings provider {prov!r} needs a positive price_in_per_1m in the config "
+                         f"(got {emb_cfg.get('price_in_per_1m')!r}); refusing to treat its calls as free")
+    return price
+
+
 def make_embedder(emb_cfg: dict, dry_run: bool, budget=None, cache=None, log=None):
     prov = emb_cfg.get("provider", "hashed")
     if dry_run or prov == "hashed":
         return HashedEmbedder(**emb_cfg)
+    embedding_price(emb_cfg)
     if prov == "openai_compatible":
         return OpenAICompatEmbedder(budget=budget, cache=cache, log=log,
                                     **{k: v for k, v in emb_cfg.items() if k != "provider"})

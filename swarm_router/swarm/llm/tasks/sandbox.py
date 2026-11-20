@@ -1,10 +1,12 @@
 """Run untrusted candidate code in a separate `python -I` process.
 
-Isolation: fresh temp dir as cwd/HOME/TMPDIR, minimal env, isolated interpreter (-I: no user site,
-no PYTHONPATH, script dir not trusted), wall-clock timeout (whole process group killed), and POSIX
-rlimits where available (CPU seconds, address space, file size, open files, no core dumps).
-This is NOT a security boundary against adversarial code (no network/syscall filtering); it is
-meant for model-written solutions to small programming tasks. Run real experiments in a container.
+Isolation: the candidate file is written to a fresh temp dir which is also cwd/HOME/TMPDIR, minimal
+env, isolated interpreter (-I: no user site, no PYTHONPATH, script dir not trusted), wall-clock
+timeout (whole process group killed, bounded wait for the pipes afterwards), and POSIX rlimits where
+available (CPU seconds, address space, file size, open files, number of processes, no core dumps).
+This is NOT a security boundary: there is no filesystem isolation (the process can read/write
+anything the user can), no network or syscall filtering, and RLIMIT_NPROC is per-user and ignored
+for root. It is meant for model-written solutions to small tasks. Run real experiments in a container.
 """
 from __future__ import annotations
 
@@ -31,13 +33,18 @@ class RunResult:
     stderr: str
 
 
+NPROC = 64            # per-user process cap inside the child (blocks fork bombs for non-root users)
+
+
 def _limits(cpu_s: int, mem_mb: int):
     def f():
         if resource is None:
             return
         for lim, val in ((resource.RLIMIT_CPU, cpu_s), (resource.RLIMIT_AS, mem_mb * 2**20),
                          (resource.RLIMIT_FSIZE, 10 * 2**20), (resource.RLIMIT_NOFILE, 64),
-                         (resource.RLIMIT_CORE, 0)):
+                         (resource.RLIMIT_CORE, 0), (getattr(resource, "RLIMIT_NPROC", None), NPROC)):
+            if lim is None:
+                continue
             try:
                 resource.setrlimit(lim, (val, val))
             except (ValueError, OSError):
@@ -68,7 +75,15 @@ def run_tests(code: str, tests: list, setup: str = "", timeout: float = 5.0, mem
                 os.killpg(p.pid, signal.SIGKILL) if os.name == "posix" else p.kill()
             except ProcessLookupError:
                 pass
-            out, err = p.communicate()
+            try:
+                out, err = p.communicate(timeout=5.0)
+            except subprocess.TimeoutExpired:      # a grandchild escaped the group and holds the pipes
+                for f in (p.stdout, p.stderr):
+                    try:
+                        f.close()
+                    except Exception:
+                        pass
+                out, err = "", "sandbox: pipes not closed after kill"
             timed_out = True
     passed = (not timed_out) and p.returncode == 0 and marker in (out or "")
     return RunResult(passed, p.returncode, timed_out, (out or "")[-2000:], (err or "")[-2000:])

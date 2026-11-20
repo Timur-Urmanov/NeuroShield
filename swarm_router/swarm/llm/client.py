@@ -27,6 +27,7 @@ class LLMClient:
     def __init__(self, cfg: LLMConfig, budget: Budget, cache: ResponseCache, log: CallLog,
                  dry_run: bool = True, oracle: Optional[SimOracle] = None):
         self.cfg, self.budget, self.cache, self.log, self.dry_run = cfg, budget, cache, log, dry_run
+        self.run_budget = budget          # `budget` may be swapped for a per-variant share of it
         self.providers = {m.name: make_provider(m, dry_run, oracle) for m in cfg.models}
         self.n_calls = self.n_hits = 0
 

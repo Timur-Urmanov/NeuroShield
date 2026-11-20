@@ -10,6 +10,8 @@ import hashlib
 import json
 import os
 import re
+import time
+import urllib.error
 import urllib.request
 from dataclasses import dataclass, field
 from typing import Optional
@@ -62,14 +64,38 @@ class Provider:
         return key
 
 
-def _post_json(url: str, body: dict, headers: dict, timeout: float = 600.0) -> dict:
-    req = urllib.request.Request(url, data=json.dumps(body).encode(), method="POST",
-                                 headers={"content-type": "application/json", **headers})
-    try:
-        with urllib.request.urlopen(req, timeout=timeout) as r:
-            return json.loads(r.read().decode())
-    except urllib.error.HTTPError as e:
-        raise ProviderError(f"HTTP {e.code} from {url}: {e.read().decode(errors='replace')[:500]}") from e
+RETRY_STATUS = {408, 409, 429, 500, 502, 503, 504, 529}
+MAX_TRIES = 4
+_sleep = time.sleep           # patched in tests
+
+
+def _post_json(url: str, body: dict, headers: dict, timeout: float = 600.0, tries: int = MAX_TRIES) -> dict:
+    """POST JSON; retries 408/409/429/5xx/529 and connection errors/timeouts with exponential backoff
+    (1, 2, 4 s, or the server's retry-after if given), `tries` attempts in total."""
+    data = json.dumps(body).encode()
+    last = None
+    for attempt in range(tries):
+        req = urllib.request.Request(url, data=data, method="POST",
+                                     headers={"content-type": "application/json", **headers})
+        try:
+            with urllib.request.urlopen(req, timeout=timeout) as r:
+                return json.loads(r.read().decode())
+        except urllib.error.HTTPError as e:
+            msg = e.read().decode(errors="replace")[:500]
+            last = ProviderError(f"HTTP {e.code} from {url}: {msg}")
+            if e.code not in RETRY_STATUS and not 500 <= e.code < 600:
+                raise last from e
+            wait = 2.0 ** attempt
+            try:
+                wait = max(wait, float(e.headers.get("retry-after") or 0))
+            except (TypeError, ValueError, AttributeError):
+                pass
+        except (urllib.error.URLError, TimeoutError, ConnectionError) as e:
+            last = ProviderError(f"connection error to {url}: {e}")
+            wait = 2.0 ** attempt
+        if attempt < tries - 1:
+            _sleep(min(wait, 60.0))
+    raise last
 
 
 class AnthropicProvider(Provider):
@@ -95,7 +121,7 @@ class AnthropicProvider(Provider):
             return self._raw(body)
         if self._client is None:
             import anthropic
-            self._client = anthropic.Anthropic(api_key=self._key(), max_retries=2)
+            self._client = anthropic.Anthropic(api_key=self._key(), max_retries=MAX_TRIES - 1)
         resp = self._client.messages.create(**body)
         text = "".join(b.text for b in resp.content if getattr(b, "type", "") == "text")
         u = resp.usage
@@ -162,19 +188,16 @@ class SimOracle:
 
     @staticmethod
     def render(task, correct: bool, u: float) -> str:
+        """Reply in the real output format; wrong replies are plausible (tasks/mutate.py)."""
+        from .tasks.mutate import wrong_code, wrong_number, wrong_text
         if task.kind == "math":
-            a = float(task.answer)
-            if not correct:
-                a = a + (1 if u < 0.5 else -2) * max(1.0, round(abs(a) * 0.1))
-            s = f"{a:.2f}".rstrip("0").rstrip(".")
+            a = float(task.answer) if correct else wrong_number(task.answer, u)
+            s = f"{a:.4f}".rstrip("0").rstrip(".")
             return f"Working through the quantities step by step.\nFinal answer: {s}"
         if task.kind == "code":
-            if correct:
-                return f"```python\n{task.reference}\n```"
-            return f"```python\ndef {task.entry_point or 'solution'}(*args, **kwargs):\n    return None\n```"
-        labels = [l for l in (task.labels or []) if str(l).lower() != str(task.answer).lower()]
-        wrong = labels[int(u * len(labels)) % len(labels)] if labels else "unknown"
-        return f"Considering the text.\nAnswer: {task.answer if correct else wrong}"
+            code = task.reference if correct else wrong_code(task)
+            return f"```python\n{code}\n```"
+        return f"Considering the text.\nAnswer: {task.answer if correct else wrong_text(task, u)}"
 
 
 class SimProvider(Provider):
@@ -223,6 +246,8 @@ class SimProvider(Provider):
         if verify_mode:
             m = _ANSWER_RE.findall(last)
             ok = bool(m) and self.oracle.check(task, m[-1])
+            if hash_uniform("noverdict", u) < sp.get("no_verdict", 0.0):
+                return out("The answer seems mostly reasonable.", "verifier")
             reject = u < (sp["false_reject"] if ok else sp["verify_detect"])
             return out("VERDICT: REVISE\nThe answer does not hold up; recheck the computation."
                        if reject else "VERDICT: ACCEPT", "verifier")

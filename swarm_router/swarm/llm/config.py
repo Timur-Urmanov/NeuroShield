@@ -10,15 +10,17 @@ ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)
 DEFAULT_CONFIG = os.path.join(ROOT, "configs", "llm.example.yaml")
 
 DEFAULT_RUN = dict(budget_usd=5.0, lam=0.15, cost_norm_usd=0.01,
-                   max_tokens=dict(planner=1024, executor=2048, verifier=512),
+                   max_tokens=dict(planner=1024, executor=2048, verifier=2048),
                    cache_dir=".cache/llm", log_dir="results/llm_calls",
-                   include_seed_in_cache_key=False, team_roles="position")
+                   include_seed_in_cache_key=True, team_roles="position",
+                   variant_budget_share="equal")
 DEFAULT_EMB = dict(dim=16, projection_seed=12345, provider="hashed")
 DEFAULT_TASKS = dict(builtin=True, external_dir="data", code_timeout_s=5.0, code_mem_mb=512)
 DEFAULT_SIM = dict(acc=dict(math=0.8, code=0.8, text=0.8),
                    role_skill=dict(none=0.0, executor=0.0, planner=-0.3, verifier=-0.3),
                    out_tokens=dict(planner=200, executor=300, verifier=80),
-                   plan_bonus=0.0, verify_detect=0.5, false_reject=0.1, context_decay_per_1k=0.0)
+                   plan_bonus=0.0, verify_detect=0.5, false_reject=0.1, no_verdict=0.0,
+                   context_decay_per_1k=0.0)
 
 
 @dataclass
@@ -33,6 +35,7 @@ class ModelSpec:
     params: dict = field(default_factory=dict)
     sim: dict = field(default_factory=dict)
     max_tokens_field: str = "max_tokens"
+    thinking: bool = False            # model may emit (billed) thinking tokens -> conservative estimate
 
     def usd(self, input_tokens: float, output_tokens: float) -> float:
         return (input_tokens * self.price_in_per_1m + output_tokens * self.price_out_per_1m) / 1e6

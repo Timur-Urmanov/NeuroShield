@@ -65,7 +65,9 @@ class LLMEnv:
         self._last = res
         self.records.append(dict(t=t, task=self.tasks[t].id, kind=self.tasks[t].kind, model=self.models[m],
                                  roles=roles, success=res.success, usd=res.usd_nominal, charged=res.usd_charged,
-                                 calls=res.n_calls, hits=res.n_cache_hits, revised=res.revised, variant=tag))
+                                 calls=res.n_calls, hits=res.n_cache_hits, revised=res.revised, variant=tag,
+                                 reward=self.step_reward(res), verdict=res.verdict,
+                                 max_tokens_stops=res.n_max_tokens, refusals=res.n_refusals))
         return res
 
     def step_reward(self, res: TeamResult) -> float:
