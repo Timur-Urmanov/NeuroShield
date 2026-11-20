@@ -42,6 +42,7 @@ class Swarm:
         self.W0 = self.W.copy()                                # prior for w_rule=mean_* (H8)
         self.nW_pair = np.zeros((N, N)); self.sW_pair = np.zeros((N, N))
         self.s_fast = 0.5                                      # EMA of success (w_rule=hebb_succ)
+        self.team_succ_sum = 0.0; self.team_n = 0              # running mean team success (w_prior=mean)
         self.t_seen = 0
         self.F = np.zeros(N); self.asleep = np.zeros(N, bool); self.timer = np.zeros(N, int)
         self.r_fast = self.r_slow = 0.5
@@ -102,7 +103,11 @@ class Swarm:
         members = [leader]
         if cfg.coupling:
             sim = np.clip(self.aff @ x, 0, None)
-            sc = ((1 - cfg.sim_w) * self.W[leader] + cfg.sim_w * sim) * 1.0
+            Wm = self.W
+            if cfg.w_prior == "mean" and cfg.w_rule.startswith("mean"):
+                p0 = self.team_succ_sum / self.team_n if self.team_n else 0.5
+                Wm = np.where(self.nW_pair > 0, self.W, p0); np.fill_diagonal(Wm, 0)
+            sc = ((1 - cfg.sim_w) * Wm[leader] + cfg.sim_w * sim) * 1.0
             if cfg.explore == "ucb":
                 sc = sc + cfg.explore_c * np.sqrt(np.log(self.t_seen + 2) / (self.n_co[leader] + 1))
             elif cfg.explore == "noise":
@@ -118,6 +123,15 @@ class Swarm:
                     c = c[c != leader]
                     if len(c):
                         members.append(int(c[np.argmax(sc[c])]))
+            elif cfg.recruit_rule == "conditional":
+                bonus = sc - ((1 - cfg.sim_w) * Wm[leader] + cfg.sim_w * sim)       # exploration term, if any
+                for _ in range(cfg.team - 1):
+                    c = (1 - cfg.sim_w) * Wm[members].mean(0) + cfg.sim_w * sim + bonus
+                    c[~free] = -1; c[members] = -1
+                    j = int(np.argmax(c))
+                    if c[j] <= cfg.recruit_thr:
+                        break
+                    members.append(j)
             else:
                 cand = np.argsort(-sc)[: cfg.team - 1]
                 members += [int(j) for j in cand if sc[j] > cfg.recruit_thr]
@@ -183,10 +197,15 @@ class Swarm:
                 ix = np.ix_(members, members)
                 self.nW_pair[ix] += 1; self.sW_pair[ix] += sig
                 np.fill_diagonal(self.nW_pair, 0); np.fill_diagonal(self.sW_pair, 0)
-                self.W[ix] = (self.sW_pair[ix] + self.W0[ix]) / (self.nW_pair[ix] + 1)
+                prior = self.W0[ix]
+                if cfg.w_prior == "mean":
+                    prior = self.team_succ_sum / self.team_n if self.team_n else 0.5
+                self.W[ix] = (self.sW_pair[ix] + prior) / (self.nW_pair[ix] + 1)
                 np.fill_diagonal(self.W, 0)
         else:
             raise ValueError(rule)
+        if len(members) > 1:
+            self.team_succ_sum += succ; self.team_n += 1
         self.s_fast += (succ - self.s_fast) / 30
         if cfg.sleep:
             self.sW *= 0.998; self.nW *= 0.998      # working memory leaks

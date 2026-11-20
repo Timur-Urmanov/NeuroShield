@@ -19,6 +19,10 @@ class SwarmConfig:
     # W learning rule (H8): mean_succ (default since H8c: per-pair mean success) | mean_r |
     #   hebb_r (Hebb on r - EMA(r); default up to H8, used by every experiment before H8c) | hebb_succ
     w_rule: str = "mean_succ"
+    # H9: recruit_rule independent (each recruit by W[leader]) | conditional (one by one, mean W to the
+    #     current team); w_prior (mean_* rules): w0 (random initial W) | mean (running mean team success)
+    recruit_rule: str = "independent"
+    w_prior: str = "w0"
     sim_w: float = 0.5            # s in score = (1-s)*W[leader] + s*sim
     recruit_thr: float = 0.25     # minimum recruit score
     # exploration bonus in recruitment (H7): none | ucb (count-based, directed) | noise (undirected control)
