@@ -1,4 +1,6 @@
-"""H9d: conditional recruitment + neutral prior vs mean_succ base on fresh seeds 5..19 (SE criterion)."""
+"""
+NOTE: pinned to recruit_rule="independent", w_prior="w0" (defaults before H9d).
+H9d: conditional recruitment + neutral prior vs mean_succ base on fresh seeds 5..19 (SE criterion)."""
 import argparse
 
 import numpy as np
@@ -8,7 +10,7 @@ from swarm import EnvConfig, SwarmConfig
 
 ap = base_args(argparse.ArgumentParser()); ap.set_defaults(seed0=5, seeds=15); a = ap.parse_args()
 seeds = list(range(a.seed0, a.seed0 + a.seeds))
-V = {"base": SwarmConfig(w_rule="mean_succ"),
+V = {"base": SwarmConfig(recruit_rule="independent", w_prior="w0", w_rule="mean_succ"),
      "cond, mean": SwarmConfig(w_rule="mean_succ", recruit_rule="conditional", w_prior="mean")}
 cells = {f"role_by_type={r}, busy={b}": EnvConfig("roles", a.T, role_by_type=r, busy=b) for r in (False, True) for b in (0, 8)}
 cells["homogeneous"] = EnvConfig("homogeneous", a.T)

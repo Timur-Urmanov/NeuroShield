@@ -21,8 +21,9 @@ class SwarmConfig:
     w_rule: str = "mean_succ"
     # H9: recruit_rule independent (each recruit by W[leader]) | conditional (one by one, mean W to the
     #     current team); w_prior (mean_* rules): w0 (random initial W) | mean (running mean team success)
-    recruit_rule: str = "independent"
-    w_prior: str = "w0"
+    #     defaults since H9d: conditional + mean; every experiment before H9d is pinned to independent + w0
+    recruit_rule: str = "conditional"
+    w_prior: str = "mean"
     sim_w: float = 0.5            # s in score = (1-s)*W[leader] + s*sim
     recruit_thr: float = 0.25     # minimum recruit score
     # exploration bonus in recruitment (H7): none | ucb (count-based, directed) | noise (undirected control)
@@ -47,7 +48,8 @@ class SwarmConfig:
 
 # Defaults of the original swarm.py constructor minus Kuramoto. Legacy rows with kuramoto=True are
 # reproducible only with legacy/swarm.py or git commit d2d10b0.
-LEGACY = SwarmConfig(fatigue=True, sleep=True, hebb_bias=0.3, w_rule="hebb_r")
+LEGACY = SwarmConfig(fatigue=True, sleep=True, hebb_bias=0.3, w_rule="hebb_r", recruit_rule="independent",
+                     w_prior="w0")
 
 
 @dataclass(frozen=True)

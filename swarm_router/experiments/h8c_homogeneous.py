@@ -1,4 +1,6 @@
 """
+NOTE: pinned to recruit_rule="independent", w_prior="w0" (defaults before H9d).
+
 NOTE: pinned to w_rule="hebb_r" (the default when this experiment was run; default is mean_succ since H8c).
 H8c: does w_rule=mean_succ keep parity in the homogeneous env? (notes/hypotheses.md)"""
 import argparse
@@ -9,11 +11,11 @@ from swarm import EnvConfig, SwarmConfig
 ap = base_args(argparse.ArgumentParser()); a = ap.parse_args()
 seeds = list(range(a.seed0, a.seed0 + a.seeds))
 env = EnvConfig("homogeneous", a.T)
-V = {"hebb_r": ("swarm", env, SwarmConfig(w_rule="hebb_r")),
-     "mean_succ": ("swarm", env, SwarmConfig(w_rule="mean_succ")),
-     "mean_r": ("swarm", env, SwarmConfig(w_rule="mean_r")),
-     "no W": ("swarm", env, SwarmConfig(w_rule="hebb_r", plastic_W=False)),
-     "solo": ("swarm", env, SwarmConfig(w_rule="hebb_r", coupling=False, plastic_W=False)),
+V = {"hebb_r": ("swarm", env, SwarmConfig(recruit_rule="independent", w_prior="w0", w_rule="hebb_r")),
+     "mean_succ": ("swarm", env, SwarmConfig(recruit_rule="independent", w_prior="w0", w_rule="mean_succ")),
+     "mean_r": ("swarm", env, SwarmConfig(recruit_rule="independent", w_prior="w0", w_rule="mean_r")),
+     "no W": ("swarm", env, SwarmConfig(recruit_rule="independent", w_prior="w0", w_rule="hebb_r", plastic_W=False)),
+     "solo": ("swarm", env, SwarmConfig(recruit_rule="independent", w_prior="w0", w_rule="hebb_r", coupling=False, plastic_W=False)),
      "linucb": ("router", env, dict(model="linucb"))}
 res = run_variants(V, seeds, a.workers)
 print(table(res, ("pre", "post", "team_size")))

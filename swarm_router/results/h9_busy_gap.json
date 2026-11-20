@@ -1,12 +1,12 @@
 {
  "experiment": "h9_busy_gap",
- "git_commit": "7af5647",
+ "git_commit": "5f4e830+dirty",
  "argv": [
   "experiments/h9_busy_gap.py",
   "--workers",
   "2"
  ],
- "created": "2026-11-20T15:42:37",
+ "created": "2026-11-20T15:46:42",
  "T": 8000,
  "seeds": [
   0,

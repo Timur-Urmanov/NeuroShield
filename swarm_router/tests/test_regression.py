@@ -44,8 +44,8 @@ def test_swarm_matches_legacy(key):
 
 
 def test_minimal_architecture_is_default():
-    # default = legacy clean config with reward-only Hebb replaced by the per-pair mean rule (H8c)
-    assert replace(CLEAN, hebb_bias=0.0, w_rule="mean_succ") == type(LEGACY)()
+    # default = legacy clean config + per-pair mean W (H8c) + conditional recruitment with neutral prior (H9d)
+    assert replace(CLEAN, hebb_bias=0.0, w_rule="mean_succ", recruit_rule="conditional", w_prior="mean") == type(LEGACY)()
 
 
 def test_linucb_matches_legacy():

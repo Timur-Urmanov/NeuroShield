@@ -1,4 +1,6 @@
 """
+NOTE: pinned to recruit_rule="independent", w_prior="w0" (defaults before H9d).
+
 NOTE: pinned to w_rule="hebb_r" (the default when this experiment was run; default is mean_succ since H8c).
 H6: is phase (Kuramoto) useful for ordering steps plan -> execute -> verify? (notes/hypotheses.md)
 
@@ -15,10 +17,10 @@ seeds = list(range(a.seed0, a.seed0 + a.seeds))
 env = EnvConfig("ordered", a.T)
 B = {}
 V = {
-    "recruit": SwarmConfig(w_rule="hebb_r", order="recruit", **B),
-    "random": SwarmConfig(w_rule="hebb_r", order="random", **B),
-    "position": SwarmConfig(w_rule="hebb_r", order="position", **B),
-    "oracle": SwarmConfig(w_rule="hebb_r", order="oracle", **B),
+    "recruit": SwarmConfig(recruit_rule="independent", w_prior="w0", w_rule="hebb_r", order="recruit", **B),
+    "random": SwarmConfig(recruit_rule="independent", w_prior="w0", w_rule="hebb_r", order="random", **B),
+    "position": SwarmConfig(recruit_rule="independent", w_prior="w0", w_rule="hebb_r", order="position", **B),
+    "oracle": SwarmConfig(recruit_rule="independent", w_prior="w0", w_rule="hebb_r", order="oracle", **B),
 }
 res = run_variants({k: ("swarm", env, v) for k, v in V.items()}, seeds, a.workers)
 res["linucb + pair_ucb c=0.03 (order = selection order)"] = run_variants(

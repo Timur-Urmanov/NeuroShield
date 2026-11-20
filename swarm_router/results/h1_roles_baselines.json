@@ -1,12 +1,12 @@
 {
  "experiment": "h1_roles_baselines",
- "git_commit": "c389372+dirty",
+ "git_commit": "5f4e830+dirty",
  "argv": [
   "experiments/h1_roles_baselines.py",
   "--workers",
-  "1"
+  "2"
  ],
- "created": "2026-11-20T15:38:07",
+ "created": "2026-11-20T15:45:42",
  "T": 8000,
  "seeds": [
   0,
@@ -35,6 +35,8 @@
     "plastic_W": true,
     "hebb_bias": 0.0,
     "w_rule": "hebb_r",
+    "recruit_rule": "independent",
+    "w_prior": "w0",
     "sim_w": 0.5,
     "recruit_thr": 0.25,
     "recruit": "learned",
@@ -120,6 +122,8 @@
     "plastic_W": false,
     "hebb_bias": 0.0,
     "w_rule": "hebb_r",
+    "recruit_rule": "independent",
+    "w_prior": "w0",
     "sim_w": 0.5,
     "recruit_thr": 0.25,
     "recruit": "learned",
@@ -205,6 +209,8 @@
     "plastic_W": false,
     "hebb_bias": 0.0,
     "w_rule": "hebb_r",
+    "recruit_rule": "independent",
+    "w_prior": "w0",
     "sim_w": 0.5,
     "recruit_thr": 0.25,
     "recruit": "learned",

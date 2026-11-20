@@ -1,4 +1,6 @@
 """
+NOTE: pinned to recruit_rule="independent", w_prior="w0" (defaults before H9d).
+
 NOTE: pinned to w_rule="hebb_r" (the default when this experiment was run; default is mean_succ since H8c).
 H2 (sim weight s), H3 (team size x member cost), H4 (role fractions, N), H5 (hebb bias x sleep prune)."""
 import argparse
@@ -13,7 +15,7 @@ roles = EnvConfig("roles", a.T)
 out = {}
 
 if "h2" in only:
-    res = run_variants({f"s={s}": ("swarm", roles, SwarmConfig(w_rule="hebb_r", sim_w=s)) for s in (0.0, 0.25, 0.5, 0.75, 1.0)}, seeds, a.workers)
+    res = run_variants({f"s={s}": ("swarm", roles, SwarmConfig(recruit_rule="independent", w_prior="w0", w_rule="hebb_r", sim_w=s)) for s in (0.0, 0.25, 0.5, 0.75, 1.0)}, seeds, a.workers)
     print("## H2\n" + table(res)); best = max(res, key=lambda k: res[k]["post"])
     cmp = [paired(res, best, "s=0.0"), paired(res, best, "s=1.0")] + [paired(res, best, k) for k in res if k != best]
     for c in cmp: print(c)
@@ -22,7 +24,7 @@ if "h2" in only:
 if "h3" in only:
     for mc in (0.0, 0.05):
         env = EnvConfig("roles", a.T, member_cost=mc)
-        res = run_variants({f"team={k}": ("swarm", env, SwarmConfig(w_rule="hebb_r", team=k)) for k in (2, 3, 4, 5)}, seeds, a.workers)
+        res = run_variants({f"team={k}": ("swarm", env, SwarmConfig(recruit_rule="independent", w_prior="w0", w_rule="hebb_r", team=k)) for k in (2, 3, 4, 5)}, seeds, a.workers)
         print(f"## H3 member_cost={mc}\n" + table(res))
         cmp = [paired(res, "team=3", "team=2"), paired(res, "team=3", "team=5"), paired(res, "team=4", "team=3")]
         for c in cmp: print(c)
@@ -35,8 +37,8 @@ if "h4" in only:
     out["h4"] = {}
     for cname, c in conds.items():
         env = EnvConfig("roles", a.T, role_fractions=c["f"])
-        V = {"swarm W_reward": ("swarm", env, SwarmConfig(w_rule="hebb_r", N=c["N"])),
-             "swarm sim-only (no W)": ("swarm", env, SwarmConfig(w_rule="hebb_r", N=c["N"], plastic_W=False)),
+        V = {"swarm W_reward": ("swarm", env, SwarmConfig(recruit_rule="independent", w_prior="w0", w_rule="hebb_r", N=c["N"])),
+             "swarm sim-only (no W)": ("swarm", env, SwarmConfig(recruit_rule="independent", w_prior="w0", w_rule="hebb_r", N=c["N"], plastic_W=False)),
              "linucb + pair_ucb c=0.03": ("router", env, dict(N=c["N"], model="linucb", team="pair_ucb", c=0.03)),
              "linucb + pair_ucb c=0.1": ("router", env, dict(N=c["N"], model="linucb", team="pair_ucb", c=0.1)),
              "linucb + oracle team": ("router", env, dict(N=c["N"], model="linucb", team="oracle"))}
@@ -48,10 +50,10 @@ if "h4" in only:
         out["h4"][cname] = dict(results=res, comparisons=cmp)
 
 if "h5" in only:
-    V = {f"bias={b}, prune={p}": ("swarm", roles, SwarmConfig(w_rule="hebb_r", fatigue=True, sleep=True, hebb_bias=b, sleep_prune=p))
+    V = {f"bias={b}, prune={p}": ("swarm", roles, SwarmConfig(recruit_rule="independent", w_prior="w0", w_rule="hebb_r", fatigue=True, sleep=True, hebb_bias=b, sleep_prune=p))
          for b in (0.0, 0.3) for p in (True, False)}
-    V["no fatigue, no sleep (ref)"] = ("swarm", roles, SwarmConfig(w_rule="hebb_r"))
-    V["fatigue, no sleep"] = ("swarm", roles, SwarmConfig(w_rule="hebb_r", fatigue=True))
+    V["no fatigue, no sleep (ref)"] = ("swarm", roles, SwarmConfig(recruit_rule="independent", w_prior="w0", w_rule="hebb_r"))
+    V["fatigue, no sleep"] = ("swarm", roles, SwarmConfig(recruit_rule="independent", w_prior="w0", w_rule="hebb_r", fatigue=True))
     res = run_variants(V, seeds, a.workers)
     print("## H5\n" + table(res, ("post", "cover_end")))
     cmp = [paired(res, "bias=0.0, prune=False", "bias=0.0, prune=True"),

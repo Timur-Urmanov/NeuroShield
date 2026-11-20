@@ -1,4 +1,6 @@
-"""H8: W learning rule, 2x2 estimator {hebb, pair mean} x signal {r, success} (notes/hypotheses.md)."""
+"""
+NOTE: pinned to recruit_rule="independent", w_prior="w0" (defaults before H9d).
+H8: W learning rule, 2x2 estimator {hebb, pair mean} x signal {r, success} (notes/hypotheses.md)."""
 import argparse, json, os
 
 import numpy as np
@@ -15,7 +17,7 @@ for rbt in (False, True):
     for busy in (0, 8):
         cell = f"role_by_type={rbt}, busy={busy}"
         env = EnvConfig("roles", a.T, role_by_type=rbt, busy=busy)
-        res = run_variants({r: ("swarm", env, SwarmConfig(w_rule=r)) for r in RULES}, seeds, a.workers)
+        res = run_variants({r: ("swarm", env, SwarmConfig(recruit_rule="independent", w_prior="w0", w_rule=r)) for r in RULES}, seeds, a.workers)
         for k, v in h1b[cell]["results"].items():
             if "_ucb" in k:
                 res[k] = v

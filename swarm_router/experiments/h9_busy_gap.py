@@ -1,4 +1,6 @@
-"""H9: conditional recruitment x neutral prior, base = mean_succ (notes/hypotheses.md)."""
+"""
+NOTE: pinned to recruit_rule="independent", w_prior="w0" (defaults before H9d).
+H9: conditional recruitment x neutral prior, base = mean_succ (notes/hypotheses.md)."""
 import argparse, json, os
 
 from common import RESULTS, base_args, paired, run_variants, save, table
@@ -8,9 +10,9 @@ ap = base_args(argparse.ArgumentParser()); a = ap.parse_args()
 seeds = list(range(a.seed0, a.seed0 + a.seeds))
 h1b = json.load(open(os.path.join(RESULTS, "h1b_context_capacity.json")))["cells"]
 h8 = json.load(open(os.path.join(RESULTS, "h8_w_rule.json")))["cells"]
-V = {"base (indep, w0)": SwarmConfig(w_rule="mean_succ"),
-     "cond, w0": SwarmConfig(w_rule="mean_succ", recruit_rule="conditional"),
-     "indep, mean prior": SwarmConfig(w_rule="mean_succ", w_prior="mean"),
+V = {"base (indep, w0)": SwarmConfig(recruit_rule="independent", w_prior="w0", w_rule="mean_succ"),
+     "cond, w0": SwarmConfig(w_rule="mean_succ", recruit_rule="conditional", w_prior="w0"),
+     "indep, mean prior": SwarmConfig(w_rule="mean_succ", recruit_rule="independent", w_prior="mean"),
      "cond, mean prior": SwarmConfig(w_rule="mean_succ", recruit_rule="conditional", w_prior="mean")}
 NEW = [k for k in V if not k.startswith("base")]
 out = {}
