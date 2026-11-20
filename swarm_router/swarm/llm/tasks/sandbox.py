@@ -62,6 +62,9 @@ def run_tests(code: str, tests: list, setup: str = "", timeout: float = 5.0, mem
             f.write(prog)
         env = {"PATH": "/usr/bin:/bin", "HOME": d, "TMPDIR": d, "PYTHONHASHSEED": "0",
                "PYTHONDONTWRITEBYTECODE": "1", "LANG": "C.UTF-8"}
+        if os.name == "nt":       # Windows: Python cannot start without SYSTEMROOT (crypto/random init)
+            env.update({k: os.environ[k] for k in ("SYSTEMROOT", "WINDIR", "COMSPEC") if k in os.environ})
+            env.update(PATH=os.environ.get("PATH", ""), TEMP=d, TMP=d, USERPROFILE=d)
         kw = dict(cwd=d, env=env, stdin=subprocess.DEVNULL, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
                   text=True)
         if os.name == "posix":
