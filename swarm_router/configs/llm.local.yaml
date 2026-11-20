@@ -1,0 +1,51 @@
+# Local CPU models (llama-cpp-python, GGUF from Hugging Face: Qwen/Qwen2.5-*-Instruct-GGUF, q4_k_m).
+# Download: see swarm/llm/README.md. Files live in .cache/models (gitignored).
+# PRICES ARE A COMPUTE PROXY, NOT MONEY: pseudo-USD per 1M tokens = parameter count in billions.
+# They keep the budget guard and the reward's cost term meaningful; nothing is billed.
+run:
+  budget_usd: 50.0
+  lam: 0.15
+  cost_norm_usd: 0.01
+  max_tokens:
+    planner: 512
+    executor: 768
+    verifier: 512
+  cache_dir: .cache/llm
+  log_dir: results/llm_calls
+  include_seed_in_cache_key: true
+  variant_budget_share: equal
+  team_roles: position
+embeddings:
+  dim: 16
+  projection_seed: 12345
+  provider: hashed
+tasks:
+  builtin: true
+  external_dir: data
+  code_timeout_s: 5.0
+  code_mem_mb: 512
+models:
+- name: qwen05
+  provider: llama_cpp
+  model: .cache/models/qwen2.5-0.5b-instruct-q4_k_m.gguf
+  price_in_per_1m: 0.5
+  price_out_per_1m: 0.5
+  params:
+    temperature: 0.7
+    n_ctx: 16384
+- name: qwen15
+  provider: llama_cpp
+  model: .cache/models/qwen2.5-1.5b-instruct-q4_k_m.gguf
+  price_in_per_1m: 1.5
+  price_out_per_1m: 1.5
+  params:
+    temperature: 0.7
+    n_ctx: 16384
+- name: qwen3
+  provider: llama_cpp
+  model: .cache/models/qwen2.5-3b-instruct-q4_k_m.gguf
+  price_in_per_1m: 3.0
+  price_out_per_1m: 3.0
+  params:
+    temperature: 0.7
+    n_ctx: 16384

@@ -79,7 +79,8 @@ def main(argv=None):
         for sd in seeds:
             row, seed_status = {}, "ok"
             try:
-                stream = make_stream(pool, kmax + a.n_tasks, sd)
+                # extra head room so that every target still has kmax non-repeat predecessors
+                stream = make_stream(pool, 2 * kmax + a.n_tasks, sd)
                 solo = {}
 
                 def reply0(j):
@@ -91,9 +92,12 @@ def main(argv=None):
                 for k in K:
                     succ, toks, trunc, refus = [], [], 0, 0
                     row[str(k)] = dict(success=None, input_tokens=None, n=0, max_tokens_stops=0, refusals=0)
-                    for i in range(kmax, kmax + a.n_tasks):
+                    for i in range(2 * kmax, 2 * kmax + a.n_tasks):
                         hist = []
-                        for j in range(i - k, i):
+                        # previous tasks of the stream, skipping repeats of the target item (the pool is
+                        # small; a repeat would put the target's own answer in the context)
+                        prev = [j for j in range(i) if stream[j].id != stream[i].id][-k:] if k else []
+                        for j in prev:
                             hist += [{"role": "user", "content": executor_message(stream[j])},
                                      {"role": "assistant", "content": reply0(j)}]
                         msgs = hist + [{"role": "user", "content": executor_message(stream[i])}]

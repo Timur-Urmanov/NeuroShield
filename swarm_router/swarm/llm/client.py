@@ -53,7 +53,7 @@ class LLMClient:
         est = self.estimate_usd(model, system, messages, max_tokens)
         self.budget.check(est, f"{model}/{tag}")       # raises BudgetExceeded: the call is not made
         t0 = time.time()
-        if prov.kind == "sim":
+        if prov.kind in ("sim", "llama_cpp"):
             c: Completion = prov.complete(system, messages, max_tokens, sample_id=sample_id)
         else:
             c = prov.complete(system, messages, max_tokens)

@@ -262,6 +262,44 @@ class SimProvider(Provider):
         return out(SimOracle.render(task, u < p, hash_uniform("w", u)), "executor")
 
 
+class LlamaCppProvider(Provider):
+    """Local GGUF model on CPU via llama-cpp-python (no network, no money).
+
+    `model` = path to the .gguf file (relative to the project root). Prices in the config are a
+    COMPUTE PROXY (pseudo-USD proportional to parameter count), not money; they keep the budget guard
+    and the cost term of the reward meaningful. Sampling: params.temperature (default 0.7) with a
+    seed derived from (model, prompt, sample_id), so each sample_id is reproducible.
+    """
+    kind = "llama_cpp"
+    _loaded: dict = {}
+
+    def _llm(self):
+        from .config import ROOT
+        path = self.spec.model if os.path.isabs(self.spec.model) else os.path.join(ROOT, self.spec.model)
+        if path not in LlamaCppProvider._loaded:
+            from llama_cpp import Llama
+            p = self.spec.params
+            LlamaCppProvider._loaded[path] = Llama(model_path=path, n_ctx=int(p.get("n_ctx", 16384)),
+                                                   n_threads=int(p.get("n_threads", os.cpu_count() or 4)),
+                                                   verbose=False)
+        return LlamaCppProvider._loaded[path]
+
+    def identity(self) -> dict:
+        p = {k: v for k, v in self.spec.params.items() if k != "n_threads"}   # threads do not change output
+        return dict(provider=self.kind, model=self.spec.model, params=p)
+
+    def complete(self, system, messages, max_tokens, sample_id: int = 0):
+        msgs = ([{"role": "system", "content": system}] if system else []) + list(messages)
+        seed = int(hash_uniform("seed", self.spec.model, system, messages, sample_id) * 2**31)
+        r = self._llm().create_chat_completion(messages=msgs, max_tokens=int(max_tokens),
+                                               temperature=float(self.spec.params.get("temperature", 0.7)),
+                                               seed=seed)
+        ch = r["choices"][0]; u = r.get("usage", {})
+        return Completion(text=ch["message"].get("content") or "", input_tokens=int(u.get("prompt_tokens", 0)),
+                          output_tokens=int(u.get("completion_tokens", 0)),
+                          stop_reason="max_tokens" if ch.get("finish_reason") == "length" else "end_turn")
+
+
 def make_provider(spec: ModelSpec, dry_run: bool, oracle: Optional[SimOracle] = None) -> Provider:
     if dry_run or spec.provider == "sim":
         if oracle is None:
@@ -271,4 +309,6 @@ def make_provider(spec: ModelSpec, dry_run: bool, oracle: Optional[SimOracle] = 
         return AnthropicProvider(spec)
     if spec.provider == "openai_compatible":
         return OpenAICompatProvider(spec)
+    if spec.provider == "llama_cpp":
+        return LlamaCppProvider(spec)
     raise ValueError(f"unknown provider {spec.provider!r}")
