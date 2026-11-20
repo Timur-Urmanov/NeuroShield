@@ -1,0 +1,103 @@
+# Phase-2 LLM experiment config. Prices live HERE, not in code (USD per 1M tokens).
+# Anthropic prices: first-party API list prices as of 2026-11 (claude-api skill table);
+# re-check https://platform.claude.com/docs/en/about-claude/pricing before a real run.
+#
+# API keys are NEVER written here: `api_key_env` names the environment variable to read.
+#
+# `sim:` blocks parameterise SimProvider (used by --dry-run). They are INVENTED numbers whose only
+# purpose is to exercise the pipeline with plausible heterogeneity; they say nothing about the
+# real models. Sim prices = the real prices above, so dry-run USD figures are realistic in scale.
+
+run:
+  budget_usd: 5.0              # hard per-run limit (BudgetExceeded stops the run)
+  lam: 0.15                    # reward = success - lam * usd_cost / cost_norm_usd
+  cost_norm_usd: 0.01          # 1 cost unit = 1 cent (~ one low-effort executor call on the large model)
+  max_tokens:                  # per role; also used by the budget guard as the worst-case output
+    planner: 1024
+    executor: 2048
+    verifier: 512
+  cache_dir: .cache/llm        # sqlite response cache (gitignored)
+  log_dir: results/llm_calls   # one jsonl per run: every call, tokens, cost, cache hit
+  # false: identical prompts share one cached response across seeds (cheap; seeds then vary
+  # task order + router randomness only, i.e. common random numbers). true: one sample per seed.
+  include_seed_in_cache_key: false
+  # how team members map to roles: "position" (exec order -> planner/executor/verifier by team size)
+  team_roles: position
+
+embeddings:
+  dim: 16                      # D seen by the swarm / LinUCB (projection of the raw embedding)
+  projection_seed: 12345       # fixed random projection (same for all seeds and variants)
+  provider: hashed             # hashed (offline, free) | openai_compatible
+  # --- openai_compatible example (OpenAI / Voyage-style /v1/embeddings), used only with --real:
+  # provider: openai_compatible
+  # base_url: https://api.voyageai.com/v1
+  # model: voyage-3.5-lite
+  # api_key_env: VOYAGE_API_KEY
+  # price_in_per_1m: 0.02
+
+tasks:
+  builtin: true                # swarm/llm/tasks/data/{math,code,text}.jsonl (~20 each)
+  external_dir: data           # drop GSM8K/MBPP-format jsonl here (data/gsm8k*.jsonl, data/mbpp*.jsonl, data/text*.jsonl)
+  code_timeout_s: 5.0
+  code_mem_mb: 512
+
+models:
+  - name: opus
+    provider: anthropic
+    model: claude-opus-5-5
+    api_key_env: ANTHROPIC_API_KEY
+    price_in_per_1m: 4.0
+    price_out_per_1m: 20.0
+    # Extra Messages API params, passed through verbatim. Opus 5.5: thinking cannot be disabled;
+    # effort is the only depth control (default medium) -> low keeps thinking (billed as output) small.
+    # No temperature/top_p: rejected on current models / API version.
+    params: {output_config: {effort: low}}
+    sim:
+      acc: {math: 0.93, code: 0.90, text: 0.86}
+      role_skill: {none: -0.02, executor: 0.0, planner: -0.30, verifier: -0.30}
+      out_tokens: {planner: 220, executor: 320, verifier: 90}
+      plan_bonus: 0.04         # executor success bonus when given this model's plan
+      verify_detect: 0.75      # P(reject | wrong answer)
+      false_reject: 0.05       # P(reject | correct answer)
+      context_decay_per_1k: 0.003
+  - name: sonnet
+    provider: anthropic
+    model: claude-sonnet-5-5
+    api_key_env: ANTHROPIC_API_KEY
+    price_in_per_1m: 2.0
+    price_out_per_1m: 10.0
+    params: {output_config: {effort: low}}
+    sim:
+      acc: {math: 0.90, code: 0.86, text: 0.87}
+      role_skill: {none: -0.02, executor: 0.0, planner: -0.30, verifier: -0.30}
+      out_tokens: {planner: 200, executor: 300, verifier: 80}
+      plan_bonus: 0.03
+      verify_detect: 0.65
+      false_reject: 0.06
+      context_decay_per_1k: 0.005
+  - name: haiku
+    provider: anthropic
+    model: claude-haiku-5-5
+    api_key_env: ANTHROPIC_API_KEY
+    price_in_per_1m: 0.10      # <=100K-token prompts
+    price_out_per_1m: 0.50
+    params: {output_config: {effort: low}}
+    sim:
+      acc: {math: 0.78, code: 0.70, text: 0.84}
+      role_skill: {none: -0.03, executor: 0.0, planner: -0.35, verifier: -0.35}
+      out_tokens: {planner: 180, executor: 260, verifier: 70}
+      plan_bonus: 0.01
+      verify_detect: 0.45
+      false_reject: 0.10
+      context_decay_per_1k: 0.010
+  # --- OpenAI-compatible chat endpoint (any vendor exposing /v1/chat/completions):
+  # - name: other
+  #   provider: openai_compatible
+  #   base_url: https://api.openai.com/v1
+  #   model: <model id>
+  #   api_key_env: OPENAI_API_KEY
+  #   max_tokens_field: max_completion_tokens   # some servers want max_tokens
+  #   price_in_per_1m: 0.0
+  #   price_out_per_1m: 0.0
+  #   params: {}
+  #   sim: {acc: {math: 0.8, code: 0.8, text: 0.8}}

@@ -1,10 +1,10 @@
 {
  "experiment": "h1_roles_baselines",
- "git_commit": "d508726",
+ "git_commit": "d2d10b0",
  "argv": [
   "experiments/h1_roles_baselines.py"
  ],
- "created": "2026-11-20T14:51:12",
+ "created": "2026-11-20T15:02:30",
  "T": 8000,
  "seeds": [
   0,
@@ -35,8 +35,6 @@
     "sim_w": 0.5,
     "recruit_thr": 0.25,
     "hormones": true,
-    "kuramoto": false,
-    "phase_filter": null,
     "fatigue": false,
     "sleep": false,
     "sleep_prune": true,
@@ -118,8 +116,6 @@
     "sim_w": 0.5,
     "recruit_thr": 0.25,
     "hormones": true,
-    "kuramoto": false,
-    "phase_filter": null,
     "fatigue": false,
     "sleep": false,
     "sleep_prune": true,
@@ -201,8 +197,6 @@
     "sim_w": 0.5,
     "recruit_thr": 0.25,
     "hormones": true,
-    "kuramoto": false,
-    "phase_filter": null,
     "fatigue": false,
     "sleep": false,
     "sleep_prune": true,

@@ -1,5 +1,6 @@
 from .base import ACC0, ACC1, COST, D, K, LAM, M, MIX, SimEnv, expected, make_stream
 from .homogeneous import HomogeneousEnv
+from .llm import LLMEnv  # noqa: F401  (Phase 2; optional deps are imported lazily)
 from .ordered import OrderedEnv
 from .roles import RolesEnv, assign_roles
 

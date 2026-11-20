@@ -1,10 +1,10 @@
 {
  "experiment": "h5b_hebb_bias_seeds",
- "git_commit": "d508726",
+ "git_commit": "d2d10b0",
  "argv": [
   "experiments/h5b_hebb_bias_seeds.py"
  ],
- "created": "2026-11-20T14:56:26",
+ "created": "2026-11-20T15:02:38",
  "T": 8000,
  "seeds": [
   5,
@@ -45,8 +45,6 @@
     "sim_w": 0.5,
     "recruit_thr": 0.25,
     "hormones": true,
-    "kuramoto": false,
-    "phase_filter": null,
     "fatigue": false,
     "sleep": false,
     "sleep_prune": true,
@@ -208,8 +206,6 @@
     "sim_w": 0.5,
     "recruit_thr": 0.25,
     "hormones": true,
-    "kuramoto": false,
-    "phase_filter": null,
     "fatigue": false,
     "sleep": false,
     "sleep_prune": true,

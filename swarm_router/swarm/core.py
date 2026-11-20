@@ -4,7 +4,8 @@ A primitive is a cheap stateful agent; it does not "think", it stores:
   - affinity vector aff (specialisation, competitive learning)
   - model value estimates Q[m] (long-term QL/nL + optional working memory sW/nW for sleep)
   - links W to other primitives (learned by reward-prediction-error Hebb)
-  - optional: phase theta (Kuramoto), fatigue F, sleep state
+  - optional: fatigue F, sleep state
+Kuramoto phases were removed after H6 (notes/hypotheses.md); see legacy/swarm.py or commit d2d10b0.
 
 Global slow variables ("hormones"):
   - dopa = reward prediction error (r - fast running mean)
@@ -21,24 +22,16 @@ import numpy as np
 from .config import SwarmConfig
 
 
-def circular_order(phases: np.ndarray) -> np.ndarray:
-    """Linear order of points on a circle: cut the circle at the largest gap."""
-    p = np.mod(phases, 2 * np.pi)
-    idx = np.argsort(p)
-    ps = p[idx]
-    gaps = np.diff(np.append(ps, ps[0] + 2 * np.pi))
-    start = (int(np.argmax(gaps)) + 1) % len(ps)
-    return np.roll(idx, -start)
-
-
 class Swarm:
     def __init__(self, cfg: SwarmConfig, seed: int, M: int, D: int):
         self.cfg, self.M, self.D = cfg, M, D
         N = self.N = cfg.N
         self.rng = r = np.random.default_rng(seed + 1000)
         self.rng_order = np.random.default_rng(seed + 3000)   # separate stream: random ordering only
-        self.theta = r.uniform(0, 2 * np.pi, N)
-        self.omega = r.normal(1.0, 0.1, N)
+        # The legacy model drew Kuramoto phases and frequencies here. The draws are kept (values unused)
+        # so that the RNG stream, and therefore every regression number, stays identical.
+        r.uniform(0, 2 * np.pi, N)
+        r.normal(1.0, 0.1, N)
         self.aff = r.normal(size=(N, D)); self.aff /= np.linalg.norm(self.aff, axis=1, keepdims=True)
         self.QL = np.full((N, M), 0.6); self.nL = np.ones((N, M))
         self.sW = np.zeros((N, M)); self.nW = np.zeros((N, M))
@@ -51,11 +44,6 @@ class Swarm:
     # ---------- helpers ----------
     def Qest(self, idx):
         return (self.QL[idx] * self.nL[idx] + self.sW[idx]) / (self.nL[idx] + self.nW[idx])
-
-    def order_param(self, mask):
-        if mask.sum() == 0:
-            return 0.0
-        return float(np.abs(np.exp(1j * self.theta[mask]).mean()))
 
     def consolidate(self, i):
         """Sleep: working memory -> long-term memory; optionally prune weak links."""
@@ -76,26 +64,18 @@ class Swarm:
             return self.rng_order.permutation(members)
         if o == "position":
             return members[np.argsort(self.pos[members], kind="stable")]
-        if o == "phase":
-            return members[circular_order(self.theta[members])]
-        if o == "phase_mean":                 # post-hoc readout: linearise around the team's mean phase
-            th = self.theta[members]
-            mu = np.angle(np.exp(1j * th).mean())
-            return members[np.argsort(np.angle(np.exp(1j * (th - mu))), kind="stable")]
         if o == "oracle":                     # upper bound, uses hidden roles
             return members[np.argsort(env.roles_at(t)[members], kind="stable")]
         raise ValueError(o)
 
     def learn_order(self, exec_order: np.ndarray, dopa: float):
         """Reward-modulated ordering: consecutive pair (a before b) is pushed apart if dopa > 0,
-        towards a swap if dopa < 0. Identical rule for `position` (scalar) and `phase` (theta)."""
-        if len(exec_order) < 2 or self.cfg.order not in ("position", "phase", "phase_mean"):
+        towards a swap if dopa < 0. (H6: the same rule on a Kuramoto phase performed at chance level.)"""
+        if len(exec_order) < 2 or self.cfg.order != "position":
             return
-        v = self.pos if self.cfg.order == "position" else self.theta
-        # same step relative to the variable's range: pos lives in ~[0,1], theta on a circle of 2*pi
-        step = self.cfg.order_lr * dopa * (1.0 if self.cfg.order == "position" else 2 * np.pi)
+        step = self.cfg.order_lr * dopa
         for a, b in zip(exec_order[:-1], exec_order[1:]):
-            v[a] -= step; v[b] += step
+            self.pos[a] -= step; self.pos[b] += step
 
     # ---------- one step = one task ----------
     def step(self, t: int, env):
@@ -111,12 +91,12 @@ class Swarm:
         bids[~free] = -np.inf
         leader = int(np.argmax(bids))
 
-        # 2. team: score = ((1-s) W[leader] + s sim) * phase_gate
+        # 2. team: score = (1-s) W[leader] + s sim   (legacy multiplied by a phase gate; `* 1.0` keeps
+        #    the float result bit-identical to the legacy no-Kuramoto path)
         members = [leader]
         if cfg.coupling:
             sim = np.clip(self.aff @ x, 0, None)
-            ph = (1 + np.cos(self.theta - self.theta[leader])) / 2 if cfg.use_phase_filter else 1.0
-            sc = ((1 - cfg.sim_w) * self.W[leader] + cfg.sim_w * sim) * ph
+            sc = ((1 - cfg.sim_w) * self.W[leader] + cfg.sim_w * sim) * 1.0
             sc[~free] = -1; sc[leader] = -1
             cand = np.argsort(-sc)[: cfg.team - 1]
             members += [int(j) for j in cand if sc[j] > cfg.recruit_thr]
@@ -184,22 +164,6 @@ class Swarm:
                     self.asleep[i] = True; self.timer[i] = 40
 
         info = dict(leader=leader, members=members, exec_order=exec_order, m=m, succ=succ)
-
-        # 8. Kuramoto phase dynamics
-        if not cfg.kuramoto:
-            return r, info
-        aw = ~self.asleep
-        R = self.order_param(aw)
-        sigma = 0.1 * (1 + 1.0 * (1 - R)) * (1 + NE) if cfg.hormones else 0.1
-        Kc = 2.0 if cfg.coupling else 0.0
-        diff = np.sin(self.theta[None, :] - self.theta[:, None])
-        coup = Kc / N * ((self.W * aw[None, :]) * diff).sum(1)
-        om = np.where(aw, self.omega, 0.3 * self.omega)
-        self.theta += 0.1 * (om + coup * aw) + np.sqrt(0.1) * sigma * self.rng.normal(size=N)
-        # successful co-workers are pulled to a common phase
-        if len(members) > 1 and dopa > 0:
-            mean_phase = np.angle(np.exp(1j * self.theta[members]).mean())
-            self.theta[members] += 0.1 * np.sin(mean_phase - self.theta[members])
         return r, info
 
 

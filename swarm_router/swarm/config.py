@@ -9,7 +9,7 @@ from typing import Optional, Sequence
 class SwarmConfig:
     """Swarm mechanisms. Defaults = current minimal architecture (CLAUDE.md, section 2).
 
-    Mechanisms are independent flags; do NOT merge them again (e.g. `coupling` != `kuramoto`).
+    Mechanisms are independent flags; do NOT merge them again (e.g. `coupling` != `plastic_W`).
     """
     N: int = 40
     team: int = 3                 # max team size (leader + team-1 recruits)
@@ -19,8 +19,7 @@ class SwarmConfig:
     sim_w: float = 0.5            # s in score = (1-s)*W[leader] + s*sim
     recruit_thr: float = 0.25     # minimum recruit score
     hormones: bool = True         # NE stress hormone (temperature + forgetting)
-    kuramoto: bool = False        # phase oscillators
-    phase_filter: Optional[bool] = None  # phase gating in recruitment; None -> same as `kuramoto`
+    # kuramoto / phase_filter: removed after H6 (no gain for step ordering, harmful in recruitment)
     fatigue: bool = False         # built-in (artificial) quality degradation of busy primitives
     sleep: bool = False           # sleep: offline consolidation of working memory
     sleep_prune: bool = True      # on waking, zero links W < prune_thr (only matters if sleep & plastic_W)
@@ -28,19 +27,15 @@ class SwarmConfig:
     # ordering of team members for envs where step order matters (envs/ordered.py)
     #   recruit  - leader first, then by recruitment score (what the swarm does implicitly)
     #   random   - random permutation
-    #   position - learned per-primitive scalar, reward-modulated (no oscillators)
-    #   phase    - order by Kuramoto phase, same reward-modulated rule applied to theta
+    #   position - learned per-primitive scalar, reward-modulated
+    #   oracle   - by hidden roles (upper bound, not a mechanism)
     order: str = "recruit"
     order_lr: float = 0.1
 
-    @property
-    def use_phase_filter(self) -> bool:
-        return self.kuramoto if self.phase_filter is None else self.phase_filter
 
-
-# Defaults of the original swarm.py constructor. Used by the regression test and to
-# reproduce the original tables.
-LEGACY = SwarmConfig(kuramoto=True, fatigue=True, sleep=True, hebb_bias=0.3)
+# Defaults of the original swarm.py constructor minus Kuramoto. Legacy rows with kuramoto=True are
+# reproducible only with legacy/swarm.py or git commit d2d10b0.
+LEGACY = SwarmConfig(fatigue=True, sleep=True, hebb_bias=0.3)
 
 
 @dataclass(frozen=True)

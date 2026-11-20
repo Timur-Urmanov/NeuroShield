@@ -32,7 +32,12 @@ ROLES = {
 FULL = {  # legacy defaults: sleep + fatigue + hormones + everything
     "full": dict(),
     "no_hormones": dict(hormones=False),
+    # without Kuramoto (removed from the package after H6); these are what the package must reproduce
+    "full_nokur": dict(kuramoto=False),
+    "no_hormones_nokur": dict(kuramoto=False, hormones=False),
+    "full_nokur_reward": dict(kuramoto=False, hebb_bias=0.0),
 }
+ROLES_FULL = {"W_reward": dict(kuramoto=False, hebb_bias=0.0), "W_only": dict(kuramoto=False)}
 
 
 def row(s, R):
@@ -48,6 +53,9 @@ for name, cfg in ROLES.items():
     out["roles"][name] = [row(*S.run_swarm(T, sd, roles=True, **CLEAN, **cfg)[:2]) for sd in range(SEEDS)]
 for name, cfg in FULL.items():
     out["full"][name] = [row(*S.run_swarm(T, sd, **cfg)[:2]) for sd in range(SEEDS)]
+out["roles_full"] = {}
+for name, cfg in ROLES_FULL.items():
+    out["roles_full"][name] = [row(*S.run_swarm(T, sd, roles=True, **cfg)[:2]) for sd in range(SEEDS)]
 out["linucb"] = []
 for sd in range(SEEDS):
     R = S.run_linucb(T, sd)
