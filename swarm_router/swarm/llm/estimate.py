@@ -205,7 +205,8 @@ def confirm_real(print_estimate, yes: bool, budget_usd: float = 0.0, budget_expl
                  isatty=None) -> bool:
     """Gate before any real spend: shows the estimate; needs an explicit budget (flag or env var) AND
     either --yes or an interactive 'yes'. Without both it returns False before any call."""
-    print("REAL RUN: this calls paid APIs.")
+    print("REAL RUN: this calls the providers in the config (paid APIs for anthropic/openai_compatible; "
+          "local llama_cpp/ollama models cost no money: their 'USD' is a compute proxy).")
     print_estimate()
     ok, why = spend_authorised(budget_usd, budget_explicit)
     if not ok:
