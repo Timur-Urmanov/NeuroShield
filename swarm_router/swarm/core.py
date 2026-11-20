@@ -107,8 +107,17 @@ class Swarm:
             elif cfg.explore != "none":
                 raise ValueError(cfg.explore)
             sc[~free] = -1; sc[leader] = -1
-            cand = np.argsort(-sc)[: cfg.team - 1]
-            members += [int(j) for j in cand if sc[j] > cfg.recruit_thr]
+            if cfg.recruit == "oracle":
+                # upper bound for leader-centred teams: fill missing roles with free primitives
+                role = env.roles_at(t)
+                for need in [k for k in range(3) if k != role[leader]][: cfg.team - 1]:
+                    c = np.where(free & (role == need))[0]
+                    c = c[c != leader]
+                    if len(c):
+                        members.append(int(c[np.argmax(sc[c])]))
+            else:
+                cand = np.argsort(-sc)[: cfg.team - 1]
+                members += [int(j) for j in cand if sc[j] > cfg.recruit_thr]
         members = np.array(members)
         env.commit(t, members)
         self.t_seen += 1

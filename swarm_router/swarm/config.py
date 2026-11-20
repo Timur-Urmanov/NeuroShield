@@ -19,6 +19,8 @@ class SwarmConfig:
     sim_w: float = 0.5            # s in score = (1-s)*W[leader] + s*sim
     recruit_thr: float = 0.25     # minimum recruit score
     # exploration bonus in recruitment (H7): none | ucb (count-based, directed) | noise (undirected control)
+    # recruit="oracle": diagnostic upper bound (uses hidden roles; post-hoc to H7, not a mechanism)
+    recruit: str = "learned"
     explore: str = "none"
     explore_c: float = 0.1
     hormones: bool = True         # NE stress hormone (temperature + forgetting)
