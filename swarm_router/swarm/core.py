@@ -103,11 +103,20 @@ class Swarm:
         members = [leader]
         if cfg.coupling:
             sim = np.clip(self.aff @ x, 0, None)
-            Wm = self.W
-            if cfg.w_prior == "mean" and cfg.w_rule.startswith("mean"):
-                p0 = self.team_succ_sum / self.team_n if self.team_n else 0.5
-                Wm = np.where(self.nW_pair > 0, self.W, p0); np.fill_diagonal(Wm, 0)
-            sc = ((1 - cfg.sim_w) * Wm[leader] + cfg.sim_w * sim) * 1.0
+            neutral = cfg.w_prior == "mean" and cfg.w_rule.startswith("mean")
+            p0 = (self.team_succ_sum / self.team_n if self.team_n else 0.5) if neutral else None
+
+            def Wrows(idx):
+                """Rows idx of the effective link matrix (untried pairs -> p0 under the neutral prior).
+                Row-wise on purpose: building the full N x N matrix every step is O(N^2)."""
+                idx = np.atleast_1d(idx)
+                if not neutral:
+                    return self.W[idx]
+                R = np.where(self.nW_pair[idx] > 0, self.W[idx], p0)
+                R[np.arange(len(idx)), idx] = 0
+                return R
+            Wl = Wrows(leader)[0]
+            sc = ((1 - cfg.sim_w) * Wl + cfg.sim_w * sim) * 1.0
             if cfg.explore == "ucb":
                 sc = sc + cfg.explore_c * np.sqrt(np.log(self.t_seen + 2) / (self.n_co[leader] + 1))
             elif cfg.explore == "noise":
@@ -124,9 +133,9 @@ class Swarm:
                     if len(c):
                         members.append(int(c[np.argmax(sc[c])]))
             elif cfg.recruit_rule == "conditional":
-                bonus = sc - ((1 - cfg.sim_w) * Wm[leader] + cfg.sim_w * sim)       # exploration term, if any
+                bonus = sc - ((1 - cfg.sim_w) * Wl + cfg.sim_w * sim)       # exploration term, if any
                 for _ in range(cfg.team - 1):
-                    c = (1 - cfg.sim_w) * Wm[members].mean(0) + cfg.sim_w * sim + bonus
+                    c = (1 - cfg.sim_w) * Wrows(members).mean(0) + cfg.sim_w * sim + bonus
                     c[~free] = -1; c[members] = -1
                     j = int(np.argmax(c))
                     if c[j] <= cfg.recruit_thr:

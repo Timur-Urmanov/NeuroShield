@@ -15,6 +15,7 @@ Team policies (only matter in roles/ordered envs; team size = `team`):
   cluster_pair_ucb - online k-means on x (told the number of task types) + one pair_ucb per cluster.
   seq_ucb   - order-aware variant: UCB over *directed* pairs (a acts before b); the sequence is grown
               greedily at the head or tail. Team order = returned order.
+  pair_mean - centralised version of the swarm's link estimator (neutral prior, greedy, conditional third).
 All team policies respect the env's capacity mask (busy primitives).
   oracle    - a team covering all roles (and in the right order for the ordered env)
 """
@@ -68,7 +69,8 @@ class TeamPolicy:
         self.ctx = 0
         C = n_clusters if kind == "cluster_pair_ucb" else 1
         self.clusters = OnlineClusters(C) if kind == "cluster_pair_ucb" else None
-        if kind in ("pair_ucb", "cluster_pair_ucb", "seq_ucb"):
+        self.succ_sum, self.succ_n = 0.0, 0
+        if kind in ("pair_ucb", "cluster_pair_ucb", "seq_ucb", "pair_mean"):
             self.n = np.zeros((C, N, N)); self.s = np.zeros((C, N, N))
         if kind == "agent_ucb":
             self.n = np.zeros((1, N)); self.s = np.zeros((1, N))
@@ -111,6 +113,22 @@ class TeamPolicy:
                 sc = U[team].sum(0); sc[team] = -np.inf
                 team.append(int(np.argmax(sc)))
             return np.array(team)
+        if self.kind == "pair_mean":
+            # centralised counterpart of the swarm's link rule (H10): estimate = (s + p0) / (n + 1) with the
+            # neutral prior p0 = running mean team success; greedy best free pair, then the member that
+            # maximises the mean estimate to the current team (= the swarm's conditional recruitment).
+            p0 = self.succ_sum / self.succ_n if self.succ_n else 0.5
+            n, s_ = self.n[0], self.s[0]
+            E = (s_ + p0) / (n + 1) + 1e-9 * self.rng.random(n.shape)
+            np.fill_diagonal(E, -np.inf)
+            if avail is not None:
+                E[~avail] = -np.inf; E[:, ~avail] = -np.inf
+            a, b = np.unravel_index(int(np.argmax(E)), E.shape)
+            team = [int(a), int(b)]
+            while len(team) < k:
+                sc = E[team].mean(0); sc[team] = -np.inf
+                team.append(int(np.argmax(sc)))
+            return np.array(team)
         if self.kind == "seq_ucb":
             # directed pairs: n[a, b] counts teams where a acts before b
             U = self._ucb(); np.fill_diagonal(U, -np.inf)
@@ -130,6 +148,7 @@ class TeamPolicy:
 
     def update(self, team, succ):
         self.t += 1
+        self.succ_sum += succ; self.succ_n += 1
         if not hasattr(self, "n"):
             return
         n, s = self.n[self.ctx], self.s[self.ctx]
@@ -139,7 +158,7 @@ class TeamPolicy:
             for i in range(len(team)):
                 for j in range(i + 1, len(team)):
                     n[team[i], team[j]] += 1; s[team[i], team[j]] += succ
-        elif self.kind in ("pair_ucb", "cluster_pair_ucb"):
+        elif self.kind in ("pair_ucb", "cluster_pair_ucb", "pair_mean"):
             for a in team:
                 for b in team:
                     if a != b:
