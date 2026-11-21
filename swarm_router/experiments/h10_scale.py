@@ -1,7 +1,7 @@
 """H10: swarm vs centralised baselines as the number of primitives grows; structure of the learned links.
 (notes/hypotheses.md)   python3 experiments/h10_scale.py [--Ns 40,160,640,2560] [--long]"""
-import argparse, os, time
-from concurrent.futures import ProcessPoolExecutor
+import argparse, json, os, time
+from concurrent.futures import ProcessPoolExecutor, as_completed
 from dataclasses import replace
 
 import numpy as np
@@ -93,12 +93,28 @@ def main():
             for vname, v in V.items():
                 for sd in seeds:
                     specs.append((v[0], v[1], v[2], sd)); keys.append((cname, N, vname, sd))
+    # checkpoint: every finished run is appended to a jsonl; a restart skips the runs already there
+    ck = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), ".cache",
+                      f"h10_jobs{'_long' if a.long else ''}_T{32000 if a.long else a.T}.jsonl")
+    os.makedirs(os.path.dirname(ck), exist_ok=True)
+    res = {}
+    if os.path.exists(ck):
+        for line in open(ck):
+            rec = json.loads(line); res[tuple(rec["key"])] = rec["res"]
+    todo = [i for i in range(len(specs)) if (keys[i][0], keys[i][1], keys[i][2], keys[i][3]) not in res]
     # heavy (large-N centralised) jobs first so the pool stays busy
-    order = sorted(range(len(specs)), key=lambda i: -(keys[i][1] ** 2 if specs[i][0] == "router" else keys[i][1]))
+    todo.sort(key=lambda i: -(keys[i][1] ** 2 if specs[i][0] == "router" else keys[i][1]))
+    print(f"{len(res)} runs from checkpoint, {len(todo)} to do", flush=True)
     t0 = time.time()
-    with ProcessPoolExecutor(max_workers=a.workers or os.cpu_count()) as ex:
-        res = dict(zip([keys[i] for i in order], ex.map(job, [specs[i] for i in order], chunksize=1)))
-    print(f"[{len(specs)} runs in {time.time() - t0:.0f}s]")
+    with ProcessPoolExecutor(max_workers=a.workers or os.cpu_count()) as ex, open(ck, "a") as fck:
+        futs = {ex.submit(job, specs[i]): i for i in todo}
+        for fu in as_completed(futs):
+            i = futs[fu]; r = fu.result(); k = list(keys[i])
+            res[tuple(k)] = r
+            fck.write(json.dumps(dict(key=k, res=r)) + "\n"); fck.flush()
+            print(f"  done {k} ({time.time() - t0:.0f}s)", flush=True)
+    res = {k: res[k] for k in [tuple(x) for x in keys]}
+    print(f"[{len(specs)} runs, {len(todo)} new in {time.time() - t0:.0f}s]")
     out = {}
     for (c, N, v, sd), r in res.items():
         out.setdefault(c, {}).setdefault(str(N), {}).setdefault(v, []).append((sd, r))
