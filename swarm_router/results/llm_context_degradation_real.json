@@ -1,0 +1,611 @@
+{
+ "experiment": "llm_context_degradation_real",
+ "git_commit": "04ea21c",
+ "argv": [
+  "experiments/llm_context_degradation.py",
+  "--config",
+  "configs/llm.local.yaml",
+  "--real",
+  "--yes",
+  "--budget-usd",
+  "50",
+  "--k",
+  "0,8,32,64",
+  "--n-tasks",
+  "30",
+  "--models",
+  "qwen15,qwen05",
+  "--seed0",
+  "0",
+  "--seeds",
+  "5"
+ ],
+ "created": "2026-11-21T01:32:46",
+ "mode": "real",
+ "status": "ok",
+ "seeds": [
+  0,
+  1,
+  2,
+  3,
+  4
+ ],
+ "K": [
+  0,
+  8,
+  32,
+  64
+ ],
+ "n_tasks": 30,
+ "models": [
+  "qwen15",
+  "qwen05"
+ ],
+ "results": {
+  "qwen15": {
+   "per_seed": [
+    {
+     "seed": 0,
+     "status": "ok",
+     "0": {
+      "success": 0.9666666666666667,
+      "input_tokens": 117.26666666666667,
+      "n": 30,
+      "max_tokens_stops": 0,
+      "refusals": 0
+     },
+     "8": {
+      "success": 0.8333333333333334,
+      "input_tokens": 1427.2333333333333,
+      "n": 30,
+      "max_tokens_stops": 0,
+      "refusals": 0
+     },
+     "32": {
+      "success": 0.9666666666666667,
+      "input_tokens": 5074.666666666667,
+      "n": 30,
+      "max_tokens_stops": 0,
+      "refusals": 0
+     },
+     "64": {
+      "success": 0.8666666666666667,
+      "input_tokens": 9420.1,
+      "n": 30,
+      "max_tokens_stops": 0,
+      "refusals": 0
+     },
+     "slope_per_k": -0.0005645161290322524
+    },
+    {
+     "seed": 1,
+     "status": "ok",
+     "0": {
+      "success": 0.9,
+      "input_tokens": 122.63333333333334,
+      "n": 30,
+      "max_tokens_stops": 0,
+      "refusals": 0
+     },
+     "8": {
+      "success": 0.9,
+      "input_tokens": 1363.2666666666667,
+      "n": 30,
+      "max_tokens_stops": 0,
+      "refusals": 0
+     },
+     "32": {
+      "success": 0.9,
+      "input_tokens": 5000.2,
+      "n": 30,
+      "max_tokens_stops": 0,
+      "refusals": 0
+     },
+     "64": {
+      "success": 0.8333333333333334,
+      "input_tokens": 9665.166666666666,
+      "n": 30,
+      "max_tokens_stops": 0,
+      "refusals": 0
+     },
+     "slope_per_k": -0.0010215053763440827
+    },
+    {
+     "seed": 2,
+     "status": "ok",
+     "0": {
+      "success": 0.9,
+      "input_tokens": 120.7,
+      "n": 30,
+      "max_tokens_stops": 0,
+      "refusals": 0
+     },
+     "8": {
+      "success": 0.8666666666666667,
+      "input_tokens": 1203.7666666666667,
+      "n": 30,
+      "max_tokens_stops": 0,
+      "refusals": 0
+     },
+     "32": {
+      "success": 0.8666666666666667,
+      "input_tokens": 4447.433333333333,
+      "n": 30,
+      "max_tokens_stops": 0,
+      "refusals": 0
+     },
+     "64": {
+      "success": 0.9,
+      "input_tokens": 9245.3,
+      "n": 30,
+      "max_tokens_stops": 0,
+      "refusals": 0
+     },
+     "slope_per_k": 0.00016129032258064627
+    },
+    {
+     "seed": 3,
+     "status": "ok",
+     "0": {
+      "success": 0.9,
+      "input_tokens": 121.7,
+      "n": 30,
+      "max_tokens_stops": 0,
+      "refusals": 0
+     },
+     "8": {
+      "success": 0.9,
+      "input_tokens": 1310.9666666666667,
+      "n": 30,
+      "max_tokens_stops": 0,
+      "refusals": 0
+     },
+     "32": {
+      "success": 0.9,
+      "input_tokens": 4959.033333333334,
+      "n": 30,
+      "max_tokens_stops": 0,
+      "refusals": 0
+     },
+     "64": {
+      "success": 0.8666666666666667,
+      "input_tokens": 9342.0,
+      "n": 30,
+      "max_tokens_stops": 0,
+      "refusals": 0
+     },
+     "slope_per_k": -0.0005107526881720359
+    },
+    {
+     "seed": 4,
+     "status": "ok",
+     "0": {
+      "success": 0.9,
+      "input_tokens": 120.46666666666667,
+      "n": 30,
+      "max_tokens_stops": 0,
+      "refusals": 0
+     },
+     "8": {
+      "success": 0.9,
+      "input_tokens": 1261.8666666666666,
+      "n": 30,
+      "max_tokens_stops": 0,
+      "refusals": 0
+     },
+     "32": {
+      "success": 0.8666666666666667,
+      "input_tokens": 5218.733333333334,
+      "n": 30,
+      "max_tokens_stops": 0,
+      "refusals": 0
+     },
+     "64": {
+      "success": 0.8333333333333334,
+      "input_tokens": 9858.333333333334,
+      "n": 30,
+      "max_tokens_stops": 0,
+      "refusals": 0
+     },
+     "slope_per_k": -0.0011021505376344052
+    }
+   ],
+   "n_seeds_ok": 5,
+   "summary": {
+    "0": {
+     "success": 0.9133333333333333,
+     "success_sd": 0.029814239699997188,
+     "input_tokens": 120.55333333333333,
+     "max_tokens_stops": 0,
+     "refusals": 0
+    },
+    "8": {
+     "success": 0.8800000000000001,
+     "success_sd": 0.029814239699997188,
+     "input_tokens": 1313.42,
+     "max_tokens_stops": 0,
+     "refusals": 0
+    },
+    "32": {
+     "success": 0.9,
+     "success_sd": 0.04082482904638629,
+     "input_tokens": 4940.013333333333,
+     "max_tokens_stops": 0,
+     "refusals": 0
+    },
+    "64": {
+     "success": 0.86,
+     "success_sd": 0.027888667551135848,
+     "input_tokens": 9506.18,
+     "max_tokens_stops": 0,
+     "refusals": 0
+    },
+    "diff_kmax_k0": {
+     "diff": -0.05333333333333332,
+     "sd": 0.038005847503304595,
+     "effect": false
+    },
+    "slope_per_k": -0.0006075268817204259,
+    "slope_per_k_sd": 0.0005045606549300194
+   }
+  },
+  "qwen05": {
+   "per_seed": [
+    {
+     "seed": 0,
+     "status": "ok",
+     "0": {
+      "success": 0.4,
+      "input_tokens": 117.26666666666667,
+      "n": 30,
+      "max_tokens_stops": 0,
+      "refusals": 0
+     },
+     "8": {
+      "success": 0.43333333333333335,
+      "input_tokens": 943.6333333333333,
+      "n": 30,
+      "max_tokens_stops": 0,
+      "refusals": 0
+     },
+     "32": {
+      "success": 0.4,
+      "input_tokens": 3598.8,
+      "n": 30,
+      "max_tokens_stops": 0,
+      "refusals": 0
+     },
+     "64": {
+      "success": 0.4666666666666667,
+      "input_tokens": 6978.2,
+      "n": 30,
+      "max_tokens_stops": 0,
+      "refusals": 0
+     },
+     "slope_per_k": 0.000779569892473121
+    },
+    {
+     "seed": 1,
+     "status": "ok",
+     "0": {
+      "success": 0.4,
+      "input_tokens": 122.63333333333334,
+      "n": 30,
+      "max_tokens_stops": 0,
+      "refusals": 0
+     },
+     "8": {
+      "success": 0.4,
+      "input_tokens": 1082.0333333333333,
+      "n": 30,
+      "max_tokens_stops": 0,
+      "refusals": 0
+     },
+     "32": {
+      "success": 0.4,
+      "input_tokens": 3851.4666666666667,
+      "n": 30,
+      "max_tokens_stops": 0,
+      "refusals": 0
+     },
+     "64": {
+      "success": 0.43333333333333335,
+      "input_tokens": 7431.4,
+      "n": 30,
+      "max_tokens_stops": 0,
+      "refusals": 0
+     },
+     "slope_per_k": 0.000510752688172047
+    },
+    {
+     "seed": 2,
+     "status": "ok",
+     "0": {
+      "success": 0.43333333333333335,
+      "input_tokens": 120.7,
+      "n": 30,
+      "max_tokens_stops": 0,
+      "refusals": 0
+     },
+     "8": {
+      "success": 0.4666666666666667,
+      "input_tokens": 1071.7666666666667,
+      "n": 30,
+      "max_tokens_stops": 0,
+      "refusals": 0
+     },
+     "32": {
+      "success": 0.5333333333333333,
+      "input_tokens": 3758.133333333333,
+      "n": 30,
+      "max_tokens_stops": 0,
+      "refusals": 0
+     },
+     "64": {
+      "success": 0.5,
+      "input_tokens": 7657.266666666666,
+      "n": 30,
+      "max_tokens_stops": 0,
+      "refusals": 0
+     },
+     "slope_per_k": 0.001021505376344089
+    },
+    {
+     "seed": 3,
+     "status": "ok",
+     "0": {
+      "success": 0.5666666666666667,
+      "input_tokens": 121.7,
+      "n": 30,
+      "max_tokens_stops": 0,
+      "refusals": 0
+     },
+     "8": {
+      "success": 0.5333333333333333,
+      "input_tokens": 1094.4333333333334,
+      "n": 30,
+      "max_tokens_stops": 0,
+      "refusals": 0
+     },
+     "32": {
+      "success": 0.43333333333333335,
+      "input_tokens": 3938.266666666667,
+      "n": 30,
+      "max_tokens_stops": 0,
+      "refusals": 0
+     },
+     "64": {
+      "success": 0.5,
+      "input_tokens": 7664.0,
+      "n": 30,
+      "max_tokens_stops": 0,
+      "refusals": 0
+     },
+     "slope_per_k": -0.0011021505376344043
+    },
+    {
+     "seed": 4,
+     "status": "ok",
+     "0": {
+      "success": 0.5,
+      "input_tokens": 120.46666666666667,
+      "n": 30,
+      "max_tokens_stops": 0,
+      "refusals": 0
+     },
+     "8": {
+      "success": 0.4666666666666667,
+      "input_tokens": 1099.3666666666666,
+      "n": 30,
+      "max_tokens_stops": 0,
+      "refusals": 0
+     },
+     "32": {
+      "success": 0.43333333333333335,
+      "input_tokens": 3908.6666666666665,
+      "n": 30,
+      "max_tokens_stops": 0,
+      "refusals": 0
+     },
+     "64": {
+      "success": 0.36666666666666664,
+      "input_tokens": 7603.8,
+      "n": 30,
+      "max_tokens_stops": 0,
+      "refusals": 0
+     },
+     "slope_per_k": -0.0019623655913978463
+    }
+   ],
+   "n_seeds_ok": 5,
+   "summary": {
+    "0": {
+     "success": 0.45999999999999996,
+     "success_sd": 0.07226494462892932,
+     "input_tokens": 120.55333333333333,
+     "max_tokens_stops": 0,
+     "refusals": 0
+    },
+    "8": {
+     "success": 0.4600000000000001,
+     "success_sd": 0.04944132324730441,
+     "input_tokens": 1058.2466666666667,
+     "max_tokens_stops": 0,
+     "refusals": 0
+    },
+    "32": {
+     "success": 0.44000000000000006,
+     "success_sd": 0.0547722557505166,
+     "input_tokens": 3811.0666666666666,
+     "max_tokens_stops": 0,
+     "refusals": 0
+    },
+    "64": {
+     "success": 0.4533333333333333,
+     "success_sd": 0.055777335102271716,
+     "input_tokens": 7466.9333333333325,
+     "max_tokens_stops": 0,
+     "refusals": 0
+    },
+    "diff_kmax_k0": {
+     "diff": -0.006666666666666677,
+     "sd": 0.08944271909999159,
+     "effect": false
+    },
+    "slope_per_k": -0.00015053763440859877,
+    "slope_per_k_sd": 0.001309997842046767
+   }
+  }
+ },
+ "budget": {
+  "limit_usd": 50.0,
+  "spent_usd": 0.0
+ },
+ "call_log": "/home/user/NeuroShield/swarm_router/results/llm_calls/llm_context_degradation_real_20261121-013234.jsonl",
+ "config": {
+  "path": "configs/llm.local.yaml",
+  "models": [
+   {
+    "name": "qwen05",
+    "provider": "llama_cpp",
+    "model": ".cache/models/qwen2.5-0.5b-instruct-q4_k_m.gguf",
+    "price_in_per_1m": 0.5,
+    "price_out_per_1m": 0.5,
+    "api_key_env": null,
+    "base_url": null,
+    "params": {
+     "temperature": 0.7,
+     "n_ctx": 16384
+    },
+    "sim": {
+     "acc": {
+      "math": 0.8,
+      "code": 0.8,
+      "text": 0.8
+     },
+     "role_skill": {
+      "none": 0.0,
+      "executor": 0.0,
+      "planner": -0.3,
+      "verifier": -0.3
+     },
+     "out_tokens": {
+      "planner": 200,
+      "executor": 300,
+      "verifier": 80
+     },
+     "plan_bonus": 0.0,
+     "verify_detect": 0.5,
+     "false_reject": 0.1,
+     "no_verdict": 0.0,
+     "context_decay_per_1k": 0.0
+    },
+    "max_tokens_field": "max_tokens",
+    "thinking": false
+   },
+   {
+    "name": "qwen15",
+    "provider": "llama_cpp",
+    "model": ".cache/models/qwen2.5-1.5b-instruct-q4_k_m.gguf",
+    "price_in_per_1m": 1.5,
+    "price_out_per_1m": 1.5,
+    "api_key_env": null,
+    "base_url": null,
+    "params": {
+     "temperature": 0.7,
+     "n_ctx": 16384
+    },
+    "sim": {
+     "acc": {
+      "math": 0.8,
+      "code": 0.8,
+      "text": 0.8
+     },
+     "role_skill": {
+      "none": 0.0,
+      "executor": 0.0,
+      "planner": -0.3,
+      "verifier": -0.3
+     },
+     "out_tokens": {
+      "planner": 200,
+      "executor": 300,
+      "verifier": 80
+     },
+     "plan_bonus": 0.0,
+     "verify_detect": 0.5,
+     "false_reject": 0.1,
+     "no_verdict": 0.0,
+     "context_decay_per_1k": 0.0
+    },
+    "max_tokens_field": "max_tokens",
+    "thinking": false
+   },
+   {
+    "name": "qwen3",
+    "provider": "llama_cpp",
+    "model": ".cache/models/qwen2.5-3b-instruct-q4_k_m.gguf",
+    "price_in_per_1m": 3.0,
+    "price_out_per_1m": 3.0,
+    "api_key_env": null,
+    "base_url": null,
+    "params": {
+     "temperature": 0.7,
+     "n_ctx": 16384
+    },
+    "sim": {
+     "acc": {
+      "math": 0.8,
+      "code": 0.8,
+      "text": 0.8
+     },
+     "role_skill": {
+      "none": 0.0,
+      "executor": 0.0,
+      "planner": -0.3,
+      "verifier": -0.3
+     },
+     "out_tokens": {
+      "planner": 200,
+      "executor": 300,
+      "verifier": 80
+     },
+     "plan_bonus": 0.0,
+     "verify_detect": 0.5,
+     "false_reject": 0.1,
+     "no_verdict": 0.0,
+     "context_decay_per_1k": 0.0
+    },
+    "max_tokens_field": "max_tokens",
+    "thinking": false
+   }
+  ],
+  "run": {
+   "budget_usd": 50.0,
+   "lam": 0.15,
+   "cost_norm_usd": 0.01,
+   "max_tokens": {
+    "planner": 512,
+    "executor": 768,
+    "verifier": 512
+   },
+   "cache_dir": ".cache/llm",
+   "log_dir": "results/llm_calls",
+   "include_seed_in_cache_key": true,
+   "team_roles": "position",
+   "variant_budget_share": "equal"
+  },
+  "embeddings": {
+   "dim": 16,
+   "projection_seed": 12345,
+   "provider": "hashed"
+  },
+  "tasks": {
+   "builtin": true,
+   "external_dir": "data",
+   "code_timeout_s": 5.0,
+   "code_mem_mb": 512
+  }
+ },
+ "note": ""
+}
