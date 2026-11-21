@@ -1,0 +1,188 @@
+{
+ "paired": [
+  {
+   "a": "swarm",
+   "b": "linucb",
+   "n_per_seed": null,
+   "diff": 0.0002,
+   "sd": 0.0144,
+   "effect_2sd": false,
+   "item_diff": 0.0002,
+   "item_se": 0.0094,
+   "effect_item": false
+  },
+  {
+   "a": "swarm",
+   "b": "single:qwen3",
+   "n_per_seed": null,
+   "diff": -0.056,
+   "sd": 0.0278,
+   "effect_2sd": true,
+   "item_diff": -0.056,
+   "item_se": 0.0087,
+   "effect_item": true
+  },
+  {
+   "a": "linucb",
+   "b": "single:qwen3",
+   "n_per_seed": null,
+   "diff": -0.0561,
+   "sd": 0.0336,
+   "effect_2sd": false,
+   "item_diff": -0.0561,
+   "item_se": 0.0083,
+   "effect_item": true
+  },
+  {
+   "a": "swarm",
+   "b": "swarm_solo",
+   "n_per_seed": null,
+   "diff": 0.0398,
+   "sd": 0.0181,
+   "effect_2sd": true,
+   "item_diff": 0.0398,
+   "item_se": 0.0089,
+   "effect_item": true
+  }
+ ],
+ "pipeline_subset": [
+  {
+   "a": "swarm",
+   "b": "pipeline:qwen3",
+   "n_per_seed": 100,
+   "diff": 0.7536,
+   "sd": 0.0259,
+   "effect_2sd": true,
+   "item_diff": 0.7536,
+   "item_se": 0.027,
+   "effect_item": true
+  },
+  {
+   "a": "single:qwen3",
+   "b": "pipeline:qwen3",
+   "n_per_seed": 100,
+   "diff": 0.8286,
+   "sd": 0.0619,
+   "effect_2sd": true,
+   "item_diff": 0.8286,
+   "item_se": 0.0244,
+   "effect_item": true
+  },
+  {
+   "a": "swarm",
+   "b": "single:qwen3",
+   "n_per_seed": 100,
+   "diff": -0.075,
+   "sd": 0.0423,
+   "effect_2sd": false,
+   "item_diff": -0.075,
+   "item_se": 0.0156,
+   "effect_item": true
+  },
+  {
+   "a": "swarm",
+   "b": "pipeline:qwen3",
+   "n_per_seed": 100,
+   "diff": 0.084,
+   "sd": 0.0532,
+   "effect_2sd": false,
+   "item_diff": 0.084,
+   "item_se": 0.027,
+   "effect_item": true
+  },
+  {
+   "a": "single:qwen3",
+   "b": "pipeline:qwen3",
+   "n_per_seed": 100,
+   "diff": 0.19,
+   "sd": 0.0797,
+   "effect_2sd": true,
+   "item_diff": 0.19,
+   "item_se": 0.0243,
+   "effect_item": true
+  }
+ ],
+ "cost_first100": {
+  "swarm": 0.000431188,
+  "linucb": 0.000434007,
+  "single:qwen3": 0.0006379620000000001,
+  "pipeline:qwen3": 0.0048953220000000006
+ },
+ "late_window": [
+  {
+   "a": "swarm",
+   "b": "single:qwen3",
+   "n_per_seed": null,
+   "diff": -0.056,
+   "sd": 0.0278,
+   "effect_2sd": true,
+   "item_diff": -0.056,
+   "item_se": 0.0087,
+   "effect_item": true,
+   "note": "all 300"
+  },
+  {
+   "window": "tasks 200-299",
+   "diff": -0.0373,
+   "sd": 0.0192
+  }
+ ],
+ "success_by_kind": {
+  "swarm": {
+   "math": 0.668,
+   "code": 0.427,
+   "text": 0.674
+  },
+  "swarm_solo": {
+   "math": 0.603,
+   "code": 0.393,
+   "text": 0.642
+  },
+  "linucb": {
+   "math": 0.687,
+   "code": 0.414,
+   "text": 0.672
+  },
+  "single:qwen05": {
+   "math": 0.042,
+   "code": 0.282,
+   "text": 0.318
+  },
+  "single:qwen15": {
+   "math": 0.613,
+   "code": 0.397,
+   "text": 0.639
+  },
+  "single:qwen3": {
+   "math": 0.805,
+   "code": 0.484,
+   "text": 0.728
+  },
+  "pipeline:qwen3": {
+   "math": 0.711,
+   "code": 0.457,
+   "text": 0.347
+  }
+ },
+ "model_share": {
+  "swarm": {
+   "qwen05": 0.091,
+   "qwen15": 0.41,
+   "qwen3": 0.499
+  },
+  "swarm_solo": {
+   "qwen05": 0.185,
+   "qwen15": 0.313,
+   "qwen3": 0.503
+  },
+  "linucb": {
+   "qwen05": 0.04,
+   "qwen15": 0.479,
+   "qwen3": 0.481
+  }
+ },
+ "oracle_per_item": {
+  "reward": 0.6892,
+  "sd": 0.0143
+ }
+}
