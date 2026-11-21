@@ -1,0 +1,416 @@
+{
+ "experiment": "llm_role_spread_real",
+ "git_commit": "6110ac2",
+ "argv": [
+  "experiments/llm_role_spread.py",
+  "--config",
+  "configs/llm.local.yaml",
+  "--real",
+  "--yes",
+  "--budget-usd",
+  "200",
+  "--models",
+  "qwen05,qwen15,qwen3",
+  "--executor-model",
+  "qwen05",
+  "--n-tasks",
+  "20",
+  "--seed0",
+  "0",
+  "--seeds",
+  "5"
+ ],
+ "created": "2026-11-21T03:57:32",
+ "mode": "real",
+ "status": "ok",
+ "seeds": [
+  0,
+  1,
+  2,
+  3,
+  4
+ ],
+ "n_tasks": 20,
+ "models": [
+  "qwen05",
+  "qwen15",
+  "qwen3"
+ ],
+ "executor_model": "qwen05",
+ "per_seed": [
+  {
+   "seed": 0,
+   "status": "ok",
+   "none": {
+    "qwen05": 0.45,
+    "qwen15": 0.9,
+    "qwen3": 1.0
+   },
+   "executor": {
+    "qwen05": 0.45,
+    "qwen15": 0.95,
+    "qwen3": 0.95
+   },
+   "planner": {
+    "qwen05": 0.4,
+    "qwen15": 0.75,
+    "qwen3": 0.55
+   },
+   "verifier": {
+    "qwen05": 0.5,
+    "qwen15": 0.65,
+    "qwen3": 0.6
+   }
+  },
+  {
+   "seed": 1,
+   "status": "ok",
+   "none": {
+    "qwen05": 0.55,
+    "qwen15": 1.0,
+    "qwen3": 1.0
+   },
+   "executor": {
+    "qwen05": 0.7,
+    "qwen15": 0.95,
+    "qwen3": 1.0
+   },
+   "planner": {
+    "qwen05": 0.75,
+    "qwen15": 0.8,
+    "qwen3": 0.85
+   },
+   "verifier": {
+    "qwen05": 0.525,
+    "qwen15": 0.6,
+    "qwen3": 0.525
+   }
+  },
+  {
+   "seed": 2,
+   "status": "ok",
+   "none": {
+    "qwen05": 0.35,
+    "qwen15": 1.0,
+    "qwen3": 1.0
+   },
+   "executor": {
+    "qwen05": 0.5,
+    "qwen15": 0.9,
+    "qwen3": 1.0
+   },
+   "planner": {
+    "qwen05": 0.45,
+    "qwen15": 0.9,
+    "qwen3": 0.45
+   },
+   "verifier": {
+    "qwen05": 0.5,
+    "qwen15": 0.625,
+    "qwen3": 0.575
+   }
+  },
+  {
+   "seed": 3,
+   "status": "ok",
+   "none": {
+    "qwen05": 0.55,
+    "qwen15": 0.95,
+    "qwen3": 1.0
+   },
+   "executor": {
+    "qwen05": 0.75,
+    "qwen15": 0.95,
+    "qwen3": 1.0
+   },
+   "planner": {
+    "qwen05": 0.55,
+    "qwen15": 0.7,
+    "qwen3": 0.7
+   },
+   "verifier": {
+    "qwen05": 0.5,
+    "qwen15": 0.625,
+    "qwen3": 0.5499999999999999
+   }
+  },
+  {
+   "seed": 4,
+   "status": "ok",
+   "none": {
+    "qwen05": 0.5,
+    "qwen15": 0.9,
+    "qwen3": 0.9
+   },
+   "executor": {
+    "qwen05": 0.45,
+    "qwen15": 0.9,
+    "qwen3": 1.0
+   },
+   "planner": {
+    "qwen05": 0.45,
+    "qwen15": 0.55,
+    "qwen3": 0.5
+   },
+   "verifier": {
+    "qwen05": 0.5,
+    "qwen15": 0.525,
+    "qwen3": 0.525
+   }
+  }
+ ],
+ "counts": {
+  "qwen05": {
+   "max_tokens_stops": 2,
+   "refusals": 0,
+   "no_verdict": 72,
+   "verdicts": 200
+  },
+  "qwen15": {
+   "max_tokens_stops": 0,
+   "refusals": 0,
+   "no_verdict": 0,
+   "verdicts": 200
+  },
+  "qwen3": {
+   "max_tokens_stops": 0,
+   "refusals": 0,
+   "no_verdict": 0,
+   "verdicts": 200
+  }
+ },
+ "summary": {
+  "none": {
+   "mean": {
+    "qwen05": 0.4800000000000001,
+    "qwen15": 0.95,
+    "qwen3": 0.9800000000000001
+   },
+   "sd": {
+    "qwen05": 0.08366600265340758,
+    "qwen15": 0.04999999999999999,
+    "qwen3": 0.04472135954999579
+   },
+   "spread": 0.4999999999999999,
+   "spread_sd": 0.10000000000000003,
+   "spread_detected": true,
+   "rank": [
+    "qwen3",
+    "qwen15",
+    "qwen05"
+   ]
+  },
+  "executor": {
+   "mean": {
+    "qwen05": 0.5700000000000001,
+    "qwen15": 0.93,
+    "qwen3": 0.99
+   },
+   "sd": {
+    "qwen05": 0.1440486029088793,
+    "qwen15": 0.02738612787525827,
+    "qwen3": 0.022360679774997918
+   },
+   "spread": 0.42000000000000004,
+   "spread_sd": 0.13509256086106294,
+   "spread_detected": true,
+   "rank": [
+    "qwen3",
+    "qwen15",
+    "qwen05"
+   ]
+  },
+  "planner": {
+   "mean": {
+    "qwen05": 0.52,
+    "qwen15": 0.74,
+    "qwen3": 0.61
+   },
+   "sd": {
+    "qwen05": 0.1396424004376894,
+    "qwen15": 0.12942179105544785,
+    "qwen3": 0.16355427233796124
+   },
+   "spread": 0.22000000000000003,
+   "spread_sd": 0.17175564037317667,
+   "spread_detected": false,
+   "rank": [
+    "qwen15",
+    "qwen3",
+    "qwen05"
+   ]
+  },
+  "verifier": {
+   "mean": {
+    "qwen05": 0.505,
+    "qwen15": 0.605,
+    "qwen3": 0.5549999999999999
+   },
+   "sd": {
+    "qwen05": 0.011180339887498959,
+    "qwen15": 0.04808846015417836,
+    "qwen3": 0.03259601202601322
+   },
+   "spread": 0.1,
+   "spread_sd": 0.05,
+   "spread_detected": false,
+   "rank": [
+    "qwen15",
+    "qwen3",
+    "qwen05"
+   ]
+  }
+ },
+ "rank_changes_across_roles": true,
+ "budget": {
+  "limit_usd": 200.0,
+  "spent_usd": 0.0
+ },
+ "call_log": "/home/user/NeuroShield/swarm_router/results/llm_calls/llm_role_spread_real_20261121-035728.jsonl",
+ "config": {
+  "path": "configs/llm.local.yaml",
+  "models": [
+   {
+    "name": "qwen05",
+    "provider": "llama_cpp",
+    "model": ".cache/models/qwen2.5-0.5b-instruct-q4_k_m.gguf",
+    "price_in_per_1m": 0.5,
+    "price_out_per_1m": 0.5,
+    "api_key_env": null,
+    "base_url": null,
+    "params": {
+     "temperature": 0.7,
+     "n_ctx": 16384
+    },
+    "sim": {
+     "acc": {
+      "math": 0.8,
+      "code": 0.8,
+      "text": 0.8
+     },
+     "role_skill": {
+      "none": 0.0,
+      "executor": 0.0,
+      "planner": -0.3,
+      "verifier": -0.3
+     },
+     "out_tokens": {
+      "planner": 200,
+      "executor": 300,
+      "verifier": 80
+     },
+     "plan_bonus": 0.0,
+     "verify_detect": 0.5,
+     "false_reject": 0.1,
+     "no_verdict": 0.0,
+     "context_decay_per_1k": 0.0
+    },
+    "max_tokens_field": "max_tokens",
+    "thinking": false
+   },
+   {
+    "name": "qwen15",
+    "provider": "llama_cpp",
+    "model": ".cache/models/qwen2.5-1.5b-instruct-q4_k_m.gguf",
+    "price_in_per_1m": 1.5,
+    "price_out_per_1m": 1.5,
+    "api_key_env": null,
+    "base_url": null,
+    "params": {
+     "temperature": 0.7,
+     "n_ctx": 16384
+    },
+    "sim": {
+     "acc": {
+      "math": 0.8,
+      "code": 0.8,
+      "text": 0.8
+     },
+     "role_skill": {
+      "none": 0.0,
+      "executor": 0.0,
+      "planner": -0.3,
+      "verifier": -0.3
+     },
+     "out_tokens": {
+      "planner": 200,
+      "executor": 300,
+      "verifier": 80
+     },
+     "plan_bonus": 0.0,
+     "verify_detect": 0.5,
+     "false_reject": 0.1,
+     "no_verdict": 0.0,
+     "context_decay_per_1k": 0.0
+    },
+    "max_tokens_field": "max_tokens",
+    "thinking": false
+   },
+   {
+    "name": "qwen3",
+    "provider": "llama_cpp",
+    "model": ".cache/models/qwen2.5-3b-instruct-q4_k_m.gguf",
+    "price_in_per_1m": 3.0,
+    "price_out_per_1m": 3.0,
+    "api_key_env": null,
+    "base_url": null,
+    "params": {
+     "temperature": 0.7,
+     "n_ctx": 16384
+    },
+    "sim": {
+     "acc": {
+      "math": 0.8,
+      "code": 0.8,
+      "text": 0.8
+     },
+     "role_skill": {
+      "none": 0.0,
+      "executor": 0.0,
+      "planner": -0.3,
+      "verifier": -0.3
+     },
+     "out_tokens": {
+      "planner": 200,
+      "executor": 300,
+      "verifier": 80
+     },
+     "plan_bonus": 0.0,
+     "verify_detect": 0.5,
+     "false_reject": 0.1,
+     "no_verdict": 0.0,
+     "context_decay_per_1k": 0.0
+    },
+    "max_tokens_field": "max_tokens",
+    "thinking": false
+   }
+  ],
+  "run": {
+   "budget_usd": 50.0,
+   "lam": 0.15,
+   "cost_norm_usd": 0.01,
+   "max_tokens": {
+    "planner": 512,
+    "executor": 768,
+    "verifier": 512
+   },
+   "cache_dir": ".cache/llm",
+   "log_dir": "results/llm_calls",
+   "include_seed_in_cache_key": true,
+   "team_roles": "position",
+   "variant_budget_share": "equal"
+  },
+  "embeddings": {
+   "dim": 16,
+   "projection_seed": 12345,
+   "provider": "hashed"
+  },
+  "tasks": {
+   "builtin": true,
+   "external_dir": "data",
+   "code_timeout_s": 5.0,
+   "code_mem_mb": 512
+  }
+ },
+ "note": ""
+}
