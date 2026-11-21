@@ -35,16 +35,16 @@ from swarm.llm.roles import ROLE_PROMPTS, executor_message, planner_message, ver
 from swarm.llm.tasks import load_pool, make_stream  # noqa: E402
 
 METRICS = ("reward", "success", "usd_per_task", "charged_usd", "calls_per_task", "cache_hit_rate", "team_size")
-ALL_VARIANTS = ("swarm", "linucb", "single", "pipeline")
+ALL_VARIANTS = ("swarm", "linucb", "single", "pipeline")      # + optional "swarm_solo"
 
 
-def run_one(env: LLMEnv, variant: str, seed: int, m: int | None = None) -> dict:
+def run_one(env: LLMEnv, variant: str, seed: int, m: int | None = None, n_limit: int | None = None) -> dict:
     """One (variant, seed). Never raises: budget stops and errors give a partial row with a status."""
     R, TS = [], []
     status = "ok"
     try:
-        if variant == "swarm":
-            s = Swarm(SwarmConfig(), seed, env.M, env.D)
+        if variant in ("swarm", "swarm_solo"):
+            s = Swarm(SwarmConfig() if variant == "swarm" else SwarmConfig(coupling=False), seed, env.M, env.D)
             for t in range(env.T):
                 r, info = s.step(t, env)
                 R.append(r); TS.append(len(info["members"]))
@@ -57,7 +57,7 @@ def run_one(env: LLMEnv, variant: str, seed: int, m: int | None = None) -> dict:
                 R.append(r); TS.append(1)
         else:                                    # single / pipeline on model m
             k = 1 if variant == "single" else 3
-            for t in range(env.T):
+            for t in range(env.T if n_limit is None else min(env.T, n_limit)):
                 R.append(env.step_reward(env.execute(t, m, k, variant))); TS.append(k)
     except BudgetExceeded as e:
         status = f"stopped_budget[{e.scope}]: {e}"
@@ -137,6 +137,8 @@ def main(argv=None):
     ap.add_argument("--seed0", type=int, default=0)
     ap.add_argument("--variants", default=",".join(ALL_VARIANTS))
     ap.add_argument("--pipeline-model", default="auto", help="model name or 'auto' (= best single)")
+    ap.add_argument("--pipeline-n", type=int, default=None,
+                    help="run the pipeline only on the first N tasks of each seed's stream (it costs ~3 calls/task)")
     ap.add_argument("--pilot", type=int, default=0, help="N calls per model to measure output tokens, then "
                                                          "re-estimate (real calls only with --real)")
     ap.add_argument("--pilot-only", action="store_true", help="stop after the pilot")
@@ -218,7 +220,7 @@ def main(argv=None):
             rows = []
             for sd in seeds:
                 env = LLMEnv(cfg, client, streams[sd], _Fixed(sd), sd, sample_id=sd if include_seed else 0)
-                row = run_one(env, variant, sd, m)
+                row = run_one(env, variant, sd, m, a.pipeline_n if variant == "pipeline" else None)
                 rows.append(row)
                 if row["status"].startswith("stopped_budget[run]"):
                     run_status = "stopped_budget"
@@ -243,7 +245,7 @@ def main(argv=None):
         for label in labels:
             if run_status == "stopped_budget":
                 break
-            if label in ("swarm", "linucb"):
+            if label in ("swarm", "swarm_solo", "linucb"):
                 run_variant(label, label)
             elif label.startswith("single:"):
                 run_variant(label, "single", cfg.names.index(label.split(":", 1)[1]))

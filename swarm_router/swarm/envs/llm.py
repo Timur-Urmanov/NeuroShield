@@ -59,7 +59,12 @@ class LLMEnv:
 
     # ------------------------------------------------------------------ execution
     def execute(self, t: int, m: int, n_members: int, tag: str = "") -> TeamResult:
-        roles = roles_for_team(n_members)
+        # team_roles="executor_only" (P3, after P1-local found no role strength): a swarm team shares its
+        # value memory but only one executor call is made; the fixed pipeline baseline keeps its roles.
+        if tag == "swarm" and self.cfg.run.get("team_roles") == "executor_only":
+            roles = ["executor"]
+        else:
+            roles = roles_for_team(n_members)
         res = run_team(self.client, self.models[m], self.tasks[t], roles, self.max_tokens,
                        sample_id=self.sample_id, check_fn=self.check_fn)
         self._last = res

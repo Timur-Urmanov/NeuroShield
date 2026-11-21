@@ -1,0 +1,26 @@
+{
+ "seed": 20261121,
+ "files": {
+  "gsm8k_test500.jsonl": {
+   "source": "openai/gsm8k/resolve/main/main/test-00000-of-00001.parquet",
+   "source_sha256": "ee7b8da9e381df27b9e3f7758a159ab2bdaa4dbaa910546cbbc47e0cb44e4f59",
+   "n_source": 1319,
+   "n": 500,
+   "sha256": "ec31c95adc69942a9968c58fc2b7d9f50fb371f2af34072176203f76ed4b73e1"
+  },
+  "mbpp_test.jsonl": {
+   "source": "google-research-datasets/mbpp/resolve/main/full/test-00000-of-00001.parquet",
+   "source_sha256": "566fd53060ffba5766dace1d1e2f4c38906781526de222b0dfbdbc325b696c77",
+   "n_source": 500,
+   "n": 500,
+   "sha256": "e584291caba420fda303bdc8705ee9d8bfd40d2562355590f1340946c107e5e0"
+  },
+  "text_agnews_test500.jsonl": {
+   "source": "fancyzhx/ag_news/resolve/main/data/test-00000-of-00001.parquet",
+   "source_sha256": "71de87ec66bc5737752a2502204dfa6d7fe9856ade3ea444dc6317789a4f13fb",
+   "n_source": 7600,
+   "n": 500,
+   "sha256": "fcd20f827159f68db5371471b06fae4a03685f888aa17150ce4b8403e4ecbf7f"
+  }
+ }
+}

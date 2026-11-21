@@ -68,6 +68,8 @@ class Estimator:
         labels = []
         if "swarm" in variants:
             labels.append("swarm")
+        if "swarm_solo" in variants:
+            labels.append("swarm_solo")
         if "linucb" in variants:
             labels.append("linucb")
         if "single" in variants or ("pipeline" in variants and pipeline_model == "auto"):
@@ -87,7 +89,7 @@ class Estimator:
             cand = models if pm == "auto" else [self.cfg.model(pm)]
             ex = [self.team_usd(m, 3, mode) for m in cand]
             return self.calls_per_task(3), float(np.mean(ex)), max(ex)
-        if label == "linucb":
+        if label in ("linucb", "swarm_solo") or (label == "swarm" and self.cfg.run.get("team_roles") == "executor_only"):
             ex = [self.team_usd(m, 1, mode) for m in models]
             return 1, float(np.mean(ex)), max(ex)
         if label == "swarm":       # expected: uniform model mix x team size uniform on {1,2,3}
