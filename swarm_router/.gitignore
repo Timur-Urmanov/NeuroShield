@@ -3,3 +3,5 @@ __pycache__/
 .cache/
 results/*.npy
 data/*.jsonl
+# live call log of the running P3-local; final version is force-added after the run
+results/llm_calls/p3_local_*.jsonl
