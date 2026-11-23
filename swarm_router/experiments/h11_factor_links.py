@@ -127,13 +127,16 @@ def main():
             V = {"matrix": ("swarm", env, SwarmConfig(N=N)),
                  "factor": ("swarm", env, SwarmConfig(N=N, w_rule="factor", factor_lr=lr["factor"])),
                  "factor_ctx": ("swarm", env, SwarmConfig(N=N, w_rule="factor_ctx", factor_lr=lr["factor_ctx"]))}
-            if ck_["kind"] != "homogeneous":
+            # centralised analogues only up to N=640: at N=2560 one run costs ~40 min of CPU (amendment
+            # recorded in notes/hypotheses.md before any test result was looked at)
+            if ck_["kind"] != "homogeneous" and N <= 640:
                 V["mf"] = ("router", env, dict(N=N, model="linucb", team="mf", lr=lr["mf"]))
                 V["mf_ctx"] = ("router", env, dict(N=N, model="linucb", team="mf_ctx", lr=lr["mf_ctx"]))
             for v, s in V.items():
                 for sd in seeds:
                     specs.append((s[0], s[1], s[2], sd)); keys.append((cname, N, v, sd))
-    table = collect(run(specs, keys, os.path.join(ROOT, ".cache", f"h11_test_T{a.T}.jsonl"), a.workers))
+    res = run(specs, keys, os.path.join(ROOT, ".cache", f"h11_test_T{a.T}.jsonl"), a.workers)
+    table = collect({k: res[k] for k in [tuple(x) for x in keys]})
     for c, byN in table.items():
         print(f"\n## {c}")
         for N, byV in sorted(byN.items(), key=lambda x: int(x[0])):
