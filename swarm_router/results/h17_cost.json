@@ -1,0 +1,159 @@
+{
+ "experiment": "h17_cost",
+ "git_commit": "f3bae37",
+ "argv": [
+  "h17_cost.py"
+ ],
+ "created": "2026-11-23T22:20:46",
+ "T": 8000,
+ "seeds": [
+  0,
+  1,
+  2,
+  3,
+  4
+ ],
+ "busy": 48,
+ "table": {
+  "swarm full|160": {
+   "post": 0.45975599999999994,
+   "post_sd": 0.02777081255563114,
+   "ms_per_step": 0.224809787375,
+   "ms_sd": 0.007510884246487934,
+   "peak_mb": 45.53203125,
+   "state_pairs": 9395.8
+  },
+  "swarm full|640": {
+   "post": 0.541291,
+   "post_sd": 0.04303016752814238,
+   "ms_per_step": 0.29753350352499996,
+   "ms_sd": 0.01150934735870832,
+   "peak_mb": 64.02109375,
+   "state_pairs": 35008.6
+  },
+  "swarm full|2560": {
+   "post": 0.497812,
+   "post_sd": 0.02271858919475415,
+   "ms_per_step": 0.7013673842499999,
+   "ms_sd": 0.04569504242889469,
+   "peak_mb": 351.965625,
+   "state_pairs": 204185.2
+  },
+  "swarm full|5120": {
+   "post": 0.4630039999999999,
+   "post_sd": 0.027355669293585214,
+   "ms_per_step": 1.8504401873750003,
+   "ms_sd": 0.12772298748842106,
+   "peak_mb": 1271.95234375,
+   "state_pairs": 393972.0
+  },
+  "bandit sparse|160": {
+   "post": 0.435708,
+   "post_sd": 0.02515019000922258,
+   "ms_per_step": 0.110374260975,
+   "ms_sd": 0.003975832978568628,
+   "peak_mb": 45.4875,
+   "state_pairs": 8037.6
+  },
+  "bandit sparse|640": {
+   "post": 0.558424,
+   "post_sd": 0.03056599896126414,
+   "ms_per_step": 0.10290042790000001,
+   "ms_sd": 0.002852301441174952,
+   "peak_mb": 43.99453125,
+   "state_pairs": 2885.4
+  },
+  "bandit sparse|2560": {
+   "post": 0.5736559999999999,
+   "post_sd": 0.021007565422961314,
+   "ms_per_step": 0.10504694775000001,
+   "ms_sd": 0.004213925590468489,
+   "peak_mb": 43.925,
+   "state_pairs": 2593.6
+  },
+  "bandit sparse|5120": {
+   "post": 0.5731200000000001,
+   "post_sd": 0.026450427217721843,
+   "ms_per_step": 0.106491213025,
+   "ms_sd": 0.0058979277694356,
+   "peak_mb": 44.25859375,
+   "state_pairs": 2692.8
+  },
+  "bandit dense|160": {
+   "post": 0.43982399999999994,
+   "post_sd": 0.026888059943030465,
+   "ms_per_step": 0.2865846067,
+   "ms_sd": 0.0064334323517666984,
+   "peak_mb": 43.7140625,
+   "state_pairs": 8031.4
+  },
+  "bandit dense|640": {
+   "post": 0.564964,
+   "post_sd": 0.035318717311080244,
+   "ms_per_step": 4.2133939134750005,
+   "ms_sd": 0.21785991372661645,
+   "peak_mb": 65.81328125,
+   "state_pairs": 2799.0
+  },
+  "bandit dense|2560": {
+   "post": 0.574297,
+   "post_sd": 0.030199416923179186,
+   "ms_per_step": 74.53888930179998,
+   "ms_sd": 3.5901826988111125,
+   "peak_mb": 438.62265625,
+   "state_pairs": 2555.4
+  }
+ },
+ "comparisons": {
+  "160": {
+   "time_ratio_swarm_over_sparse": 2.036795403105076,
+   "reward_swarm_minus_sparse": {
+    "diff": 0.024048000000000003,
+    "sd": 0.043153414349272536,
+    "effect": false
+   },
+   "time_ratio_dense_over_swarm": 1.2747870546310107,
+   "reward_sparse_minus_dense": {
+    "diff": -0.004115999999999997,
+    "sd": 0.006624604139116563,
+    "effect": false
+   }
+  },
+  "640": {
+   "time_ratio_swarm_over_sparse": 2.891470031729576,
+   "reward_swarm_minus_sparse": {
+    "diff": -0.01713299999999999,
+    "sd": 0.03848190932113421,
+    "effect": false
+   },
+   "time_ratio_dense_over_swarm": 14.161073840616991,
+   "reward_sparse_minus_dense": {
+    "diff": -0.0065400000000000345,
+    "sd": 0.009253401401646856,
+    "effect": false
+   }
+  },
+  "2560": {
+   "time_ratio_swarm_over_sparse": 6.676704076344758,
+   "reward_swarm_minus_sparse": {
+    "diff": -0.07584400000000001,
+    "sd": 0.014233332972287243,
+    "effect": true
+   },
+   "time_ratio_dense_over_swarm": 106.27652636215382,
+   "reward_sparse_minus_dense": {
+    "diff": -0.0006410000000000027,
+    "sd": 0.02003436279246229,
+    "effect": false
+   }
+  },
+  "5120": {
+   "time_ratio_swarm_over_sparse": 17.376458909718576,
+   "reward_swarm_minus_sparse": {
+    "diff": -0.11011600000000002,
+    "sd": 0.022245210270977436,
+    "effect": true
+   }
+  }
+ }
+}
