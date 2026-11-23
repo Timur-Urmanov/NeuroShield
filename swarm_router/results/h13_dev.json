@@ -1,0 +1,1040 @@
+{
+ "experiment": "h13_dev",
+ "git_commit": "bb1130f",
+ "argv": [
+  "experiments/h13_team_selection.py",
+  "--stage",
+  "dev",
+  "--workers",
+  "2"
+ ],
+ "created": "2026-11-23T15:01:17",
+ "T": 8000,
+ "seeds": [
+  100,
+  101,
+  102,
+  103,
+  104
+ ],
+ "N": 640,
+ "table": {
+  "roles common": {
+   "640": {
+    "none": {
+     "per_seed": [
+      {
+       "pre": 0.486515,
+       "post": 0.503235,
+       "cover_start": 0.385,
+       "cover_end": 0.629,
+       "q_end": 0.7366941249999998,
+       "team_size": 3.0,
+       "pop": {
+        "active_frac": 0.75,
+        "births": 0,
+        "genotypes": 0,
+        "in_genotype_frac": 0.0,
+        "largest_genotype_frac": 0.0,
+        "genotype_team_frac": 0.0,
+        "distinct_leaders": 372,
+        "min_role_share": 0.3328125,
+        "pop_in_full_cover_genotypes": 0.0
+       },
+       "ms_per_step": 0.2936016023159027
+      },
+      {
+       "pre": 0.43531499999999995,
+       "post": 0.50513,
+       "cover_start": 0.354,
+       "cover_end": 0.61,
+       "q_end": 0.7307922499999998,
+       "team_size": 3.0,
+       "pop": {
+        "active_frac": 0.8453125,
+        "births": 0,
+        "genotypes": 0,
+        "in_genotype_frac": 0.0,
+        "largest_genotype_frac": 0.0,
+        "genotype_team_frac": 0.0,
+        "distinct_leaders": 420,
+        "min_role_share": 0.3328125,
+        "pop_in_full_cover_genotypes": 0.0
+       },
+       "ms_per_step": 0.30311834812164307
+      },
+      {
+       "pre": 0.45643999999999996,
+       "post": 0.5370199999999999,
+       "cover_start": 0.392,
+       "cover_end": 0.649,
+       "q_end": 0.7437098749999997,
+       "team_size": 3.0,
+       "pop": {
+        "active_frac": 0.7171875,
+        "births": 0,
+        "genotypes": 0,
+        "in_genotype_frac": 0.0,
+        "largest_genotype_frac": 0.0,
+        "genotype_team_frac": 0.0,
+        "distinct_leaders": 350,
+        "min_role_share": 0.3328125,
+        "pop_in_full_cover_genotypes": 0.0
+       },
+       "ms_per_step": 0.26324787735939026
+      },
+      {
+       "pre": 0.477125,
+       "post": 0.514005,
+       "cover_start": 0.377,
+       "cover_end": 0.636,
+       "q_end": 0.7384064999999999,
+       "team_size": 3.0,
+       "pop": {
+        "active_frac": 0.79375,
+        "births": 0,
+        "genotypes": 0,
+        "in_genotype_frac": 0.0,
+        "largest_genotype_frac": 0.0,
+        "genotype_team_frac": 0.0,
+        "distinct_leaders": 384,
+        "min_role_share": 0.3328125,
+        "pop_in_full_cover_genotypes": 0.0
+       },
+       "ms_per_step": 0.2719806134700775
+      },
+      {
+       "pre": 0.46934999999999993,
+       "post": 0.50401,
+       "cover_start": 0.3,
+       "cover_end": 0.629,
+       "q_end": 0.7358961249999998,
+       "team_size": 3.0,
+       "pop": {
+        "active_frac": 0.790625,
+        "births": 0,
+        "genotypes": 0,
+        "in_genotype_frac": 0.0,
+        "largest_genotype_frac": 0.0,
+        "genotype_team_frac": 0.0,
+        "distinct_leaders": 382,
+        "min_role_share": 0.3328125,
+        "pop_in_full_cover_genotypes": 0.0
+       },
+       "ms_per_step": 0.2569737136363983
+      }
+     ],
+     "pre": 0.464949,
+     "pre_sd": 0.019895308303718256,
+     "post": 0.51268,
+     "post_sd": 0.014279098798593688,
+     "cover_end": 0.6306,
+     "cover_end_sd": 0.014117365193264654,
+     "q_end": 0.7370997749999999,
+     "q_end_sd": 0.004658303046879017,
+     "team_size": 3.0,
+     "team_size_sd": 0.0,
+     "ms_per_step": 0.2777844309806824,
+     "pop": {
+      "active_frac": 0.779375,
+      "births": 0.0,
+      "genotypes": 0.0,
+      "in_genotype_frac": 0.0,
+      "largest_genotype_frac": 0.0,
+      "genotype_team_frac": 0.0,
+      "distinct_leaders": 381.6,
+      "min_role_share": 0.3328125,
+      "pop_in_full_cover_genotypes": 0.0
+     }
+    },
+    "team rho=0.02": {
+     "per_seed": [
+      {
+       "pre": 0.433395,
+       "post": 0.5158699999999999,
+       "cover_start": 0.275,
+       "cover_end": 0.6695,
+       "q_end": 0.7509833124999998,
+       "team_size": 3.0,
+       "pop": {
+        "active_frac": 0.925,
+        "births": 960,
+        "genotypes": 9,
+        "in_genotype_frac": 0.9984375,
+        "largest_genotype_frac": 0.2421875,
+        "genotype_team_frac": 0.5515,
+        "distinct_leaders": 511,
+        "min_role_share": 0.31875,
+        "pop_in_full_cover_genotypes": 0.9984375
+       },
+       "ms_per_step": 0.3086370825767517
+      },
+      {
+       "pre": 0.429855,
+       "post": 0.5146499999999999,
+       "cover_start": 0.308,
+       "cover_end": 0.634,
+       "q_end": 0.7378744999999999,
+       "team_size": 3.0,
+       "pop": {
+        "active_frac": 0.946875,
+        "births": 960,
+        "genotypes": 9,
+        "in_genotype_frac": 0.9984375,
+        "largest_genotype_frac": 0.1890625,
+        "genotype_team_frac": 0.5295,
+        "distinct_leaders": 503,
+        "min_role_share": 0.3296875,
+        "pop_in_full_cover_genotypes": 0.9984375
+       },
+       "ms_per_step": 0.3181341886520386
+      },
+      {
+       "pre": 0.42882499999999996,
+       "post": 0.5552149999999999,
+       "cover_start": 0.275,
+       "cover_end": 0.669,
+       "q_end": 0.7520223749999998,
+       "team_size": 3.0,
+       "pop": {
+        "active_frac": 0.95,
+        "births": 960,
+        "genotypes": 8,
+        "in_genotype_frac": 1.0,
+        "largest_genotype_frac": 0.2140625,
+        "genotype_team_frac": 0.4435,
+        "distinct_leaders": 538,
+        "min_role_share": 0.3265625,
+        "pop_in_full_cover_genotypes": 1.0
+       },
+       "ms_per_step": 0.31569287180900574
+      },
+      {
+       "pre": 0.44254499999999997,
+       "post": 0.52575,
+       "cover_start": 0.294,
+       "cover_end": 0.686,
+       "q_end": 0.7568934999999999,
+       "team_size": 3.0,
+       "pop": {
+        "active_frac": 0.878125,
+        "births": 960,
+        "genotypes": 6,
+        "in_genotype_frac": 0.996875,
+        "largest_genotype_frac": 0.296875,
+        "genotype_team_frac": 0.5035,
+        "distinct_leaders": 472,
+        "min_role_share": 0.325,
+        "pop_in_full_cover_genotypes": 0.996875
+       },
+       "ms_per_step": 0.3068024516105652
+      },
+      {
+       "pre": 0.45544499999999993,
+       "post": 0.48833,
+       "cover_start": 0.263,
+       "cover_end": 0.615,
+       "q_end": 0.7291796249999998,
+       "team_size": 3.0,
+       "pop": {
+        "active_frac": 0.89375,
+        "births": 960,
+        "genotypes": 5,
+        "in_genotype_frac": 1.0,
+        "largest_genotype_frac": 0.30625,
+        "genotype_team_frac": 0.3115,
+        "distinct_leaders": 469,
+        "min_role_share": 0.33125,
+        "pop_in_full_cover_genotypes": 1.0
+       },
+       "ms_per_step": 0.30582547187805176
+      }
+     ],
+     "pre": 0.43801299999999993,
+     "pre_sd": 0.01114351694932976,
+     "post": 0.519963,
+     "post_sd": 0.024092634662900587,
+     "cover_end": 0.6547000000000001,
+     "cover_end_sd": 0.0291881825401994,
+     "q_end": 0.7453906624999999,
+     "q_end_sd": 0.011476748786234899,
+     "team_size": 3.0,
+     "team_size_sd": 0.0,
+     "ms_per_step": 0.31101841330528257,
+     "pop": {
+      "active_frac": 0.91875,
+      "births": 960.0,
+      "genotypes": 7.4,
+      "in_genotype_frac": 0.99875,
+      "largest_genotype_frac": 0.2496875,
+      "genotype_team_frac": 0.46790000000000004,
+      "distinct_leaders": 498.6,
+      "min_role_share": 0.32625000000000004,
+      "pop_in_full_cover_genotypes": 0.99875
+     }
+    },
+    "team rho=0.05": {
+     "per_seed": [
+      {
+       "pre": 0.4636049999999999,
+       "post": 0.495225,
+       "cover_start": 0.268,
+       "cover_end": 0.621,
+       "q_end": 0.7334688749999998,
+       "team_size": 3.0,
+       "pop": {
+        "active_frac": 0.8609375,
+        "births": 2640,
+        "genotypes": 11,
+        "in_genotype_frac": 0.9953125,
+        "largest_genotype_frac": 0.296875,
+        "genotype_team_frac": 0.456,
+        "distinct_leaders": 446,
+        "min_role_share": 0.328125,
+        "pop_in_full_cover_genotypes": 0.9953125
+       },
+       "ms_per_step": 0.31811773777008057
+      },
+      {
+       "pre": 0.44044,
+       "post": 0.454625,
+       "cover_start": 0.251,
+       "cover_end": 0.5265,
+       "q_end": 0.7010251874999998,
+       "team_size": 3.0,
+       "pop": {
+        "active_frac": 0.9140625,
+        "births": 2640,
+        "genotypes": 11,
+        "in_genotype_frac": 0.9953125,
+        "largest_genotype_frac": 0.346875,
+        "genotype_team_frac": 0.2665,
+        "distinct_leaders": 513,
+        "min_role_share": 0.3296875,
+        "pop_in_full_cover_genotypes": 0.9859375
+       },
+       "ms_per_step": 0.3433813750743866
+      },
+      {
+       "pre": 0.43716499999999997,
+       "post": 0.46932499999999994,
+       "cover_start": 0.31,
+       "cover_end": 0.4845,
+       "q_end": 0.6879579374999999,
+       "team_size": 3.0,
+       "pop": {
+        "active_frac": 0.871875,
+        "births": 2640,
+        "genotypes": 11,
+        "in_genotype_frac": 0.996875,
+        "largest_genotype_frac": 0.3515625,
+        "genotype_team_frac": 0.355,
+        "distinct_leaders": 433,
+        "min_role_share": 0.3265625,
+        "pop_in_full_cover_genotypes": 0.9796875
+       },
+       "ms_per_step": 0.31508055329322815
+      },
+      {
+       "pre": 0.47296999999999995,
+       "post": 0.5236199999999999,
+       "cover_start": 0.304,
+       "cover_end": 0.694,
+       "q_end": 0.7581237499999998,
+       "team_size": 3.0,
+       "pop": {
+        "active_frac": 0.95,
+        "births": 2640,
+        "genotypes": 11,
+        "in_genotype_frac": 1.0,
+        "largest_genotype_frac": 0.2890625,
+        "genotype_team_frac": 0.509,
+        "distinct_leaders": 538,
+        "min_role_share": 0.325,
+        "pop_in_full_cover_genotypes": 0.990625
+       },
+       "ms_per_step": 0.3169722557067871
+      },
+      {
+       "pre": 0.46542999999999995,
+       "post": 0.52878,
+       "cover_start": 0.228,
+       "cover_end": 0.688,
+       "q_end": 0.7556299999999999,
+       "team_size": 3.0,
+       "pop": {
+        "active_frac": 0.9125,
+        "births": 2640,
+        "genotypes": 11,
+        "in_genotype_frac": 0.9953125,
+        "largest_genotype_frac": 0.3046875,
+        "genotype_team_frac": 0.333,
+        "distinct_leaders": 500,
+        "min_role_share": 0.328125,
+        "pop_in_full_cover_genotypes": 0.9953125
+       },
+       "ms_per_step": 0.314278244972229
+      }
+     ],
+     "pre": 0.4559219999999999,
+     "pre_sd": 0.01605912692209633,
+     "post": 0.49431499999999995,
+     "post_sd": 0.03258543980829473,
+     "cover_end": 0.6027999999999999,
+     "cover_end_sd": 0.09450436497855534,
+     "q_end": 0.7272411499999999,
+     "q_end_sd": 0.031736783941822486,
+     "team_size": 3.0,
+     "team_size_sd": 0.0,
+     "ms_per_step": 0.3215660333633423,
+     "pop": {
+      "active_frac": 0.9018749999999999,
+      "births": 2640.0,
+      "genotypes": 11.0,
+      "in_genotype_frac": 0.9965624999999999,
+      "largest_genotype_frac": 0.3178125,
+      "genotype_team_frac": 0.3839,
+      "distinct_leaders": 486.0,
+      "min_role_share": 0.3275,
+      "pop_in_full_cover_genotypes": 0.9893750000000001
+     }
+    },
+    "team rho=0.1": {
+     "per_seed": [
+      {
+       "pre": 0.4283499999999999,
+       "post": 0.4651,
+       "cover_start": 0.231,
+       "cover_end": 0.4565,
+       "q_end": 0.6798116874999999,
+       "team_size": 3.0,
+       "pop": {
+        "active_frac": 0.859375,
+        "births": 5040,
+        "genotypes": 21,
+        "in_genotype_frac": 0.99375,
+        "largest_genotype_frac": 0.303125,
+        "genotype_team_frac": 0.129,
+        "distinct_leaders": 462,
+        "min_role_share": 0.328125,
+        "pop_in_full_cover_genotypes": 0.9562499999999999
+       },
+       "ms_per_step": 0.3582089841365814
+      },
+      {
+       "pre": 0.45449,
+       "post": 0.49019,
+       "cover_start": 0.202,
+       "cover_end": 0.5975,
+       "q_end": 0.7242503124999998,
+       "team_size": 3.0,
+       "pop": {
+        "active_frac": 0.8734375,
+        "births": 5040,
+        "genotypes": 21,
+        "in_genotype_frac": 0.996875,
+        "largest_genotype_frac": 0.290625,
+        "genotype_team_frac": 0.197,
+        "distinct_leaders": 486,
+        "min_role_share": 0.325,
+        "pop_in_full_cover_genotypes": 0.9703125000000001
+       },
+       "ms_per_step": 0.35966014862060547
+      },
+      {
+       "pre": 0.44406,
+       "post": 0.49625500000000006,
+       "cover_start": 0.229,
+       "cover_end": 0.5535,
+       "q_end": 0.7104515624999997,
+       "team_size": 3.0,
+       "pop": {
+        "active_frac": 0.8453125,
+        "births": 5040,
+        "genotypes": 21,
+        "in_genotype_frac": 0.9953125,
+        "largest_genotype_frac": 0.3171875,
+        "genotype_team_frac": 0.237,
+        "distinct_leaders": 451,
+        "min_role_share": 0.31875,
+        "pop_in_full_cover_genotypes": 0.9218750000000001
+       },
+       "ms_per_step": 0.410707950592041
+      },
+      {
+       "pre": 0.417765,
+       "post": 0.470645,
+       "cover_start": 0.192,
+       "cover_end": 0.5095,
+       "q_end": 0.6912663124999999,
+       "team_size": 3.0,
+       "pop": {
+        "active_frac": 0.9296875,
+        "births": 5040,
+        "genotypes": 21,
+        "in_genotype_frac": 0.9984375,
+        "largest_genotype_frac": 0.3234375,
+        "genotype_team_frac": 0.3065,
+        "distinct_leaders": 521,
+        "min_role_share": 0.3140625,
+        "pop_in_full_cover_genotypes": 0.9046875000000001
+       },
+       "ms_per_step": 0.4233878552913666
+      },
+      {
+       "pre": 0.38184999999999997,
+       "post": 0.4487,
+       "cover_start": 0.146,
+       "cover_end": 0.374,
+       "q_end": 0.6401859999999999,
+       "team_size": 3.0,
+       "pop": {
+        "active_frac": 0.83125,
+        "births": 5040,
+        "genotypes": 21,
+        "in_genotype_frac": 0.99375,
+        "largest_genotype_frac": 0.303125,
+        "genotype_team_frac": 0.2435,
+        "distinct_leaders": 427,
+        "min_role_share": 0.3296875,
+        "pop_in_full_cover_genotypes": 0.9140625
+       },
+       "ms_per_step": 0.3559393882751465
+      }
+     ],
+     "pre": 0.4253029999999999,
+     "pre_sd": 0.02809793088467549,
+     "post": 0.47417800000000004,
+     "post_sd": 0.0192859970574508,
+     "cover_end": 0.49820000000000003,
+     "cover_end_sd": 0.08690627135023112,
+     "q_end": 0.6891931749999999,
+     "q_end_sd": 0.032306869768987355,
+     "team_size": 3.0,
+     "team_size_sd": 0.0,
+     "ms_per_step": 0.38158086538314817,
+     "pop": {
+      "active_frac": 0.8678125,
+      "births": 5040.0,
+      "genotypes": 21.0,
+      "in_genotype_frac": 0.9956250000000001,
+      "largest_genotype_frac": 0.3075,
+      "genotype_team_frac": 0.2226,
+      "distinct_leaders": 469.4,
+      "min_role_share": 0.323125,
+      "pop_in_full_cover_genotypes": 0.9334375000000001
+     }
+    }
+   }
+  },
+  "by type + busy 8": {
+   "640": {
+    "none": {
+     "per_seed": [
+      {
+       "pre": 0.4254,
+       "post": 0.49578999999999995,
+       "cover_start": 0.325,
+       "cover_end": 0.588,
+       "q_end": 0.7228454999999999,
+       "team_size": 3.0,
+       "pop": {
+        "active_frac": 0.75625,
+        "births": 0,
+        "genotypes": 0,
+        "in_genotype_frac": 0.0,
+        "largest_genotype_frac": 0.0,
+        "genotype_team_frac": 0.0,
+        "distinct_leaders": 372,
+        "min_role_share": 0.3328125,
+        "pop_in_full_cover_genotypes": 0.0
+       },
+       "ms_per_step": 0.2629120647907257
+      },
+      {
+       "pre": 0.43439,
+       "post": 0.49156999999999995,
+       "cover_start": 0.372,
+       "cover_end": 0.577,
+       "q_end": 0.7170766249999998,
+       "team_size": 3.0,
+       "pop": {
+        "active_frac": 0.8484375,
+        "births": 0,
+        "genotypes": 0,
+        "in_genotype_frac": 0.0,
+        "largest_genotype_frac": 0.0,
+        "genotype_team_frac": 0.0,
+        "distinct_leaders": 428,
+        "min_role_share": 0.3328125,
+        "pop_in_full_cover_genotypes": 0.0
+       },
+       "ms_per_step": 0.2735763192176819
+      },
+      {
+       "pre": 0.43411,
+       "post": 0.496735,
+       "cover_start": 0.339,
+       "cover_end": 0.5465,
+       "q_end": 0.7080409375,
+       "team_size": 3.0,
+       "pop": {
+        "active_frac": 0.7484375,
+        "births": 0,
+        "genotypes": 0,
+        "in_genotype_frac": 0.0,
+        "largest_genotype_frac": 0.0,
+        "genotype_team_frac": 0.0,
+        "distinct_leaders": 374,
+        "min_role_share": 0.3328125,
+        "pop_in_full_cover_genotypes": 0.0
+       },
+       "ms_per_step": 0.29587477445602417
+      },
+      {
+       "pre": 0.45053499999999996,
+       "post": 0.46496499999999996,
+       "cover_start": 0.37,
+       "cover_end": 0.531,
+       "q_end": 0.7029453749999998,
+       "team_size": 3.0,
+       "pop": {
+        "active_frac": 0.81875,
+        "births": 0,
+        "genotypes": 0,
+        "in_genotype_frac": 0.0,
+        "largest_genotype_frac": 0.0,
+        "genotype_team_frac": 0.0,
+        "distinct_leaders": 398,
+        "min_role_share": 0.3328125,
+        "pop_in_full_cover_genotypes": 0.0
+       },
+       "ms_per_step": 0.2923966348171234
+      },
+      {
+       "pre": 0.44241499999999995,
+       "post": 0.48363999999999996,
+       "cover_start": 0.332,
+       "cover_end": 0.546,
+       "q_end": 0.7081822499999998,
+       "team_size": 3.0,
+       "pop": {
+        "active_frac": 0.796875,
+        "births": 0,
+        "genotypes": 0,
+        "in_genotype_frac": 0.0,
+        "largest_genotype_frac": 0.0,
+        "genotype_team_frac": 0.0,
+        "distinct_leaders": 391,
+        "min_role_share": 0.3328125,
+        "pop_in_full_cover_genotypes": 0.0
+       },
+       "ms_per_step": 0.2800174355506897
+      }
+     ],
+     "pre": 0.4373699999999999,
+     "pre_sd": 0.009507341242429433,
+     "post": 0.4865399999999999,
+     "post_sd": 0.013121471430445597,
+     "cover_end": 0.5577,
+     "cover_end_sd": 0.02380021008310638,
+     "q_end": 0.7118181374999998,
+     "q_end_sd": 0.007991671393208792,
+     "team_size": 3.0,
+     "team_size_sd": 0.0,
+     "ms_per_step": 0.280955445766449,
+     "pop": {
+      "active_frac": 0.79375,
+      "births": 0.0,
+      "genotypes": 0.0,
+      "in_genotype_frac": 0.0,
+      "largest_genotype_frac": 0.0,
+      "genotype_team_frac": 0.0,
+      "distinct_leaders": 392.6,
+      "min_role_share": 0.3328125,
+      "pop_in_full_cover_genotypes": 0.0
+     }
+    },
+    "team rho=0.02": {
+     "per_seed": [
+      {
+       "pre": 0.40326,
+       "post": 0.46858999999999995,
+       "cover_start": 0.268,
+       "cover_end": 0.514,
+       "q_end": 0.6935855,
+       "team_size": 3.0,
+       "pop": {
+        "active_frac": 0.925,
+        "births": 960,
+        "genotypes": 6,
+        "in_genotype_frac": 0.9984375,
+        "largest_genotype_frac": 0.2921875,
+        "genotype_team_frac": 0.368,
+        "distinct_leaders": 500,
+        "min_role_share": 0.25937499999999997,
+        "pop_in_full_cover_genotypes": 0.4302083333333333
+       },
+       "ms_per_step": 0.30665263533592224
+      },
+      {
+       "pre": 0.43307499999999993,
+       "post": 0.525415,
+       "cover_start": 0.301,
+       "cover_end": 0.692,
+       "q_end": 0.7571927499999997,
+       "team_size": 3.0,
+       "pop": {
+        "active_frac": 0.9390625,
+        "births": 960,
+        "genotypes": 8,
+        "in_genotype_frac": 0.9984375,
+        "largest_genotype_frac": 0.303125,
+        "genotype_team_frac": 0.511,
+        "distinct_leaders": 532,
+        "min_role_share": 0.19791666666666666,
+        "pop_in_full_cover_genotypes": 0.540625
+       },
+       "ms_per_step": 0.3491584062576294
+      },
+      {
+       "pre": 0.393335,
+       "post": 0.55596,
+       "cover_start": 0.271,
+       "cover_end": 0.627,
+       "q_end": 0.7320723749999999,
+       "team_size": 3.0,
+       "pop": {
+        "active_frac": 0.8890625,
+        "births": 960,
+        "genotypes": 6,
+        "in_genotype_frac": 1.0,
+        "largest_genotype_frac": 0.25625,
+        "genotype_team_frac": 0.505,
+        "distinct_leaders": 482,
+        "min_role_share": 0.2333333333333333,
+        "pop_in_full_cover_genotypes": 0.55
+       },
+       "ms_per_step": 0.3601377606391907
+      },
+      {
+       "pre": 0.43166499999999997,
+       "post": 0.439345,
+       "cover_start": 0.309,
+       "cover_end": 0.5775,
+       "q_end": 0.7183318124999999,
+       "team_size": 3.0,
+       "pop": {
+        "active_frac": 0.8515625,
+        "births": 960,
+        "genotypes": 5,
+        "in_genotype_frac": 0.9984375,
+        "largest_genotype_frac": 0.3359375,
+        "genotype_team_frac": 0.284,
+        "distinct_leaders": 440,
+        "min_role_share": 0.24270833333333333,
+        "pop_in_full_cover_genotypes": 0.6942708333333334
+       },
+       "ms_per_step": 0.3446497321128845
+      },
+      {
+       "pre": 0.439285,
+       "post": 0.49117999999999995,
+       "cover_start": 0.279,
+       "cover_end": 0.564,
+       "q_end": 0.7155637499999998,
+       "team_size": 3.0,
+       "pop": {
+        "active_frac": 0.9515625,
+        "births": 960,
+        "genotypes": 12,
+        "in_genotype_frac": 0.996875,
+        "largest_genotype_frac": 0.134375,
+        "genotype_team_frac": 0.4145,
+        "distinct_leaders": 505,
+        "min_role_share": 0.284375,
+        "pop_in_full_cover_genotypes": 0.596875
+       },
+       "ms_per_step": 0.3204645812511444
+      }
+     ],
+     "pre": 0.42012400000000005,
+     "pre_sd": 0.020433502024861015,
+     "post": 0.49609799999999993,
+     "post_sd": 0.04594759332652801,
+     "cover_end": 0.5949,
+     "cover_end_sd": 0.06756700378143164,
+     "q_end": 0.7233492374999998,
+     "q_end_sd": 0.023415512515177504,
+     "team_size": 3.0,
+     "team_size_sd": 0.0,
+     "ms_per_step": 0.33621262311935424,
+     "pop": {
+      "active_frac": 0.9112500000000001,
+      "births": 960.0,
+      "genotypes": 7.4,
+      "in_genotype_frac": 0.9984375,
+      "largest_genotype_frac": 0.26437499999999997,
+      "genotype_team_frac": 0.4165,
+      "distinct_leaders": 491.8,
+      "min_role_share": 0.24354166666666663,
+      "pop_in_full_cover_genotypes": 0.5623958333333334
+     }
+    },
+    "team rho=0.05": {
+     "per_seed": [
+      {
+       "pre": 0.4822199999999999,
+       "post": 0.4994449999999999,
+       "cover_start": 0.264,
+       "cover_end": 0.6345,
+       "q_end": 0.7377331874999998,
+       "team_size": 3.0,
+       "pop": {
+        "active_frac": 0.9046875,
+        "births": 2640,
+        "genotypes": 11,
+        "in_genotype_frac": 0.99375,
+        "largest_genotype_frac": 0.3234375,
+        "genotype_team_frac": 0.4195,
+        "distinct_leaders": 492,
+        "min_role_share": 0.25885416666666666,
+        "pop_in_full_cover_genotypes": 0.5515625
+       },
+       "ms_per_step": 0.3565915524959564
+      },
+      {
+       "pre": 0.46069999999999994,
+       "post": 0.506565,
+       "cover_start": 0.277,
+       "cover_end": 0.5825,
+       "q_end": 0.7216069374999997,
+       "team_size": 3.0,
+       "pop": {
+        "active_frac": 0.9078125,
+        "births": 2640,
+        "genotypes": 11,
+        "in_genotype_frac": 0.996875,
+        "largest_genotype_frac": 0.35,
+        "genotype_team_frac": 0.332,
+        "distinct_leaders": 493,
+        "min_role_share": 0.14375000000000002,
+        "pop_in_full_cover_genotypes": 0.4203124999999999
+       },
+       "ms_per_step": 0.3264847695827484
+      },
+      {
+       "pre": 0.398165,
+       "post": 0.49312,
+       "cover_start": 0.257,
+       "cover_end": 0.591,
+       "q_end": 0.7234938749999997,
+       "team_size": 3.0,
+       "pop": {
+        "active_frac": 0.85625,
+        "births": 2640,
+        "genotypes": 11,
+        "in_genotype_frac": 0.9953125,
+        "largest_genotype_frac": 0.309375,
+        "genotype_team_frac": 0.3185,
+        "distinct_leaders": 438,
+        "min_role_share": 0.20833333333333334,
+        "pop_in_full_cover_genotypes": 0.5921875
+       },
+       "ms_per_step": 0.35257473587989807
+      },
+      {
+       "pre": 0.367355,
+       "post": 0.40206499999999995,
+       "cover_start": 0.254,
+       "cover_end": 0.32,
+       "q_end": 0.6191387500000001,
+       "team_size": 3.0,
+       "pop": {
+        "active_frac": 0.871875,
+        "births": 2640,
+        "genotypes": 11,
+        "in_genotype_frac": 1.0,
+        "largest_genotype_frac": 0.33125,
+        "genotype_team_frac": 0.134,
+        "distinct_leaders": 457,
+        "min_role_share": 0.18385416666666665,
+        "pop_in_full_cover_genotypes": 0.5375
+       },
+       "ms_per_step": 0.35549718141555786
+      },
+      {
+       "pre": 0.438555,
+       "post": 0.521265,
+       "cover_start": 0.228,
+       "cover_end": 0.6045,
+       "q_end": 0.7278579374999998,
+       "team_size": 3.0,
+       "pop": {
+        "active_frac": 0.8125,
+        "births": 2640,
+        "genotypes": 11,
+        "in_genotype_frac": 1.0,
+        "largest_genotype_frac": 0.334375,
+        "genotype_team_frac": 0.381,
+        "distinct_leaders": 418,
+        "min_role_share": 0.26979166666666665,
+        "pop_in_full_cover_genotypes": 0.690625
+       },
+       "ms_per_step": 0.36020249128341675
+      }
+     ],
+     "pre": 0.429399,
+     "pre_sd": 0.04657967279296837,
+     "post": 0.4844919999999999,
+     "post_sd": 0.04725387756576175,
+     "cover_end": 0.5465,
+     "cover_end_sd": 0.1281468883742403,
+     "q_end": 0.7059661374999997,
+     "q_end_sd": 0.04893681589439211,
+     "team_size": 3.0,
+     "team_size_sd": 0.0,
+     "ms_per_step": 0.3502701461315155,
+     "pop": {
+      "active_frac": 0.8706250000000001,
+      "births": 2640.0,
+      "genotypes": 11.0,
+      "in_genotype_frac": 0.9971875000000001,
+      "largest_genotype_frac": 0.3296875,
+      "genotype_team_frac": 0.31700000000000006,
+      "distinct_leaders": 459.6,
+      "min_role_share": 0.21291666666666664,
+      "pop_in_full_cover_genotypes": 0.5584374999999999
+     }
+    },
+    "team rho=0.1": {
+     "per_seed": [
+      {
+       "pre": 0.370205,
+       "post": 0.39883500000000005,
+       "cover_start": 0.208,
+       "cover_end": 0.312,
+       "q_end": 0.6174097499999999,
+       "team_size": 3.0,
+       "pop": {
+        "active_frac": 0.853125,
+        "births": 5040,
+        "genotypes": 21,
+        "in_genotype_frac": 0.996875,
+        "largest_genotype_frac": 0.3328125,
+        "genotype_team_frac": 0.1025,
+        "distinct_leaders": 446,
+        "min_role_share": 0.2203125,
+        "pop_in_full_cover_genotypes": 0.3869791666666667
+       },
+       "ms_per_step": 0.4441303610801697
+      },
+      {
+       "pre": 0.43285500000000005,
+       "post": 0.454045,
+       "cover_start": 0.247,
+       "cover_end": 0.437,
+       "q_end": 0.6683653749999998,
+       "team_size": 3.0,
+       "pop": {
+        "active_frac": 0.884375,
+        "births": 5040,
+        "genotypes": 21,
+        "in_genotype_frac": 0.996875,
+        "largest_genotype_frac": 0.315625,
+        "genotype_team_frac": 0.291,
+        "distinct_leaders": 489,
+        "min_role_share": 0.1651041666666667,
+        "pop_in_full_cover_genotypes": 0.4171875
+       },
+       "ms_per_step": 0.3842863142490387
+      },
+      {
+       "pre": 0.39612,
+       "post": 0.45466999999999996,
+       "cover_start": 0.202,
+       "cover_end": 0.4405,
+       "q_end": 0.6660794374999998,
+       "team_size": 3.0,
+       "pop": {
+        "active_frac": 0.85625,
+        "births": 5040,
+        "genotypes": 21,
+        "in_genotype_frac": 0.9953125,
+        "largest_genotype_frac": 0.290625,
+        "genotype_team_frac": 0.192,
+        "distinct_leaders": 448,
+        "min_role_share": 0.23958333333333334,
+        "pop_in_full_cover_genotypes": 0.41197916666666656
+       },
+       "ms_per_step": 0.39284470677375793
+      },
+      {
+       "pre": 0.41387499999999994,
+       "post": 0.453325,
+       "cover_start": 0.214,
+       "cover_end": 0.4485,
+       "q_end": 0.6683071874999998,
+       "team_size": 3.0,
+       "pop": {
+        "active_frac": 0.90625,
+        "births": 5040,
+        "genotypes": 21,
+        "in_genotype_frac": 0.99375,
+        "largest_genotype_frac": 0.3265625,
+        "genotype_team_frac": 0.2185,
+        "distinct_leaders": 490,
+        "min_role_share": 0.19427083333333336,
+        "pop_in_full_cover_genotypes": 0.38541666666666663
+       },
+       "ms_per_step": 0.3895166218280792
+      },
+      {
+       "pre": 0.39764499999999997,
+       "post": 0.46104999999999996,
+       "cover_start": 0.179,
+       "cover_end": 0.379,
+       "q_end": 0.6538351249999999,
+       "team_size": 3.0,
+       "pop": {
+        "active_frac": 0.8390625,
+        "births": 5040,
+        "genotypes": 21,
+        "in_genotype_frac": 0.9953125,
+        "largest_genotype_frac": 0.3078125,
+        "genotype_team_frac": 0.1655,
+        "distinct_leaders": 426,
+        "min_role_share": 0.2625,
+        "pop_in_full_cover_genotypes": 0.5812499999999998
+       },
+       "ms_per_step": 0.3895213305950165
+      }
+     ],
+     "pre": 0.40214,
+     "pre_sd": 0.023223969837217757,
+     "post": 0.4443849999999999,
+     "post_sd": 0.02564929409360028,
+     "cover_end": 0.4034,
+     "cover_end_sd": 0.05807043137432338,
+     "q_end": 0.6547993749999999,
+     "q_end_sd": 0.021752304477009918,
+     "team_size": 3.0,
+     "team_size_sd": 0.0,
+     "ms_per_step": 0.4000598669052124,
+     "pop": {
+      "active_frac": 0.8678125,
+      "births": 5040.0,
+      "genotypes": 21.0,
+      "in_genotype_frac": 0.9956250000000001,
+      "largest_genotype_frac": 0.3146875,
+      "genotype_team_frac": 0.1939,
+      "distinct_leaders": 459.8,
+      "min_role_share": 0.21635416666666668,
+      "pop_in_full_cover_genotypes": 0.43656249999999996
+     }
+    }
+   }
+  }
+ },
+ "best_rho": 0.02
+}
