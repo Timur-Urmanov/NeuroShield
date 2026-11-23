@@ -1,4 +1,5 @@
 from .base import ACC0, ACC1, COST, D, K, LAM, M, MIX, SimEnv, expected, make_stream
+from .config_env import ConfigEnv
 from .homogeneous import HomogeneousEnv
 from .llm import LLMEnv  # noqa: F401  (Phase 2; optional deps are imported lazily)
 from .ordered import OrderedEnv
@@ -14,6 +15,9 @@ def make_env(env_cfg, seed: int, N: int):
         return HomogeneousEnv(env_cfg.T, seed, N, env_cfg.member_cost)
     if env_cfg.kind == "roles":
         return RolesEnv(env_cfg.T, seed, **kw)
+    if env_cfg.kind == "config":
+        return ConfigEnv(env_cfg.T, seed, N, env_cfg.strong, env_cfg.weak, env_cfg.member_cost, env_cfg.busy,
+                         env_cfg.genes_L, env_cfg.genes_A)
     if env_cfg.kind == "ordered":
         return OrderedEnv(env_cfg.T, seed, **kw)
     raise ValueError(env_cfg.kind)

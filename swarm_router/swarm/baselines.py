@@ -148,6 +148,128 @@ class SparsePairMean:
                 self.s[c][row] += succ; self.n[c][row] += 1
 
 
+def _sp_set(b, c, a, x, s_, n_):
+    """SparsePairMean: create or overwrite the statistics of pair (a, x) in cluster c."""
+    a, x = (a, x) if a < x else (x, a)
+    row = b.idx[c].get((a, x))
+    if row is None:
+        row = b.m[c]; b.m[c] += 1
+        if row == len(b.A[c]):
+            for arr in (b.A, b.B, b.s, b.n):
+                arr[c] = np.concatenate([arr[c], np.zeros_like(arr[c])])
+        b.idx[c][(a, x)] = row; b.A[c][row] = a; b.B[c][row] = x
+        b.nb[c].setdefault(a, {})[x] = row; b.nb[c].setdefault(x, {})[a] = row
+    b.s[c][row] = s_; b.n[c][row] = n_
+
+
+def _sp_drop(b, i):
+    """SparsePairMean: forget everything about primitive i (its configuration was rewritten)."""
+    for c in range(b.C):
+        for j, row in b.nb[c].pop(i, {}).items():
+            b.nb[c][j].pop(i, None); b.idx[c].pop((min(i, j), max(i, j)), None)
+            b.s[c][row] = 0.0; b.n[c][row] = 0.0       # dead row: estimate = p0, never preferred
+
+
+class EvolvingBandit:
+    """H20: sparse context bandit (fast layer) + a slow layer that rewrites configurations every `every` tasks.
+      mode fixed      - no slow layer
+      mode random     - least valuable primitives get random configurations
+      mode individual - best primitives (LCB of own success, per cluster) are copied over the least valuable ones
+      mode pattern    - best triples (LCB of the triple's success in a cluster) are copied as a unit
+    A copy is mutated with probability pm (env.clone) and inherits half of the parent's pair statistics.
+    Value of a primitive = its best per-cluster LCB. frac = share of the population rewritten per generation."""
+    def __init__(self, mode, N, team, rng, env, frac=0.02, pm=0.1, every=100, seed=0):
+        self.mode, self.N, self.team, self.env, self.frac, self.pm, self.every = mode, N, team, env, frac, pm, every
+        self.b = SparsePairMean(N, team, rng)
+        self.rg = np.random.default_rng(seed + 8000)
+        C = self.b.C
+        self.is_ = np.zeros((C, N)); self.in_ = np.zeros((C, N))
+        self.tri = {}; self.epoch = np.zeros(N, int); self.t = 0; self.births = 0
+
+    @property
+    def state_size(self):
+        return self.b.state_size
+
+    def choose(self, t, x, avail=None):
+        return self.b.choose(t, x, avail)
+
+    def _lcb(self, s_, n_):
+        p0 = self.b.succ_sum / self.b.succ_n if self.b.succ_n else 0.5
+        return (s_ + p0) / (n_ + 1) - 1 / np.sqrt(n_ + 1)
+
+    def update(self, team, succ):
+        b = self.b; b.update(team, succ); c = b.ctx; self.t += 1
+        team = [int(i) for i in team]
+        self.is_[c, team] += succ; self.in_[c, team] += 1
+        if self.mode == "pattern" and len(team) == 3:
+            key = (c, *sorted(team)); ep = tuple(int(self.epoch[i]) for i in key[1:])
+            st = self.tri.get(key)
+            if st is None or st[2] != ep:
+                st = self.tri[key] = [0.0, 0.0, ep]
+            st[0] += succ; st[1] += 1
+        if self.mode != "fixed" and self.t % self.every == 0:
+            self._generation()
+
+    def _rewrite(self, kid):
+        _sp_drop(self.b, kid); self.epoch[kid] += 1; self.births += 1
+        self.is_[:, kid] = 0; self.in_[:, kid] = 0
+
+    def _generation(self):
+        N, rg, b, env = self.N, self.rg, self.b, self.env
+        R = max(1, int(round(self.frac * N / 3)))
+        val = self._lcb(self.is_, self.in_).max(0) + 1e-9 * rg.random(N)
+        if self.mode == "random":
+            for kid in np.argsort(val)[: 3 * R]:
+                env.randomize(int(kid), rg); self._rewrite(int(kid))
+            return
+        if self.mode == "individual":
+            L = self._lcb(self.is_, self.in_) + 1e-9 * rg.random(self.is_.shape)
+            parents, seen = [], set()
+            for flat in np.argsort(-L, axis=None):
+                c, i = divmod(int(flat), N)
+                if i not in seen and self.in_[c, i] > 0:
+                    seen.add(i); parents.append(i)
+                if len(parents) >= 3 * R:
+                    break
+            val[parents] = np.inf
+            for p, kid in zip(parents, (int(v) for v in np.argsort(val)[: len(parents)])):
+                env.clone(p, kid, bool(rg.random() < self.pm), rg); self._rewrite(kid)
+                for c in range(b.C):
+                    for j, row in list(b.nb[c].get(p, {}).items()):
+                        if j != kid:
+                            _sp_set(b, c, kid, j, b.s[c][row] / 2, b.n[c][row] / 2)
+                self.is_[:, kid] = self.is_[:, p] / 2; self.in_[:, kid] = self.in_[:, p] / 2
+            return
+        cand = sorted(((self._lcb(st[0], st[1]), key) for key, st in self.tri.items()
+                       if st[2] == tuple(int(self.epoch[i]) for i in key[1:])), key=lambda v: -v[0])
+        parents, used = [], set()
+        for _, key in cand:
+            if len(parents) >= R:
+                break
+            if not used & set(key[1:]):
+                used |= set(key[1:]); parents.append(key)
+        if not parents:
+            return
+        val[list(used)] = np.inf
+        victims = [int(v) for v in np.argsort(val)[: 3 * len(parents)]]
+        for k, key in enumerate(parents):
+            team, kids = key[1:], victims[3 * k: 3 * k + 3]
+            st = self.tri[key]
+            for p, kid in zip(team, kids):
+                env.clone(p, kid, bool(rg.random() < self.pm), rg); self._rewrite(kid)
+                self.is_[:, kid] = self.is_[:, p] / 2; self.in_[:, kid] = self.in_[:, p] / 2
+            for c in range(b.C):                                  # the copy inherits the triple's pair statistics
+                for u in range(3):
+                    for v in range(u + 1, 3):
+                        row = b.idx[c].get((min(team[u], team[v]), max(team[u], team[v])))
+                        if row is not None and b.n[c][row] > 0:
+                            _sp_set(b, c, kids[u], kids[v], b.s[c][row] / 2, b.n[c][row] / 2)
+            ck = (key[0], *sorted(kids))
+            self.tri[ck] = [st[0] / 2, st[1] / 2, tuple(int(self.epoch[i]) for i in ck[1:])]
+        if len(self.tri) > 200_000:
+            self.tri = {k: v for k, v in self.tri.items() if v[2] == tuple(int(self.epoch[i]) for i in k[1:])}
+
+
 class NodeBandits:
     """Distributed setting (H19). kind:
       central_sparse - one SparsePairMean with all outcomes (needs a call to the centre per task; charged by the caller)
@@ -337,7 +459,7 @@ class TeamPolicy:
 
 
 def run_router(env_cfg, seed, N=40, model="linucb", team="solo", team_size=3, c=0.3,
-               alpha=0.4, gamma=0.995, lr=0.05, team_gamma=1.0, reset_at=None, role_k=None, eps=0.0):
+               alpha=0.4, gamma=0.995, lr=0.05, team_gamma=1.0, reset_at=None, role_k=None, eps=0.0, frac=0.02, pm=0.1):
     """Returns dict(R=rewards, q=team factor, cover=coverage).
     team_gamma / reset_at: forgetting in the team policy (H16). role_k: replace the hidden roles (K x N) by a
     given population, e.g. the one a swarm with inheritance ended with (H16c)."""
@@ -349,6 +471,8 @@ def run_router(env_cfg, seed, N=40, model="linucb", team="solo", team_size=3, c=
     lin = LinUCB(env.M, env.D, alpha, gamma) if model == "linucb" else None
     if team == "cluster_pair_mean_sparse":
         tp = SparsePairMean(N, team_size, rng)
+    elif team.startswith("evo_"):
+        tp = EvolvingBandit(team[4:], N, team_size, rng, env, frac, pm, seed=seed)
     elif team in ("central_sparse", "node_sparse", "shard_sparse", "node_random", "node_oracle"):
         tp = NodeBandits(team, N, team_size, rng, env, eps)
     else:

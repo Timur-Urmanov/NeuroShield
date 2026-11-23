@@ -74,7 +74,7 @@ LEGACY = SwarmConfig(fatigue=True, sleep=True, hebb_bias=0.3, w_rule="hebb_r", r
 
 @dataclass(frozen=True)
 class EnvConfig:
-    kind: str = "homogeneous"     # homogeneous | roles | ordered
+    kind: str = "homogeneous"     # homogeneous | roles | ordered | config (H20)
     T: int = 8000
     role_fractions: Optional[Sequence[float]] = None  # None -> arange(N) % 3 (exact thirds)
     strong: float = 0.95          # quality of a primitive in its own role
@@ -85,6 +85,8 @@ class EnvConfig:
     role_shift: float = 0.0       # H16: fraction of primitives whose hidden roles are reshuffled at T/2
     # H19 (distributed): primitives live on `nodes` nodes, each task arrives at a home node, every team member
     # from another node costs comm_cost; node_skew=1: every node lacks one role per task type
+    genes_L: int = 6              # H20 (kind='config'): genes per primitive configuration
+    genes_A: int = 4              # H20: values per gene
     nodes: int = 0
     comm_cost: float = 0.0
     node_skew: float = 0.0
