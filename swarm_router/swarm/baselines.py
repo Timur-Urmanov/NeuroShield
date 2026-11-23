@@ -17,6 +17,7 @@ Team policies (only matter in roles/ordered envs; team size = `team`):
               greedily at the head or tail. Team order = returned order.
   mf / mf_ctx - centralised version of the swarm's computed links (H11, swarm/links.py).
   pair_mean - centralised version of the swarm's link estimator (neutral prior, greedy, conditional third).
+  cluster_pair_mean / cluster_agent_ucb - the same with separate statistics per online cluster of x.
 All team policies respect the env's capacity mask (busy primitives).
   oracle    - a team covering all roles (and in the right order for the ordered env)
 """
@@ -68,17 +69,20 @@ class TeamPolicy:
     def __init__(self, kind, N, team, rng, env, c=0.3, n_clusters=3, lr=0.05, d=4, seed=0,
                  gamma=1.0, reset_at=None):
         self.gamma, self.reset_at = gamma, reset_at       # H16: discounted statistics / informed reset
+        clustered = kind in ("cluster_pair_mean", "cluster_agent_ucb", "cluster_pair_ucb")
+        if kind in ("cluster_pair_mean", "cluster_agent_ucb"):    # H16 addendum: per-cluster statistics
+            kind = kind[len("cluster_"):]
         self.kind, self.N, self.team, self.rng, self.env, self.c = kind, N, team, rng, env, c
         self.fl = FactorLinks(N, env.D, d, lr, kind == "mf_ctx", seed) if kind in ("mf", "mf_ctx") else None
         self.t = 0
         self.ctx = 0
-        C = n_clusters if kind == "cluster_pair_ucb" else 1
-        self.clusters = OnlineClusters(C) if kind == "cluster_pair_ucb" else None
+        C = n_clusters if clustered else 1
+        self.clusters = OnlineClusters(C) if clustered else None
         self.succ_sum, self.succ_n = 0.0, 0
         if kind in ("pair_ucb", "cluster_pair_ucb", "seq_ucb", "pair_mean"):
             self.n = np.zeros((C, N, N)); self.s = np.zeros((C, N, N))
         if kind == "agent_ucb":
-            self.n = np.zeros((1, N)); self.s = np.zeros((1, N))
+            self.n = np.zeros((C, N)); self.s = np.zeros((C, N))
 
     def _ucb(self):
         n, s = self.n[self.ctx], self.s[self.ctx]
@@ -132,7 +136,7 @@ class TeamPolicy:
             # neutral prior p0 = running mean team success; greedy best free pair, then the member that
             # maximises the mean estimate to the current team (= the swarm's conditional recruitment).
             p0 = self.succ_sum / self.succ_n if self.succ_n else 0.5
-            n, s_ = self.n[0], self.s[0]
+            n, s_ = self.n[self.ctx], self.s[self.ctx]
             E = (s_ + p0) / (n + 1) + 1e-9 * self.rng.random(n.shape)
             np.fill_diagonal(E, -np.inf)
             if avail is not None:
