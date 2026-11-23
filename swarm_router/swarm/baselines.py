@@ -64,6 +64,84 @@ class OnlineClusters:
         return j
 
 
+class SparsePairMean:
+    """cluster_pair_mean on sparse statistics (H17): only visited pairs are stored. Unvisited pairs all have the
+    estimate p0, so the dense argmax is reproduced by: best visited free pair if its estimate > p0, else a random
+    free unvisited pair (same for the third member). Work per step ~ number of visited pairs, not N^2."""
+    def __init__(self, N, team, rng, n_clusters=3):
+        self.N, self.team, self.rng = N, team, rng
+        self.clusters = OnlineClusters(n_clusters)
+        self.C = n_clusters
+        self.idx = [dict() for _ in range(n_clusters)]            # (a, b), a < b -> row
+        self.nb = [dict() for _ in range(n_clusters)]             # node -> {partner: row}
+        self.A = [np.zeros(64, int) for _ in range(n_clusters)]; self.B = [np.zeros(64, int) for _ in range(n_clusters)]
+        self.s = [np.zeros(64) for _ in range(n_clusters)]; self.n = [np.zeros(64) for _ in range(n_clusters)]
+        self.m = [0] * n_clusters
+        self.succ_sum, self.succ_n, self.ctx = 0.0, 0, 0
+
+    @property
+    def state_size(self):
+        return int(sum(self.m))
+
+    def choose(self, t, x, avail=None):
+        c = self.ctx = self.clusters.assign(x)
+        N, m, rng = self.N, self.m[c], self.rng
+        av = np.ones(N, bool) if avail is None else avail
+        p0 = self.succ_sum / self.succ_n if self.succ_n else 0.5
+        team = None
+        if m:
+            A, B = self.A[c][:m], self.B[c][:m]
+            est = np.where(av[A] & av[B], (self.s[c][:m] + p0) / (self.n[c][:m] + 1), -np.inf)
+            j = int(np.argmax(est))
+            if est[j] > p0:
+                team = [int(A[j]), int(B[j])]
+        if team is None:
+            free = np.where(av)[0]
+            for _ in range(50):                                   # a random free unvisited pair
+                a, b = (int(v) for v in rng.choice(free, size=2, replace=False))
+                if (min(a, b), max(a, b)) not in self.idx[c]:
+                    break
+            team = [a, b]
+        while len(team) < self.team:
+            sc = {}
+            for a in team:
+                for j, row in self.nb[c].get(a, {}).items():
+                    if av[j] and j not in team:
+                        sc.setdefault(j, {})[a] = (self.s[c][row] + p0) / (self.n[c][row] + 1)
+            best, bv = None, -np.inf
+            for j, d in sc.items():
+                v = (sum(d.values()) + p0 * (len(team) - len(d))) / len(team)
+                if v > bv:
+                    best, bv = j, v
+            if best is None or bv <= p0:
+                free = np.where(av)[0]
+                for _ in range(50):                               # a random free node unknown to the team
+                    j = int(rng.choice(free))
+                    if j not in team and j not in sc:
+                        best = j
+                        break
+                if best is None:
+                    best = int(next(j for j in free if j not in team))
+            team.append(best)
+        return np.array(team)
+
+    def update(self, team, succ):
+        c = self.ctx
+        self.succ_sum += succ; self.succ_n += 1
+        for i in range(len(team)):
+            for k in range(i + 1, len(team)):
+                a, b = int(min(team[i], team[k])), int(max(team[i], team[k]))
+                row = self.idx[c].get((a, b))
+                if row is None:
+                    row = self.m[c]; self.m[c] += 1
+                    if row == len(self.A[c]):
+                        for arr in (self.A, self.B, self.s, self.n):
+                            arr[c] = np.concatenate([arr[c], np.zeros_like(arr[c])])
+                    self.idx[c][(a, b)] = row; self.A[c][row] = a; self.B[c][row] = b
+                    self.nb[c].setdefault(a, {})[b] = row; self.nb[c].setdefault(b, {})[a] = row
+                self.s[c][row] += succ; self.n[c][row] += 1
+
+
 class TeamPolicy:
     """kind in solo | random | oracle | agent_ucb | pair_ucb | cluster_pair_ucb."""
     def __init__(self, kind, N, team, rng, env, c=0.3, n_clusters=3, lr=0.05, d=4, seed=0,
@@ -214,7 +292,11 @@ def run_router(env_cfg, seed, N=40, model="linucb", team="solo", team_size=3, c=
     T = env_cfg.T
     rng = np.random.default_rng(seed + 7)
     lin = LinUCB(env.M, env.D, alpha, gamma) if model == "linucb" else None
-    tp = TeamPolicy(team, N, team_size, rng, env, c, lr=lr, seed=seed, gamma=team_gamma, reset_at=reset_at) if env.kind != "homogeneous" else None
+    if team == "cluster_pair_mean_sparse":
+        tp = SparsePairMean(N, team_size, rng)
+    else:
+        tp = TeamPolicy(team, N, team_size, rng, env, c, lr=lr, seed=seed, gamma=team_gamma, reset_at=reset_at) \
+            if env.kind != "homogeneous" else None
     R = np.zeros(T); Q = np.zeros(T); COV = np.full(T, np.nan)
     for t in range(T):
         x, k, u = env.X[t], env.ks[t], env.U[t]
@@ -237,7 +319,7 @@ def run_router(env_cfg, seed, N=40, model="linucb", team="solo", team_size=3, c=
             tp.update(members, succ)
             COV[t] = float(env.coverage(members, t))
         R[t], Q[t] = r, q
-    return dict(R=R, q=Q, cover=COV)
+    return dict(R=R, q=Q, cover=COV, policy=tp)
 
 
 def summary(out, T):
