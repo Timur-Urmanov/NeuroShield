@@ -259,6 +259,19 @@ class Swarm:
                 if self.asleep.mean() < 0.3:
                     self.asleep[i] = True; self.timer[i] = 40
 
+        if (t + 1) % cfg.inherit_every == 0 and (cfg.forget_geno < 1.0 or cfg.forget_links < 1.0):   # H18
+            if cfg.forget_links < 1.0 and cfg.w_rule in ("mean_r", "mean_succ"):
+                self.sW_pair *= cfg.forget_links; self.nW_pair *= cfg.forget_links
+                prior = (self.team_succ_sum / self.team_n if self.team_n else 0.5) if cfg.w_prior == "mean" else self.W0
+                self.W = (self.sW_pair + prior) / (self.nW_pair + 1)
+                np.fill_diagonal(self.W, 0)
+            if cfg.forget_geno < 1.0:
+                self.fit_s *= cfg.forget_geno; self.fit_n *= cfg.forget_geno
+                for st in self.geno.values():
+                    st[0] *= cfg.forget_geno; st[1] *= cfg.forget_geno
+                for st in self.tri.values():
+                    st[0] *= cfg.forget_geno; st[1] *= cfg.forget_geno
+
         if cfg.inherit != "none":
             if len(members) > 1:
                 self.fit_s[members] += succ; self.fit_n[members] += 1

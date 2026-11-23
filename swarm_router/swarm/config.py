@@ -59,6 +59,10 @@ class SwarmConfig:
     # True = the swarm is told which children mutated and keeps them out of the genotype. That is hidden-role
     # information (review of H14); H13/H14 were run with True, everything later uses False.
     inherit_mut_known: bool = False
+    # H18: forgetting once per generation (multiplier; 1.0 = off). geno: genotype/triple records and
+    # per-primitive fitness; links: pair sums and counts of the mean_* link rules
+    forget_geno: float = 1.0
+    forget_links: float = 1.0
 
 
 # Defaults of the original swarm.py constructor minus Kuramoto. Legacy rows with kuramoto=True are
