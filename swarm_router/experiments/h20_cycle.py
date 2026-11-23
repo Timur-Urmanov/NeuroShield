@@ -11,10 +11,11 @@ from swarm import EnvConfig, SwarmConfig, run_swarm
 from swarm.baselines import run_router
 from swarm.envs import make_env
 
-T, N, BUSY, TEST = 20000, 640, 48, list(range(5))
+N, BUSY, TEST = 640, 48, list(range(5))
 FRAC, PM = (0.02, 0.05), (0.1, 0.3)
 ENV_KW = dict(a.split("=") for a in sys.argv[1:] if "=" in a)          # e.g. genes_L=4 for follow-ups
 TAG = "".join(f"_{k}{v}" for k, v in ENV_KW.items())
+T = int(ENV_KW.pop("T", 20000)); W = T // 10
 GRID = {"A fixed": [dict(team="evo_fixed")],
         "R random search": [dict(team="evo_random", frac=f) for f in FRAC],
         "I individual selection": [dict(team="evo_individual", frac=f, pm=p) for f in FRAC for p in PM],
@@ -25,7 +26,7 @@ GRID = {"A fixed": [dict(team="evo_fixed")],
 
 def job(spec):
     v, i, seed = spec
-    kw = dict(GRID[v][i]); env_cfg = EnvConfig("config", T, busy=BUSY, **{k: int(x) for k, x in ENV_KW.items()})
+    kw = dict(GRID[v][i]); env_cfg = EnvConfig("config", T, busy=BUSY, **{k: (float(x) if k == 'genes_pow' else int(x)) for k, x in ENV_KW.items()})
     if kw.pop("swarm", False):
         tr = run_swarm(env_cfg, SwarmConfig(N=N, inherit="team", recruit_agg="min", sim_weight="evidence", inherit_frac=kw["frac"],
                                             inherit_mut=kw["pm"], inherit_mut_known=True), seed, keep=True)
@@ -33,7 +34,7 @@ def job(spec):
     else:
         o = run_router(env_cfg, seed, N=N, model="linucb", **kw); R, q, env = o["R"], o["q"], o["env"]
     m = (env.genes[None, :, None, :] == env.targets[:, None, :, :]).sum(-1)
-    return dict(post=float(R[-2000:].mean()), mid=float(R[T // 2 - 2000:T // 2].mean()), q=float(q[-2000:].mean()),
+    return dict(post=float(R[-W:].mean()), mid=float(R[T // 2 - W:T // 2].mean()), q=float(q[-W:].mean()),
                 niches_with_perfect=int(((m == env.L).sum(1) > 0).sum()), perfect_share=float((m == env.L).any((0, 2)).mean()),
                 best_match_mean=float(m.max(1).mean()), oracle=float(env.oracle_value("post", env.q_full)))
 

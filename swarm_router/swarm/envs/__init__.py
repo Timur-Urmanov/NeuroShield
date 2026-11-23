@@ -17,7 +17,7 @@ def make_env(env_cfg, seed: int, N: int):
         return RolesEnv(env_cfg.T, seed, **kw)
     if env_cfg.kind == "config":
         return ConfigEnv(env_cfg.T, seed, N, env_cfg.strong, env_cfg.weak, env_cfg.member_cost, env_cfg.busy,
-                         env_cfg.genes_L, env_cfg.genes_A)
+                         env_cfg.genes_L, env_cfg.genes_A, env_cfg.genes_pow)
     if env_cfg.kind == "ordered":
         return OrderedEnv(env_cfg.T, seed, **kw)
     raise ValueError(env_cfg.kind)

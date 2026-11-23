@@ -15,7 +15,8 @@ from .roles import N_ROLES, RolesEnv
 class ConfigEnv(RolesEnv):
     kind = "config"
 
-    def __init__(self, T, seed, N=40, strong=0.95, weak=0.6, member_cost=0.0, busy=0, genes_L=6, genes_A=4):
+    def __init__(self, T, seed, N=40, strong=0.95, weak=0.6, member_cost=0.0, busy=0, genes_L=6, genes_A=4, genes_pow=2.0):
+        self.pow = genes_pow
         super().__init__(T, seed, N, None, strong, weak, member_cost, False, busy)
         self.L, self.A = genes_L, genes_A
         self.genes = np.random.default_rng(seed + 2900).integers(genes_A, size=(N, genes_L))
@@ -25,7 +26,7 @@ class ConfigEnv(RolesEnv):
 
     def _recompute(self, idx):
         m = (self.genes[idx][None, :, None, :] == self.targets[:, None, :, :]).sum(-1)      # K x n x roles
-        self.skill[:, idx, :] = self.weak + (self.strong - self.weak) * (m / self.L) ** 2
+        self.skill[:, idx, :] = self.weak + (self.strong - self.weak) * (m / self.L) ** self.pow
 
     def team_factor(self, members, t=None) -> float:
         k = self.ks[t] if t is not None else 0
