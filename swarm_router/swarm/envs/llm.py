@@ -89,6 +89,9 @@ class LLMEnv:
     def team_factor(self, members, t=None) -> float:
         return 1.0
 
+    def clone(self, src, dst, mutate, rng) -> None:   # primitives have no hidden properties here
+        pass
+
     def available(self, t: int):          # no capacity limits on primitives (all available)
         return None
 

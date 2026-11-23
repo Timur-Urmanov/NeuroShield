@@ -21,6 +21,7 @@ class Trace:
     q: np.ndarray                 # team quality factor actually applied
     teams: list = field(default_factory=list)
     swarm: Swarm | None = None
+    env: object = None            # the env instance after the run (keep=True); roles may have evolved (H12)
 
     def window(self, name: str, T: int) -> slice:
         return {"pre": slice(T // 2 - 1000, T // 2), "post": slice(T - 1000, T),
@@ -54,4 +55,4 @@ def run_swarm(env_cfg: EnvConfig, cfg: SwarmConfig, seed: int, keep=False) -> Tr
         Q[t] = env.team_factor(info["exec_order"], t)
         if keep:
             teams.append(info["exec_order"].tolist())
-    return Trace(R, Ms, env.ks, L, TS, COV, Q, teams, s if keep else None)
+    return Trace(R, Ms, env.ks, L, TS, COV, Q, teams, s if keep else None, env if keep else None)

@@ -63,6 +63,10 @@ class SimEnv:
     def commit(self, t: int, members) -> None:
         pass
 
+    def clone(self, src: int, dst: int, mutate: bool, rng) -> None:
+        """Inheritance (H12): primitive dst becomes a copy of src. No hidden properties here."""
+        pass
+
     def p_success(self, t: int, m: int, members) -> float:
         """Success probability before the swarm's own (artificial) fatigue penalty."""
         return self.acc(t)[m, self.ks[t]] * self.team_factor(members, t)

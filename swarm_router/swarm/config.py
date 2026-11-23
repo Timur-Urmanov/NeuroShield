@@ -47,6 +47,11 @@ class SwarmConfig:
     #   oracle   - by hidden roles (upper bound, not a mechanism)
     order: str = "recruit"
     order_lr: float = 0.1
+    # inheritance and selection (H12): none | full | nolinks | random
+    inherit: str = "none"
+    inherit_every: int = 100      # tasks between generations
+    inherit_frac: float = 0.02    # fraction of primitives replaced per generation
+    inherit_mut: float = 0.05     # probability that a child's hidden role is random
 
 
 # Defaults of the original swarm.py constructor minus Kuramoto. Legacy rows with kuramoto=True are

@@ -58,6 +58,15 @@ class RolesEnv(SimEnv):
     def coverage(self, members, t=None) -> bool:
         return len(set(self.roles_at(t)[members].tolist())) == N_ROLES
 
+    def clone(self, src, dst, mutate, rng):
+        """dst inherits the hidden role(s) of src; a mutated child gets a random role instead."""
+        if mutate:
+            self.role_k[:, dst] = rng.integers(N_ROLES, size=self.K) if self.role_by_type else rng.integers(N_ROLES)
+        else:
+            self.role_k[:, dst] = self.role_k[:, src]
+        if not self.role_by_type:
+            self.role[dst] = self.role_k[0, dst]
+
     def available(self, t):
         if not self.busy:
             return None

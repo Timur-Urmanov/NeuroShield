@@ -46,6 +46,10 @@ class Swarm:
         self.fl = (FactorLinks(N, D, cfg.factor_d, cfg.factor_lr, cfg.w_rule == "factor_ctx", seed)
                    if cfg.w_rule.startswith("factor") else None)
         self.team_succ_sum = 0.0; self.team_n = 0              # running mean team success (w_prior=mean)
+        # inheritance (H12): per-primitive fitness statistics, lineage ids, separate RNG stream
+        self.fit_s = np.zeros(N); self.fit_n = np.zeros(N)
+        self.lineage = np.arange(N); self.rng_inherit = np.random.default_rng(seed + 7000)
+        self.n_births = 0
         self.t_seen = 0
         self.F = np.zeros(N); self.asleep = np.zeros(N, bool); self.timer = np.zeros(N, int)
         self.r_fast = self.r_slow = 0.5
@@ -246,8 +250,51 @@ class Swarm:
                 if self.asleep.mean() < 0.3:
                     self.asleep[i] = True; self.timer[i] = 40
 
+        if cfg.inherit != "none":
+            if len(members) > 1:
+                self.fit_s[members] += succ; self.fit_n[members] += 1
+            if (t + 1) % cfg.inherit_every == 0:
+                self.reproduce(env)
+
         info = dict(leader=leader, members=members, exec_order=exec_order, m=m, succ=succ)
         return r, info
+
+    # ---------- inheritance and selection (H12) ----------
+    def reproduce(self, env):
+        """Replace the least fit primitives by copies of the fittest (lower confidence bound of the mean
+        team success). A child inherits the parent's hidden role (env.clone), affinity (+noise), model
+        value memory, links (unless inherit="nolinks") and half of the fitness statistics."""
+        cfg, N, rg = self.cfg, self.N, self.rng_inherit
+        R = int(round(cfg.inherit_frac * N))
+        if R < 1:
+            return
+        if cfg.inherit == "random":
+            perm = rg.permutation(N); parents, victims = perm[:R], perm[R:2 * R]
+        else:
+            p0 = self.team_succ_sum / self.team_n if self.team_n else 0.5
+            lcb = (self.fit_s + p0) / (self.fit_n + 1) - 1 / np.sqrt(self.fit_n + 1) + 1e-9 * rg.random(N)
+            order = np.argsort(-lcb)
+            parents = order[:R][self.fit_n[order[:R]] > 0]
+            victims = order[::-1][:len(parents)]
+            keep = ~np.isin(victims, parents)
+            parents, victims = parents[keep], victims[keep]
+        for p, c in zip(parents, victims):
+            p, c = int(p), int(c)
+            env.clone(p, c, rg.random() < cfg.inherit_mut, rg)
+            a = self.aff[p] + 0.05 * rg.normal(size=self.D); self.aff[c] = a / np.linalg.norm(a)
+            for arr in (self.QL, self.nL, self.sW, self.nW):
+                arr[c] = arr[p]
+            self.pos[c] = self.pos[p]; self.F[c] = 0.0; self.asleep[c] = False
+            for M_ in (self.W, self.nW_pair, self.sW_pair, self.W0, self.n_co):
+                if cfg.inherit == "nolinks":
+                    M_[c, :] = 0; M_[:, c] = 0
+                else:
+                    M_[c, :] = M_[p, :]; M_[:, c] = M_[:, p]
+                    M_[c, p] = 0; M_[p, c] = 0          # child-parent pair: untried
+                M_[c, c] = 0
+            self.fit_s[p] /= 2; self.fit_n[p] /= 2      # parent and child share the evidence
+            self.fit_s[c] = self.fit_s[p]; self.fit_n[c] = self.fit_n[p]
+            self.lineage[c] = self.lineage[p]; self.n_births += 1
 
 
 def clusters(W, thr=0.4):
