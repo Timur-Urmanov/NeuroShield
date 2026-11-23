@@ -29,7 +29,7 @@ class RolesEnv(SimEnv):
     kind = "roles"
 
     def __init__(self, T, seed, N=40, role_fractions=None, strong=0.95, weak=0.6, member_cost=0.0,
-                 role_by_type=False, busy=0):
+                 role_by_type=False, busy=0, role_shift=0.0):
         super().__init__(T, seed, N, member_cost)
         self.role = assign_roles(N, role_fractions, seed)
         self.strong, self.weak = strong, weak
@@ -44,8 +44,23 @@ class RolesEnv(SimEnv):
         # busy: a primitive that worked on task t is unavailable for tasks t+1 .. t+busy
         self.busy = busy
         self.busy_until = np.full(N, -1)
+        # role_shift (H16): at T/2 the hidden roles of this fraction of primitives are permuted among them
+        self.role_shift, self._shifted = role_shift, False
+
+    def _shift(self):
+        self._shifted = True
+        rr = np.random.default_rng(self.seed + 2600)
+        idx = rr.choice(self.N, size=int(round(self.role_shift * self.N)), replace=False)
+        if self.role_by_type:
+            for k in range(self.K):
+                self.role_k[k, idx] = self.role_k[k, rr.permutation(idx)]
+        else:
+            self.role[idx] = self.role[rr.permutation(idx)]
+            self.role_k[:] = self.role[None]
 
     def roles_at(self, t):
+        if self.role_shift and not self._shifted and t is not None and t >= self.T // 2:
+            self._shift()
         if t is None or not self.role_by_type:
             return self.role
         return self.role_k[self.ks[t]]

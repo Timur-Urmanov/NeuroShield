@@ -77,6 +77,7 @@ class EnvConfig:
     member_cost: float = 0.0      # reward penalty per extra team member (legacy: 0)
     role_by_type: bool = False    # strong role of a primitive depends on task type
     busy: int = 0                 # steps a primitive stays busy after a task (capacity); 0 = unlimited
+    role_shift: float = 0.0       # H16: fraction of primitives whose hidden roles are reshuffled at T/2
 
 
 def to_dict(*cfgs) -> dict:

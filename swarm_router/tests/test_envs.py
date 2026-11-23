@@ -58,3 +58,35 @@ def test_oracle_team_bounds_router():
     o = summary(run_router(env, 0, model="oracle", team="oracle"), 3000)
     r = summary(run_router(env, 0, model="oracle", team="random"), 3000)
     assert o["cover_end"] == 1.0 and o["post"] > r["post"]
+
+
+def test_role_shift_h16():
+    """role_shift permutes hidden roles at T/2 (role counts preserved); 0 leaves the env untouched."""
+    import numpy as np
+    from swarm import EnvConfig
+    from swarm.envs import make_env
+    for by_type in (False, True):
+        e0 = make_env(EnvConfig("roles", 400, role_by_type=by_type), 3, 60)
+        e1 = make_env(EnvConfig("roles", 400, role_by_type=by_type, role_shift=1.0), 3, 60)
+        before = e1.role_k.copy()
+        assert np.array_equal(e1.roles_at(199), e0.roles_at(199)) and np.array_equal(e1.role_k, before)
+        e1.roles_at(200)
+        assert not np.array_equal(e1.role_k, before)
+        assert all(np.array_equal(np.bincount(e1.role_k[k], minlength=3), np.bincount(before[k], minlength=3)) for k in range(3))
+        e0.roles_at(399)
+        assert np.array_equal(e0.role_k, before)
+        after = e1.role_k.copy(); e1.roles_at(399)
+        assert np.array_equal(e1.role_k, after)          # shifted once
+    e2 = make_env(EnvConfig("roles", 400, role_shift=0.3), 3, 60); b = e2.role.copy(); e2.roles_at(200)
+    assert 0 < (e2.role != b).sum() <= 18
+
+
+def test_team_policy_forgetting_h16():
+    import numpy as np
+    from swarm import EnvConfig
+    from swarm.baselines import run_router
+    env = EnvConfig("roles", 400, busy=4, role_shift=1.0)
+    a = run_router(env, 1, N=30, team="agent_ucb")["R"]
+    b = run_router(env, 1, N=30, team="agent_ucb", reset_at=200)["R"]
+    c = run_router(env, 1, N=30, team="pair_mean", team_gamma=0.99)["R"]
+    assert np.array_equal(a[:200], b[:200]) and not np.array_equal(a[200:], b[200:]) and np.isfinite(c).all()

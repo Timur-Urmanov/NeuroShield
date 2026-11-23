@@ -65,7 +65,9 @@ class OnlineClusters:
 
 class TeamPolicy:
     """kind in solo | random | oracle | agent_ucb | pair_ucb | cluster_pair_ucb."""
-    def __init__(self, kind, N, team, rng, env, c=0.3, n_clusters=3, lr=0.05, d=4, seed=0):
+    def __init__(self, kind, N, team, rng, env, c=0.3, n_clusters=3, lr=0.05, d=4, seed=0,
+                 gamma=1.0, reset_at=None):
+        self.gamma, self.reset_at = gamma, reset_at       # H16: discounted statistics / informed reset
         self.kind, self.N, self.team, self.rng, self.env, self.c = kind, N, team, rng, env, c
         self.fl = FactorLinks(N, env.D, d, lr, kind == "mf_ctx", seed) if kind in ("mf", "mf_ctx") else None
         self.t = 0
@@ -80,11 +82,20 @@ class TeamPolicy:
 
     def _ucb(self):
         n, s = self.n[self.ctx], self.s[self.ctx]
+        if self.gamma < 1.0:          # discounted UCB: effective horizon 1/(1-gamma); decayed-out arms are new again
+            lg = np.log(min(self.t + 2, 1.0 / (1.0 - self.gamma)))
+            nn = np.maximum(n, 0.05)
+            u = np.where(n > 0.05, s / nn + self.c * np.sqrt(lg / nn), 1e6)
+            return u + 1e-9 * self.rng.random(u.shape)
         u = np.where(n > 0, s / np.maximum(n, 1) + self.c * np.sqrt(np.log(self.t + 2) / np.maximum(n, 1)), 1e6)
         return u + 1e-9 * self.rng.random(u.shape)       # random tie-break
 
     def choose(self, t, x, avail=None):
         N, k = self.N, self.team
+        if self.reset_at is not None and t == self.reset_at:      # told about the shift: forget everything
+            self.succ_sum, self.succ_n = 0.0, 0
+            if hasattr(self, "n"):
+                self.n[:] = 0; self.s[:] = 0
         free = np.arange(N) if avail is None else np.where(avail)[0]
         if self.clusters is not None:
             self.ctx = self.clusters.assign(x)
@@ -171,6 +182,9 @@ class TeamPolicy:
         self.succ_sum += succ; self.succ_n += 1
         if not hasattr(self, "n"):
             return
+        if self.gamma < 1.0:
+            self.n *= self.gamma; self.s *= self.gamma
+            self.succ_sum *= self.gamma; self.succ_n *= self.gamma
         n, s = self.n[self.ctx], self.s[self.ctx]
         if self.kind == "agent_ucb":
             n[team] += 1; s[team] += succ
@@ -186,13 +200,17 @@ class TeamPolicy:
 
 
 def run_router(env_cfg, seed, N=40, model="linucb", team="solo", team_size=3, c=0.3,
-               alpha=0.4, gamma=0.995, lr=0.05):
-    """Returns dict(R=rewards, q=team factor, cover=coverage)."""
+               alpha=0.4, gamma=0.995, lr=0.05, team_gamma=1.0, reset_at=None, role_k=None):
+    """Returns dict(R=rewards, q=team factor, cover=coverage).
+    team_gamma / reset_at: forgetting in the team policy (H16). role_k: replace the hidden roles (K x N) by a
+    given population, e.g. the one a swarm with inheritance ended with (H16c)."""
     env = make_env(env_cfg, seed, N)
+    if role_k is not None:
+        env.role_k = np.array(role_k); env.role = env.role_k[0].copy()
     T = env_cfg.T
     rng = np.random.default_rng(seed + 7)
     lin = LinUCB(env.M, env.D, alpha, gamma) if model == "linucb" else None
-    tp = TeamPolicy(team, N, team_size, rng, env, c, lr=lr, seed=seed) if env.kind != "homogeneous" else None
+    tp = TeamPolicy(team, N, team_size, rng, env, c, lr=lr, seed=seed, gamma=team_gamma, reset_at=reset_at) if env.kind != "homogeneous" else None
     R = np.zeros(T); Q = np.zeros(T); COV = np.full(T, np.nan)
     for t in range(T):
         x, k, u = env.X[t], env.ks[t], env.U[t]
