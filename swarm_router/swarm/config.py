@@ -47,7 +47,7 @@ class SwarmConfig:
     #   oracle   - by hidden roles (upper bound, not a mechanism)
     order: str = "recruit"
     order_lr: float = 0.1
-    # inheritance and selection (H12): none | full | nolinks | random
+    # inheritance and selection: none | full | nolinks | random (H12, individuals) | team | team_nopool (H13)
     inherit: str = "none"
     inherit_every: int = 100      # tasks between generations
     inherit_frac: float = 0.02    # fraction of primitives replaced per generation

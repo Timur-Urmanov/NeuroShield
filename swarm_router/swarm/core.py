@@ -50,6 +50,9 @@ class Swarm:
         self.fit_s = np.zeros(N); self.fit_n = np.zeros(N)
         self.lineage = np.arange(N); self.rng_inherit = np.random.default_rng(seed + 7000)
         self.n_births = 0
+        self.epoch = np.zeros(N, int)                           # incremented when a primitive is replaced
+        self.tag_g = np.full(N, -1); self.tag_slot = np.zeros(N, int)   # team genotype id / slot (H13)
+        self.geno = {}; self.tri = {}; self.next_g = 0
         self.t_seen = 0
         self.F = np.zeros(N); self.asleep = np.zeros(N, bool); self.timer = np.zeros(N, int)
         self.r_fast = self.r_slow = 0.5
@@ -253,8 +256,10 @@ class Swarm:
         if cfg.inherit != "none":
             if len(members) > 1:
                 self.fit_s[members] += succ; self.fit_n[members] += 1
+            if cfg.inherit.startswith("team"):
+                self.record_team(members, succ)
             if (t + 1) % cfg.inherit_every == 0:
-                self.reproduce(env)
+                self.reproduce_teams(env) if cfg.inherit.startswith("team") else self.reproduce(env)
 
         info = dict(leader=leader, members=members, exec_order=exec_order, m=m, succ=succ)
         return r, info
@@ -279,8 +284,14 @@ class Swarm:
             keep = ~np.isin(victims, parents)
             parents, victims = parents[keep], victims[keep]
         for p, c in zip(parents, victims):
-            p, c = int(p), int(c)
-            env.clone(p, c, rg.random() < cfg.inherit_mut, rg)
+            self._clone(int(p), int(c), env)
+
+    def _clone(self, p: int, c: int, env) -> bool:
+        """Primitive c becomes a copy of p (see reproduce). Returns True if the child's role mutated."""
+        cfg, rg = self.cfg, self.rng_inherit
+        if True:
+            mutated = bool(rg.random() < cfg.inherit_mut)
+            env.clone(p, c, mutated, rg)
             a = self.aff[p] + 0.05 * rg.normal(size=self.D); self.aff[c] = a / np.linalg.norm(a)
             for arr in (self.QL, self.nL, self.sW, self.nW):
                 arr[c] = arr[p]
@@ -295,6 +306,94 @@ class Swarm:
             self.fit_s[p] /= 2; self.fit_n[p] /= 2      # parent and child share the evidence
             self.fit_s[c] = self.fit_s[p]; self.fit_n[c] = self.fit_n[p]
             self.lineage[c] = self.lineage[p]; self.n_births += 1
+            self.epoch[c] += 1; self.tag_g[c] = -1
+            return mutated
+
+    # ---------- team-level selection (H13) ----------
+    def _lcb(self, s_, n_, p0):
+        return (s_ + p0) / (n_ + 1) - 1 / np.sqrt(n_ + 1)
+
+    def record_team(self, members, succ):
+        if len(members) != 3:
+            return
+        g = self.tag_g[members]
+        if self.cfg.inherit == "team" and g[0] >= 0 and g[0] == g[1] == g[2] \
+                and len(set(self.tag_slot[members].tolist())) == 3:
+            st = self.geno[int(g[0])]
+        else:
+            key = tuple(sorted(int(i) for i in members))
+            st = self.tri.setdefault(key, [0.0, 0.0, tuple(int(self.epoch[i]) for i in key)])
+            if st[2] != tuple(int(self.epoch[i]) for i in key):          # a member was replaced since
+                st[:] = [0.0, 0.0, tuple(int(self.epoch[i]) for i in key)]
+        st[0] += succ; st[1] += 1
+
+    def reproduce_teams(self, env):
+        """Copy the best teams as a unit over the least valuable primitives. With inherit="team" all copies
+        of a team share one genotype id and one pooled success record."""
+        cfg, N, rg = self.cfg, self.N, self.rng_inherit
+        R = int(round(cfg.inherit_frac * N / 3))
+        if R < 1:
+            return
+        pool = cfg.inherit == "team"
+        p0 = self.team_succ_sum / self.team_n if self.team_n else 0.5
+        cand = []
+        for g, st in self.geno.items():
+            cand.append((self._lcb(st[0], st[1], p0), 0, g))
+        for key, st in self.tri.items():
+            if st[1] > 0 and st[2] == tuple(int(self.epoch[i]) for i in key):
+                cand.append((self._lcb(st[0], st[1], p0), 1, key))
+        cand.sort(key=lambda c: -c[0])
+        parents, used = [], set()
+        for _, kind, key in cand:
+            if len(parents) >= R:
+                break
+            if kind == 0:                         # one random instance of each slot of the genotype
+                inst = []
+                for slot in range(3):
+                    w = np.where((self.tag_g == key) & (self.tag_slot == slot))[0]
+                    if len(w) == 0:
+                        break
+                    inst.append(int(rg.choice(w)))
+                if len(inst) < 3:
+                    continue
+                team = tuple(inst)
+            else:
+                team = key
+            if used & set(team):
+                continue
+            used |= set(team); parents.append((kind, key, team))
+        if not parents:
+            return
+        # value of a primitive: pooled LCB of its genotype if it has one, else its own LCB
+        val = self._lcb(self.fit_s, self.fit_n, p0)
+        if pool:
+            for g, st in self.geno.items():
+                val[self.tag_g == g] = self._lcb(st[0], st[1], p0)
+        val = val + 1e-9 * rg.random(N)
+        val[list(used)] = np.inf
+        victims = np.argsort(val)[: 3 * len(parents)]
+        for k, (kind, key, team) in enumerate(parents):
+            kids = [int(v) for v in victims[3 * k: 3 * k + 3]]
+            if len(kids) < 3:
+                break
+            if pool:
+                if kind == 0:
+                    g = key
+                else:                             # a new genotype is founded by this team
+                    g = self.next_g; self.next_g += 1
+                    st = self.tri.pop(key); self.geno[g] = [st[0], st[1]]
+                    for slot, i in enumerate(team):
+                        self.tag_g[i] = g; self.tag_slot[i] = slot
+            for slot, (pp, cc) in enumerate(zip(team, kids)):
+                mutated = self._clone(pp, cc, env)
+                if pool and not mutated:
+                    self.tag_g[cc] = g; self.tag_slot[cc] = self.tag_slot[pp]
+            if not pool:                          # parent and child triples share the evidence
+                st = self.tri[key]; st[0] /= 2; st[1] /= 2
+                ck = tuple(sorted(kids))
+                self.tri[ck] = [st[0], st[1], tuple(int(self.epoch[i]) for i in ck)]
+        if len(self.tri) > 50_000:                # drop stale entries
+            self.tri = {k: v for k, v in self.tri.items() if v[2] == tuple(int(self.epoch[i]) for i in k)}
 
 
 def clusters(W, thr=0.4):
