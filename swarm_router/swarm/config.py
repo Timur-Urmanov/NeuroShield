@@ -26,6 +26,10 @@ class SwarmConfig:
     #     current team); w_prior (mean_* rules): w0 (random initial W) | mean (running mean team success)
     #     defaults since H9d: conditional + mean; every experiment before H9d is pinned to independent + w0
     recruit_rule: str = "conditional"
+    # H14 (conditional recruitment only): link of a candidate to the team = mean | min over members;
+    #      sim_weight fixed (s) | evidence (s / (1 + fewest joint tasks with a team member))
+    recruit_agg: str = "mean"
+    sim_weight: str = "fixed"
     w_prior: str = "mean"
     sim_w: float = 0.5            # s in score = (1-s)*W[leader] + s*sim
     recruit_thr: float = 0.25     # minimum recruit score

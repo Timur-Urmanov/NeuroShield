@@ -148,7 +148,13 @@ class Swarm:
             elif cfg.recruit_rule == "conditional":
                 bonus = sc - ((1 - cfg.sim_w) * Wl + cfg.sim_w * sim)       # exploration term, if any
                 for _ in range(cfg.team - 1):
-                    c = (1 - cfg.sim_w) * Wrows(members).mean(0) + cfg.sim_w * sim + bonus
+                    Wt = Wrows(members)
+                    link = Wt.min(0) if cfg.recruit_agg == "min" else Wt.mean(0)
+                    if cfg.sim_weight == "evidence" and not factor:
+                        sw = cfg.sim_w / (1 + self.nW_pair[members].min(0))
+                    else:
+                        sw = cfg.sim_w
+                    c = (1 - sw) * link + sw * sim + bonus
                     c[~free] = -1; c[members] = -1
                     j = int(np.argmax(c))
                     if c[j] <= cfg.recruit_thr:
