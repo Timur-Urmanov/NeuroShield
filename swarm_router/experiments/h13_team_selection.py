@@ -1,4 +1,5 @@
 """H13: team-level selection (notes/hypotheses.md).
+NOTE: pinned to inherit_mut_known=True (how H13/H14 were run; found by review to leak mutation information).
   --stage dev                 rho sweep on dev seeds 100-104, N=640
   --stage test --rho X        seeds 0-4, N in 40..2560 (checkpointed); `none`/`full` come from H12 results"""
 import argparse, json, os, time
@@ -86,7 +87,7 @@ def main():
         for cname in ("roles common", "by type + busy 8"):
             env = EnvConfig(T=a.T, **CELLS[cname])
             V = {"none": SwarmConfig(N=N)}
-            V.update({f"team rho={r}": SwarmConfig(N=N, inherit="team", inherit_frac=r) for r in RHO})
+            V.update({f"team rho={r}": SwarmConfig(N=N, inherit="team", inherit_frac=r, inherit_mut_known=True) for r in RHO})
             for v, cfg in V.items():
                 for sd in seeds:
                     specs.append((env, cfg, sd)); keys.append((cname, N, v, sd))
@@ -105,7 +106,7 @@ def main():
             env = EnvConfig(T=a.T, **ck_)
             for v in ("team", "team_nopool"):
                 for sd in seeds:
-                    specs.append((env, SwarmConfig(N=N, inherit=v, inherit_frac=a.rho), sd)); keys.append((cname, N, v, sd))
+                    specs.append((env, SwarmConfig(N=N, inherit=v, inherit_frac=a.rho, inherit_mut_known=True), sd)); keys.append((cname, N, v, sd))
     table = collect(run(specs, keys, os.path.join(ROOT, ".cache", f"h13_test_T{a.T}.jsonl"), a.workers))
     for c, byN in table.items():
         print(f"\n## {c}")

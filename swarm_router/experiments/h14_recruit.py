@@ -18,7 +18,8 @@ for cname, ck in CELLS.items():
                 for sw in ("fixed", "evidence"):
                     if agg_ == "mean" and sw == "fixed":
                         continue
-                    cfg = SwarmConfig(N=N, inherit=inh, inherit_frac=0.02, recruit_agg=agg_, sim_weight=sw)
+                    cfg = SwarmConfig(N=N, inherit=inh, inherit_frac=0.02, recruit_agg=agg_, sim_weight=sw,
+                                      inherit_mut_known=True)   # as run; see the review note in notes/hypotheses.md
                     for sd in seeds:
                         specs.append((env, cfg, sd)); keys.append((cname, N, f"{inh}|{agg_}|{sw}", sd))
 table = collect(run(specs, keys, os.path.join(ROOT, ".cache", f"h14_T{a.T}.jsonl"), a.workers))

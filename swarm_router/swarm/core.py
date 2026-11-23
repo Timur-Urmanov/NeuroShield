@@ -392,7 +392,7 @@ class Swarm:
                         self.tag_g[i] = g; self.tag_slot[i] = slot
             for slot, (pp, cc) in enumerate(zip(team, kids)):
                 mutated = self._clone(pp, cc, env)
-                if pool and not mutated:
+                if pool and not (mutated and cfg.inherit_mut_known):
                     self.tag_g[cc] = g; self.tag_slot[cc] = self.tag_slot[pp]
             if not pool:                          # parent and child triples share the evidence
                 st = self.tri[key]; st[0] /= 2; st[1] /= 2

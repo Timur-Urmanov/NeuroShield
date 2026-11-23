@@ -56,6 +56,9 @@ class SwarmConfig:
     inherit_every: int = 100      # tasks between generations
     inherit_frac: float = 0.02    # fraction of primitives replaced per generation
     inherit_mut: float = 0.05     # probability that a child's hidden role is random
+    # True = the swarm is told which children mutated and keeps them out of the genotype. That is hidden-role
+    # information (review of H14); H13/H14 were run with True, everything later uses False.
+    inherit_mut_known: bool = False
 
 
 # Defaults of the original swarm.py constructor minus Kuramoto. Legacy rows with kuramoto=True are
