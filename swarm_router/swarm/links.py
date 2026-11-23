@@ -40,7 +40,9 @@ class FactorLinks:
         """All pairs (N, N): only the centralised baseline needs this. O(N^2 d)."""
         p, q = self.vecs(None, x)
         A = p @ q.T
-        return p0 + self.b[:, None] + self.b[None, :] + 0.5 * (A + A.T)
+        A += A.T; A *= 0.5; A += p0
+        A += self.b[:, None]; A += self.b[None, :]
+        return A
 
     def update(self, team, succ: float, p0: float, x) -> None:
         team = np.asarray(team)

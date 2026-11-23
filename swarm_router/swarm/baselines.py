@@ -136,7 +136,7 @@ class TeamPolicy:
             # centralised counterpart of the swarm's computed links (H11): same model and update rule,
             # but the best free pair is chosen globally, then the third by mean link to the team.
             p0 = self.succ_sum / self.succ_n if self.succ_n else 0.5
-            E = self.fl.full(x, p0) + 1e-9 * self.rng.random((N, N))
+            E = self.fl.full(x, p0)          # real-valued predictions: no tie-break noise needed (O(N^2) saved)
             np.fill_diagonal(E, -np.inf)
             if avail is not None:
                 E[~avail] = -np.inf; E[:, ~avail] = -np.inf
