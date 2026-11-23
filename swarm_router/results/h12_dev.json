@@ -1,0 +1,992 @@
+{
+ "experiment": "h12_dev",
+ "git_commit": "d482680",
+ "argv": [
+  "experiments/h12_inherit.py",
+  "--stage",
+  "dev",
+  "--workers",
+  "2"
+ ],
+ "created": "2026-11-23T14:46:01",
+ "T": 8000,
+ "seeds": [
+  100,
+  101,
+  102,
+  103,
+  104
+ ],
+ "N": 640,
+ "table": {
+  "roles common": {
+   "640": {
+    "none": {
+     "per_seed": [
+      {
+       "pre": 0.486515,
+       "post": 0.503235,
+       "cover_start": 0.385,
+       "cover_end": 0.629,
+       "q_end": 0.7366941249999998,
+       "team_size": 3.0,
+       "pop": {
+        "active_frac": 0.75,
+        "load_gini": 0.7051197916666667,
+        "births": 0,
+        "lineages": 640,
+        "largest_lineage_frac": 0.0015625,
+        "distinct_leaders": 372,
+        "min_role_share": 0.3328125,
+        "max_role_share": 0.3343749999999999
+       },
+       "ms_per_step": 0.2992613911628723
+      },
+      {
+       "pre": 0.43531499999999995,
+       "post": 0.50513,
+       "cover_start": 0.354,
+       "cover_end": 0.61,
+       "q_end": 0.7307922499999998,
+       "team_size": 3.0,
+       "pop": {
+        "active_frac": 0.8453125,
+        "load_gini": 0.66191875,
+        "births": 0,
+        "lineages": 640,
+        "largest_lineage_frac": 0.0015625,
+        "distinct_leaders": 420,
+        "min_role_share": 0.3328125,
+        "max_role_share": 0.3343749999999999
+       },
+       "ms_per_step": 0.2778233289718628
+      },
+      {
+       "pre": 0.45643999999999996,
+       "post": 0.5370199999999999,
+       "cover_start": 0.392,
+       "cover_end": 0.649,
+       "q_end": 0.7437098749999997,
+       "team_size": 3.0,
+       "pop": {
+        "active_frac": 0.7171875,
+        "load_gini": 0.7192953125,
+        "births": 0,
+        "lineages": 640,
+        "largest_lineage_frac": 0.0015625,
+        "distinct_leaders": 350,
+        "min_role_share": 0.3328125,
+        "max_role_share": 0.3343749999999999
+       },
+       "ms_per_step": 0.23808380961418152
+      },
+      {
+       "pre": 0.477125,
+       "post": 0.514005,
+       "cover_start": 0.377,
+       "cover_end": 0.636,
+       "q_end": 0.7384064999999999,
+       "team_size": 3.0,
+       "pop": {
+        "active_frac": 0.79375,
+        "load_gini": 0.6875973958333333,
+        "births": 0,
+        "lineages": 640,
+        "largest_lineage_frac": 0.0015625,
+        "distinct_leaders": 384,
+        "min_role_share": 0.3328125,
+        "max_role_share": 0.3343749999999999
+       },
+       "ms_per_step": 0.2587406635284424
+      },
+      {
+       "pre": 0.46934999999999993,
+       "post": 0.50401,
+       "cover_start": 0.3,
+       "cover_end": 0.629,
+       "q_end": 0.7358961249999998,
+       "team_size": 3.0,
+       "pop": {
+        "active_frac": 0.790625,
+        "load_gini": 0.6937989583333334,
+        "births": 0,
+        "lineages": 640,
+        "largest_lineage_frac": 0.0015625,
+        "distinct_leaders": 382,
+        "min_role_share": 0.3328125,
+        "max_role_share": 0.3343749999999999
+       },
+       "ms_per_step": 0.2369409203529358
+      }
+     ],
+     "pre": 0.464949,
+     "pre_sd": 0.019895308303718256,
+     "post": 0.51268,
+     "post_sd": 0.014279098798593688,
+     "cover_end": 0.6306,
+     "cover_end_sd": 0.014117365193264654,
+     "q_end": 0.7370997749999999,
+     "q_end_sd": 0.004658303046879017,
+     "team_size": 3.0,
+     "team_size_sd": 0.0,
+     "ms_per_step": 0.26217002272605894,
+     "pop": {
+      "active_frac": 0.779375,
+      "load_gini": 0.6935460416666667,
+      "births": 0.0,
+      "lineages": 640.0,
+      "largest_lineage_frac": 0.0015625,
+      "distinct_leaders": 381.6,
+      "min_role_share": 0.3328125,
+      "max_role_share": 0.3343749999999999
+     }
+    },
+    "full rho=0.005": {
+     "per_seed": [
+      {
+       "pre": 0.444135,
+       "post": 0.499125,
+       "cover_start": 0.416,
+       "cover_end": 0.6585,
+       "q_end": 0.7463116874999999,
+       "team_size": 3.0,
+       "pop": {
+        "active_frac": 0.959375,
+        "load_gini": 0.4881494791666667,
+        "births": 240,
+        "lineages": 400,
+        "largest_lineage_frac": 0.06875,
+        "distinct_leaders": 510,
+        "min_role_share": 0.3125,
+        "max_role_share": 0.3531250000000001
+       },
+       "ms_per_step": 0.27578651905059814
+      },
+      {
+       "pre": 0.472775,
+       "post": 0.49844499999999997,
+       "cover_start": 0.402,
+       "cover_end": 0.647,
+       "q_end": 0.7415818749999998,
+       "team_size": 3.0,
+       "pop": {
+        "active_frac": 0.9734375,
+        "load_gini": 0.49065,
+        "births": 240,
+        "lineages": 400,
+        "largest_lineage_frac": 0.0984375,
+        "distinct_leaders": 522,
+        "min_role_share": 0.3109375,
+        "max_role_share": 0.3625
+       },
+       "ms_per_step": 0.2733398377895355
+      },
+      {
+       "pre": 0.46159500000000003,
+       "post": 0.52922,
+       "cover_start": 0.384,
+       "cover_end": 0.642,
+       "q_end": 0.7392044999999998,
+       "team_size": 3.0,
+       "pop": {
+        "active_frac": 0.9359375,
+        "load_gini": 0.4940161458333333,
+        "births": 240,
+        "lineages": 400,
+        "largest_lineage_frac": 0.078125,
+        "distinct_leaders": 498,
+        "min_role_share": 0.3140625,
+        "max_role_share": 0.3499999999999999
+       },
+       "ms_per_step": 0.25529396533966064
+      },
+      {
+       "pre": 0.450005,
+       "post": 0.515795,
+       "cover_start": 0.362,
+       "cover_end": 0.633,
+       "q_end": 0.7373591249999998,
+       "team_size": 3.0,
+       "pop": {
+        "active_frac": 0.96875,
+        "load_gini": 0.4701020833333333,
+        "births": 240,
+        "lineages": 400,
+        "largest_lineage_frac": 0.0515625,
+        "distinct_leaders": 522,
+        "min_role_share": 0.3265625,
+        "max_role_share": 0.340625
+       },
+       "ms_per_step": 0.2587319016456604
+      },
+      {
+       "pre": 0.44991499999999995,
+       "post": 0.5133249999999999,
+       "cover_start": 0.269,
+       "cover_end": 0.6245,
+       "q_end": 0.7349734374999998,
+       "team_size": 3.0,
+       "pop": {
+        "active_frac": 0.975,
+        "load_gini": 0.4691625,
+        "births": 240,
+        "lineages": 400,
+        "largest_lineage_frac": 0.040625,
+        "distinct_leaders": 520,
+        "min_role_share": 0.328125,
+        "max_role_share": 0.3421874999999999
+       },
+       "ms_per_step": 0.25282022356987
+      }
+     ],
+     "pre": 0.455685,
+     "pre_sd": 0.011466843506388331,
+     "post": 0.511182,
+     "post_sd": 0.012833979117950926,
+     "cover_end": 0.641,
+     "cover_end_sd": 0.013033610397737051,
+     "q_end": 0.7398861249999998,
+     "q_end_sd": 0.004334404850068489,
+     "team_size": 3.0,
+     "team_size_sd": 0.0,
+     "ms_per_step": 0.26319448947906493,
+     "pop": {
+      "active_frac": 0.9625,
+      "load_gini": 0.48241604166666663,
+      "births": 240.0,
+      "lineages": 400.0,
+      "largest_lineage_frac": 0.0675,
+      "distinct_leaders": 514.4,
+      "min_role_share": 0.31843750000000004,
+      "max_role_share": 0.3496875
+     }
+    },
+    "full rho=0.02": {
+     "per_seed": [
+      {
+       "pre": 0.45597999999999994,
+       "post": 0.50896,
+       "cover_start": 0.338,
+       "cover_end": 0.6325,
+       "q_end": 0.7378994374999998,
+       "team_size": 3.0,
+       "pop": {
+        "active_frac": 0.9875,
+        "load_gini": 0.3325416666666667,
+        "births": 1040,
+        "lineages": 120,
+        "largest_lineage_frac": 0.071875,
+        "distinct_leaders": 552,
+        "min_role_share": 0.315625,
+        "max_role_share": 0.3453125000000001
+       },
+       "ms_per_step": 0.27405285835266113
+      },
+      {
+       "pre": 0.453,
+       "post": 0.5233450000000001,
+       "cover_start": 0.346,
+       "cover_end": 0.684,
+       "q_end": 0.7563614999999998,
+       "team_size": 3.0,
+       "pop": {
+        "active_frac": 0.9890625,
+        "load_gini": 0.34818229166666664,
+        "births": 1040,
+        "lineages": 104,
+        "largest_lineage_frac": 0.121875,
+        "distinct_leaders": 559,
+        "min_role_share": 0.3046875,
+        "max_role_share": 0.359375
+       },
+       "ms_per_step": 0.2710251212120056
+      },
+      {
+       "pre": 0.45856499999999994,
+       "post": 0.5425049999999999,
+       "cover_start": 0.359,
+       "cover_end": 0.7265,
+       "q_end": 0.7695866874999997,
+       "team_size": 3.0,
+       "pop": {
+        "active_frac": 0.9875,
+        "load_gini": 0.31032291666666667,
+        "births": 1040,
+        "lineages": 93,
+        "largest_lineage_frac": 0.084375,
+        "distinct_leaders": 555,
+        "min_role_share": 0.3234375,
+        "max_role_share": 0.3484375
+       },
+       "ms_per_step": 0.27698469161987305
+      },
+      {
+       "pre": 0.46187,
+       "post": 0.55882,
+       "cover_start": 0.308,
+       "cover_end": 0.7825,
+       "q_end": 0.7872756874999998,
+       "team_size": 3.0,
+       "pop": {
+        "active_frac": 0.990625,
+        "load_gini": 0.32218020833333333,
+        "births": 1040,
+        "lineages": 80,
+        "largest_lineage_frac": 0.1640625,
+        "distinct_leaders": 568,
+        "min_role_share": 0.3125,
+        "max_role_share": 0.3499999999999999
+       },
+       "ms_per_step": 0.2811209261417389
+      },
+      {
+       "pre": 0.46547,
+       "post": 0.5168799999999999,
+       "cover_start": 0.28,
+       "cover_end": 0.612,
+       "q_end": 0.7319227499999997,
+       "team_size": 3.0,
+       "pop": {
+        "active_frac": 0.9859375,
+        "load_gini": 0.3525786458333333,
+        "births": 1040,
+        "lineages": 120,
+        "largest_lineage_frac": 0.0796875,
+        "distinct_leaders": 571,
+        "min_role_share": 0.3234375,
+        "max_role_share": 0.346875
+       },
+       "ms_per_step": 0.2700176239013672
+      }
+     ],
+     "pre": 0.45897699999999997,
+     "pre_sd": 0.004883768524408179,
+     "post": 0.530102,
+     "post_sd": 0.02028558866535551,
+     "cover_end": 0.6875,
+     "cover_end_sd": 0.06943252119864293,
+     "q_end": 0.7566092124999998,
+     "q_end_sd": 0.022739756040349453,
+     "team_size": 3.0,
+     "team_size_sd": 0.0,
+     "ms_per_step": 0.2746402442455292,
+     "pop": {
+      "active_frac": 0.9881249999999999,
+      "load_gini": 0.33316114583333334,
+      "births": 1040.0,
+      "lineages": 103.4,
+      "largest_lineage_frac": 0.104375,
+      "distinct_leaders": 561.0,
+      "min_role_share": 0.31593750000000004,
+      "max_role_share": 0.35
+     }
+    },
+    "full rho=0.05": {
+     "per_seed": [
+      {
+       "pre": 0.43451,
+       "post": 0.517905,
+       "cover_start": 0.258,
+       "cover_end": 0.6715,
+       "q_end": 0.7510165624999997,
+       "team_size": 3.0,
+       "pop": {
+        "active_frac": 0.9953125,
+        "load_gini": 0.2899744791666667,
+        "births": 2560,
+        "lineages": 77,
+        "largest_lineage_frac": 0.090625,
+        "distinct_leaders": 577,
+        "min_role_share": 0.3171875,
+        "max_role_share": 0.3531250000000001
+       },
+       "ms_per_step": 0.2920299470424652
+      },
+      {
+       "pre": 0.48244999999999993,
+       "post": 0.5339949999999999,
+       "cover_start": 0.302,
+       "cover_end": 0.736,
+       "q_end": 0.7727869999999998,
+       "team_size": 3.0,
+       "pop": {
+        "active_frac": 0.9953125,
+        "load_gini": 0.28323125,
+        "births": 2560,
+        "lineages": 66,
+        "largest_lineage_frac": 0.0921875,
+        "distinct_leaders": 580,
+        "min_role_share": 0.3203125,
+        "max_role_share": 0.340625
+       },
+       "ms_per_step": 0.30614370107650757
+      },
+      {
+       "pre": 0.44118499999999994,
+       "post": 0.531895,
+       "cover_start": 0.289,
+       "cover_end": 0.6135,
+       "q_end": 0.7330948124999997,
+       "team_size": 3.0,
+       "pop": {
+        "active_frac": 0.990625,
+        "load_gini": 0.3242875,
+        "births": 2560,
+        "lineages": 73,
+        "largest_lineage_frac": 0.10625,
+        "distinct_leaders": 565,
+        "min_role_share": 0.3140625,
+        "max_role_share": 0.3453125000000001
+       },
+       "ms_per_step": 0.2984108626842499
+      },
+      {
+       "pre": 0.4160849999999999,
+       "post": 0.5114249999999999,
+       "cover_start": 0.238,
+       "cover_end": 0.5555,
+       "q_end": 0.7110833124999999,
+       "team_size": 3.0,
+       "pop": {
+        "active_frac": 0.996875,
+        "load_gini": 0.3113869791666667,
+        "births": 2560,
+        "lineages": 81,
+        "largest_lineage_frac": 0.096875,
+        "distinct_leaders": 595,
+        "min_role_share": 0.328125,
+        "max_role_share": 0.340625
+       },
+       "ms_per_step": 0.290610134601593
+      },
+      {
+       "pre": 0.44578999999999996,
+       "post": 0.490245,
+       "cover_start": 0.192,
+       "cover_end": 0.568,
+       "q_end": 0.7186227499999998,
+       "team_size": 3.0,
+       "pop": {
+        "active_frac": 0.9890625,
+        "load_gini": 0.30530677083333335,
+        "births": 2560,
+        "lineages": 69,
+        "largest_lineage_frac": 0.1390625,
+        "distinct_leaders": 580,
+        "min_role_share": 0.309375,
+        "max_role_share": 0.346875
+       },
+       "ms_per_step": 0.29809150099754333
+      }
+     ],
+     "pre": 0.44400399999999995,
+     "pre_sd": 0.024283935379176082,
+     "post": 0.5170929999999999,
+     "post_sd": 0.017736808337465892,
+     "cover_end": 0.6289,
+     "cover_end_sd": 0.07519757309913665,
+     "q_end": 0.7373208874999998,
+     "q_end_sd": 0.025006534382654017,
+     "team_size": 3.0,
+     "team_size_sd": 0.0,
+     "ms_per_step": 0.2970572292804718,
+     "pop": {
+      "active_frac": 0.9934375000000001,
+      "load_gini": 0.30283739583333336,
+      "births": 2560.0,
+      "lineages": 73.2,
+      "largest_lineage_frac": 0.10500000000000001,
+      "distinct_leaders": 579.4,
+      "min_role_share": 0.3178125,
+      "max_role_share": 0.3453125
+     }
+    }
+   }
+  },
+  "by type + busy 8": {
+   "640": {
+    "none": {
+     "per_seed": [
+      {
+       "pre": 0.4254,
+       "post": 0.49578999999999995,
+       "cover_start": 0.325,
+       "cover_end": 0.588,
+       "q_end": 0.7228454999999999,
+       "team_size": 3.0,
+       "pop": {
+        "active_frac": 0.75625,
+        "load_gini": 0.6788348958333333,
+        "births": 0,
+        "lineages": 640,
+        "largest_lineage_frac": 0.0015625,
+        "distinct_leaders": 372,
+        "min_role_share": 0.3328125,
+        "max_role_share": 0.3343749999999999
+       },
+       "ms_per_step": 0.2654774487018585
+      },
+      {
+       "pre": 0.43439,
+       "post": 0.49156999999999995,
+       "cover_start": 0.372,
+       "cover_end": 0.577,
+       "q_end": 0.7170766249999998,
+       "team_size": 3.0,
+       "pop": {
+        "active_frac": 0.8484375,
+        "load_gini": 0.6405286458333334,
+        "births": 0,
+        "lineages": 640,
+        "largest_lineage_frac": 0.0015625,
+        "distinct_leaders": 428,
+        "min_role_share": 0.3328125,
+        "max_role_share": 0.3343749999999999
+       },
+       "ms_per_step": 0.267740398645401
+      },
+      {
+       "pre": 0.43411,
+       "post": 0.496735,
+       "cover_start": 0.339,
+       "cover_end": 0.5465,
+       "q_end": 0.7080409375,
+       "team_size": 3.0,
+       "pop": {
+        "active_frac": 0.7484375,
+        "load_gini": 0.6843838541666667,
+        "births": 0,
+        "lineages": 640,
+        "largest_lineage_frac": 0.0015625,
+        "distinct_leaders": 374,
+        "min_role_share": 0.3328125,
+        "max_role_share": 0.3343749999999999
+       },
+       "ms_per_step": 0.28768274188041687
+      },
+      {
+       "pre": 0.45053499999999996,
+       "post": 0.46496499999999996,
+       "cover_start": 0.37,
+       "cover_end": 0.531,
+       "q_end": 0.7029453749999998,
+       "team_size": 3.0,
+       "pop": {
+        "active_frac": 0.81875,
+        "load_gini": 0.6581520833333333,
+        "births": 0,
+        "lineages": 640,
+        "largest_lineage_frac": 0.0015625,
+        "distinct_leaders": 398,
+        "min_role_share": 0.3328125,
+        "max_role_share": 0.3343749999999999
+       },
+       "ms_per_step": 0.285129189491272
+      },
+      {
+       "pre": 0.44241499999999995,
+       "post": 0.48363999999999996,
+       "cover_start": 0.332,
+       "cover_end": 0.546,
+       "q_end": 0.7081822499999998,
+       "team_size": 3.0,
+       "pop": {
+        "active_frac": 0.796875,
+        "load_gini": 0.6548140625,
+        "births": 0,
+        "lineages": 640,
+        "largest_lineage_frac": 0.0015625,
+        "distinct_leaders": 391,
+        "min_role_share": 0.3328125,
+        "max_role_share": 0.3343749999999999
+       },
+       "ms_per_step": 0.2886928617954254
+      }
+     ],
+     "pre": 0.4373699999999999,
+     "pre_sd": 0.009507341242429433,
+     "post": 0.4865399999999999,
+     "post_sd": 0.013121471430445597,
+     "cover_end": 0.5577,
+     "cover_end_sd": 0.02380021008310638,
+     "q_end": 0.7118181374999998,
+     "q_end_sd": 0.007991671393208792,
+     "team_size": 3.0,
+     "team_size_sd": 0.0,
+     "ms_per_step": 0.27894452810287473,
+     "pop": {
+      "active_frac": 0.79375,
+      "load_gini": 0.6633427083333333,
+      "births": 0.0,
+      "lineages": 640.0,
+      "largest_lineage_frac": 0.0015625,
+      "distinct_leaders": 392.6,
+      "min_role_share": 0.3328125,
+      "max_role_share": 0.3343749999999999
+     }
+    },
+    "full rho=0.005": {
+     "per_seed": [
+      {
+       "pre": 0.46223499999999995,
+       "post": 0.475775,
+       "cover_start": 0.291,
+       "cover_end": 0.585,
+       "q_end": 0.7215986249999998,
+       "team_size": 3.0,
+       "pop": {
+        "active_frac": 0.9515625,
+        "load_gini": 0.4687385416666667,
+        "births": 240,
+        "lineages": 400,
+        "largest_lineage_frac": 0.040625,
+        "distinct_leaders": 507,
+        "min_role_share": 0.325,
+        "max_role_share": 0.3411458333333333
+       },
+       "ms_per_step": 0.26859113574028015
+      },
+      {
+       "pre": 0.43903499999999995,
+       "post": 0.50472,
+       "cover_start": 0.338,
+       "cover_end": 0.5575,
+       "q_end": 0.7125130624999997,
+       "team_size": 3.0,
+       "pop": {
+        "active_frac": 0.965625,
+        "load_gini": 0.4747177083333333,
+        "births": 240,
+        "lineages": 400,
+        "largest_lineage_frac": 0.0671875,
+        "distinct_leaders": 536,
+        "min_role_share": 0.30833333333333335,
+        "max_role_share": 0.35781250000000003
+       },
+       "ms_per_step": 0.2701088786125183
+      },
+      {
+       "pre": 0.443125,
+       "post": 0.51776,
+       "cover_start": 0.341,
+       "cover_end": 0.6005,
+       "q_end": 0.7268936874999998,
+       "team_size": 3.0,
+       "pop": {
+        "active_frac": 0.9578125,
+        "load_gini": 0.46196041666666665,
+        "births": 240,
+        "lineages": 400,
+        "largest_lineage_frac": 0.0546875,
+        "distinct_leaders": 520,
+        "min_role_share": 0.2989583333333334,
+        "max_role_share": 0.36302083333333335
+       },
+       "ms_per_step": 0.28586599230766296
+      },
+      {
+       "pre": 0.4589899999999999,
+       "post": 0.50695,
+       "cover_start": 0.365,
+       "cover_end": 0.5895,
+       "q_end": 0.7226210624999999,
+       "team_size": 3.0,
+       "pop": {
+        "active_frac": 0.9671875,
+        "load_gini": 0.45819791666666665,
+        "births": 240,
+        "lineages": 400,
+        "largest_lineage_frac": 0.046875,
+        "distinct_leaders": 528,
+        "min_role_share": 0.29843749999999997,
+        "max_role_share": 0.3848958333333334
+       },
+       "ms_per_step": 0.27100858092308044
+      },
+      {
+       "pre": 0.4564599999999999,
+       "post": 0.4870649999999999,
+       "cover_start": 0.315,
+       "cover_end": 0.5595,
+       "q_end": 0.7145413124999997,
+       "team_size": 3.0,
+       "pop": {
+        "active_frac": 0.9625,
+        "load_gini": 0.462440625,
+        "births": 240,
+        "lineages": 400,
+        "largest_lineage_frac": 0.034375,
+        "distinct_leaders": 527,
+        "min_role_share": 0.3,
+        "max_role_share": 0.3557291666666667
+       },
+       "ms_per_step": 0.2997201979160309
+      }
+     ],
+     "pre": 0.45196899999999995,
+     "pre_sd": 0.01025132881630472,
+     "post": 0.498454,
+     "post_sd": 0.016794439332707724,
+     "cover_end": 0.5784,
+     "cover_end_sd": 0.01903417978269619,
+     "q_end": 0.7196335499999998,
+     "q_end_sd": 0.005960884418571069,
+     "team_size": 3.0,
+     "team_size_sd": 0.0,
+     "ms_per_step": 0.2790589570999146,
+     "pop": {
+      "active_frac": 0.9609375,
+      "load_gini": 0.4652110416666667,
+      "births": 240.0,
+      "lineages": 400.0,
+      "largest_lineage_frac": 0.04875,
+      "distinct_leaders": 523.6,
+      "min_role_share": 0.30614583333333334,
+      "max_role_share": 0.36052083333333335
+     }
+    },
+    "full rho=0.02": {
+     "per_seed": [
+      {
+       "pre": 0.40513,
+       "post": 0.520115,
+       "cover_start": 0.274,
+       "cover_end": 0.5875,
+       "q_end": 0.7233858124999998,
+       "team_size": 3.0,
+       "pop": {
+        "active_frac": 0.990625,
+        "load_gini": 0.3135203125,
+        "births": 1040,
+        "lineages": 132,
+        "largest_lineage_frac": 0.06875,
+        "distinct_leaders": 580,
+        "min_role_share": 0.284375,
+        "max_role_share": 0.36614583333333334
+       },
+       "ms_per_step": 0.2941981256008148
+      },
+      {
+       "pre": 0.39250999999999997,
+       "post": 0.484065,
+       "cover_start": 0.276,
+       "cover_end": 0.4895,
+       "q_end": 0.6919313124999998,
+       "team_size": 3.0,
+       "pop": {
+        "active_frac": 0.9828125,
+        "load_gini": 0.3504265625,
+        "births": 1040,
+        "lineages": 115,
+        "largest_lineage_frac": 0.1234375,
+        "distinct_leaders": 562,
+        "min_role_share": 0.21770833333333336,
+        "max_role_share": 0.4401041666666667
+       },
+       "ms_per_step": 0.2928024232387543
+      },
+      {
+       "pre": 0.41256999999999994,
+       "post": 0.5127449999999999,
+       "cover_start": 0.295,
+       "cover_end": 0.5965,
+       "q_end": 0.7235354374999998,
+       "team_size": 3.0,
+       "pop": {
+        "active_frac": 0.984375,
+        "load_gini": 0.33589166666666664,
+        "births": 1040,
+        "lineages": 114,
+        "largest_lineage_frac": 0.0640625,
+        "distinct_leaders": 553,
+        "min_role_share": 0.23020833333333332,
+        "max_role_share": 0.43645833333333334
+       },
+       "ms_per_step": 0.2889242470264435
+      },
+      {
+       "pre": 0.453345,
+       "post": 0.49234999999999995,
+       "cover_start": 0.3,
+       "cover_end": 0.6965,
+       "q_end": 0.7582151874999998,
+       "team_size": 3.0,
+       "pop": {
+        "active_frac": 0.9921875,
+        "load_gini": 0.3196171875,
+        "births": 1040,
+        "lineages": 113,
+        "largest_lineage_frac": 0.0828125,
+        "distinct_leaders": 557,
+        "min_role_share": 0.2546875,
+        "max_role_share": 0.4036458333333333
+       },
+       "ms_per_step": 0.3152814507484436
+      },
+      {
+       "pre": 0.40765999999999997,
+       "post": 0.48684499999999997,
+       "cover_start": 0.27,
+       "cover_end": 0.4855,
+       "q_end": 0.6886728124999999,
+       "team_size": 3.0,
+       "pop": {
+        "active_frac": 0.9890625,
+        "load_gini": 0.344659375,
+        "births": 1040,
+        "lineages": 133,
+        "largest_lineage_frac": 0.1109375,
+        "distinct_leaders": 558,
+        "min_role_share": 0.278125,
+        "max_role_share": 0.3744791666666667
+       },
+       "ms_per_step": 0.2987267076969147
+      }
+     ],
+     "pre": 0.4142429999999999,
+     "pre_sd": 0.023078514250271843,
+     "post": 0.49922400000000006,
+     "post_sd": 0.016198287872488233,
+     "cover_end": 0.5711,
+     "cover_end_sd": 0.08750028571381925,
+     "q_end": 0.7171481124999998,
+     "q_end_sd": 0.028341406031331815,
+     "team_size": 3.0,
+     "team_size_sd": 0.0,
+     "ms_per_step": 0.2979865908622742,
+     "pop": {
+      "active_frac": 0.9878125000000001,
+      "load_gini": 0.3328230208333333,
+      "births": 1040.0,
+      "lineages": 121.4,
+      "largest_lineage_frac": 0.09,
+      "distinct_leaders": 562.0,
+      "min_role_share": 0.25302083333333336,
+      "max_role_share": 0.4041666666666666
+     }
+    },
+    "full rho=0.05": {
+     "per_seed": [
+      {
+       "pre": 0.403145,
+       "post": 0.50703,
+       "cover_start": 0.249,
+       "cover_end": 0.561,
+       "q_end": 0.7136186249999998,
+       "team_size": 3.0,
+       "pop": {
+        "active_frac": 0.990625,
+        "load_gini": 0.30135677083333334,
+        "births": 2560,
+        "lineages": 82,
+        "largest_lineage_frac": 0.15625,
+        "distinct_leaders": 586,
+        "min_role_share": 0.2421875,
+        "max_role_share": 0.40781249999999997
+       },
+       "ms_per_step": 0.3301960825920105
+      },
+      {
+       "pre": 0.43860000000000005,
+       "post": 0.522875,
+       "cover_start": 0.246,
+       "cover_end": 0.6625,
+       "q_end": 0.7480739374999998,
+       "team_size": 3.0,
+       "pop": {
+        "active_frac": 0.9921875,
+        "load_gini": 0.30857135416666664,
+        "births": 2560,
+        "lineages": 66,
+        "largest_lineage_frac": 0.084375,
+        "distinct_leaders": 569,
+        "min_role_share": 0.2859375,
+        "max_role_share": 0.4010416666666667
+       },
+       "ms_per_step": 0.30399489402770996
+      },
+      {
+       "pre": 0.434525,
+       "post": 0.5445699999999999,
+       "cover_start": 0.253,
+       "cover_end": 0.649,
+       "q_end": 0.7402186249999998,
+       "team_size": 3.0,
+       "pop": {
+        "active_frac": 0.9953125,
+        "load_gini": 0.2814,
+        "births": 2560,
+        "lineages": 80,
+        "largest_lineage_frac": 0.1390625,
+        "distinct_leaders": 578,
+        "min_role_share": 0.2578125,
+        "max_role_share": 0.4192708333333333
+       },
+       "ms_per_step": 0.3325946629047394
+      },
+      {
+       "pre": 0.40334,
+       "post": 0.5063349999999999,
+       "cover_start": 0.262,
+       "cover_end": 0.5985,
+       "q_end": 0.7252644374999998,
+       "team_size": 3.0,
+       "pop": {
+        "active_frac": 0.990625,
+        "load_gini": 0.30975260416666667,
+        "births": 2560,
+        "lineages": 79,
+        "largest_lineage_frac": 0.1875,
+        "distinct_leaders": 585,
+        "min_role_share": 0.26875,
+        "max_role_share": 0.4421875
+       },
+       "ms_per_step": 0.3368019163608551
+      },
+      {
+       "pre": 0.38836499999999996,
+       "post": 0.4814399999999999,
+       "cover_start": 0.266,
+       "cover_end": 0.487,
+       "q_end": 0.6893461249999999,
+       "team_size": 3.0,
+       "pop": {
+        "active_frac": 0.9921875,
+        "load_gini": 0.3028625,
+        "births": 2560,
+        "lineages": 85,
+        "largest_lineage_frac": 0.090625,
+        "distinct_leaders": 574,
+        "min_role_share": 0.24479166666666666,
+        "max_role_share": 0.3984375
+       },
+       "ms_per_step": 0.29767051339149475
+      }
+     ],
+     "pre": 0.41359500000000005,
+     "pre_sd": 0.02187598769198779,
+     "post": 0.51245,
+     "post_sd": 0.023284999194760556,
+     "cover_end": 0.5916,
+     "cover_end_sd": 0.07114544960853084,
+     "q_end": 0.7233043499999999,
+     "q_end_sd": 0.02318642609712459,
+     "team_size": 3.0,
+     "team_size_sd": 0.0,
+     "ms_per_step": 0.32025161385536194,
+     "pop": {
+      "active_frac": 0.9921875,
+      "load_gini": 0.3007886458333333,
+      "births": 2560.0,
+      "lineages": 78.4,
+      "largest_lineage_frac": 0.13156249999999997,
+      "distinct_leaders": 578.4,
+      "min_role_share": 0.2598958333333333,
+      "max_role_share": 0.41374999999999995
+     }
+    }
+   }
+  }
+ },
+ "best_rho": 0.05
+}
