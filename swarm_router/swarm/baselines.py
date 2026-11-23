@@ -83,22 +83,27 @@ class SparsePairMean:
     def state_size(self):
         return int(sum(self.m))
 
-    def choose(self, t, x, avail=None):
+    def choose(self, t, x, avail=None, pen=None):
+        """pen (H19): per-primitive cost of a remote call; None = single node. Unvisited pairs are then drawn
+        among zero-cost (local) primitives first, and every estimate is reduced by the cost of its members."""
         c = self.ctx = self.clusters.assign(x)
         N, m, rng = self.N, self.m[c], self.rng
         av = np.ones(N, bool) if avail is None else avail
+        pz = np.zeros(N) if pen is None else pen
+        pool = np.where(av & (pz == 0))[0]                        # where unvisited candidates come from
+        if len(pool) < self.team:
+            pool = np.where(av)[0]
         p0 = self.succ_sum / self.succ_n if self.succ_n else 0.5
         team = None
         if m:
             A, B = self.A[c][:m], self.B[c][:m]
-            est = np.where(av[A] & av[B], (self.s[c][:m] + p0) / (self.n[c][:m] + 1), -np.inf)
+            est = np.where(av[A] & av[B], (self.s[c][:m] + p0) / (self.n[c][:m] + 1) - pz[A] - pz[B], -np.inf)
             j = int(np.argmax(est))
             if est[j] > p0:
                 team = [int(A[j]), int(B[j])]
         if team is None:
-            free = np.where(av)[0]
             for _ in range(50):                                   # a random free unvisited pair
-                a, b = (int(v) for v in rng.choice(free, size=2, replace=False))
+                a, b = (int(v) for v in rng.choice(pool, size=2, replace=False))
                 if (min(a, b), max(a, b)) not in self.idx[c]:
                     break
             team = [a, b]
@@ -110,23 +115,24 @@ class SparsePairMean:
                         sc.setdefault(j, {})[a] = (self.s[c][row] + p0) / (self.n[c][row] + 1)
             best, bv = None, -np.inf
             for j, d in sc.items():
-                v = (sum(d.values()) + p0 * (len(team) - len(d))) / len(team)
+                v = (sum(d.values()) + p0 * (len(team) - len(d))) / len(team) - pz[j]
                 if v > bv:
                     best, bv = j, v
             if best is None or bv <= p0:
-                free = np.where(av)[0]
+                cand = None
                 for _ in range(50):                               # a random free node unknown to the team
-                    j = int(rng.choice(free))
+                    j = int(rng.choice(pool))
                     if j not in team and j not in sc:
-                        best = j
+                        cand = j
                         break
-                if best is None:
-                    best = int(next(j for j in free if j not in team))
+                if cand is None and best is None:
+                    cand = int(next(j for j in np.where(av)[0] if j not in team))
+                best = cand if cand is not None else best
             team.append(best)
         return np.array(team)
 
-    def update(self, team, succ):
-        c = self.ctx
+    def update(self, team, succ, x=None):
+        c = self.ctx if x is None else self.clusters.assign(x)    # x given: an outcome reported from another node
         self.succ_sum += succ; self.succ_n += 1
         for i in range(len(team)):
             for k in range(i + 1, len(team)):
@@ -140,6 +146,55 @@ class SparsePairMean:
                     self.idx[c][(a, b)] = row; self.A[c][row] = a; self.B[c][row] = b
                     self.nb[c].setdefault(a, {})[b] = row; self.nb[c].setdefault(b, {})[a] = row
                 self.s[c][row] += succ; self.n[c][row] += 1
+
+
+class NodeBandits:
+    """Distributed setting (H19). kind:
+      central_sparse - one SparsePairMean with all outcomes (needs a call to the centre per task; charged by the caller)
+      node_sparse    - one per node over all primitives; a node learns from tasks that arrived at it or used its primitives
+      shard_sparse   - one per node, local primitives only (no communication)
+      node_random    - random free local team;  node_oracle - per role a free local primitive, else a remote one
+    eps: probability of a decision that ignores the remote-call cost (exploration of remote partners)."""
+    def __init__(self, kind, N, team, rng, env, eps=0.0):
+        self.kind, self.N, self.team, self.rng, self.env, self.eps = kind, N, team, rng, env, eps
+        P = 1 if kind == "central_sparse" else env.nodes
+        self.b = [SparsePairMean(N, team, rng) for _ in range(P)] if kind.endswith("sparse") else []
+
+    @property
+    def state_size(self):
+        return int(sum(b.state_size for b in self.b))
+
+    def choose(self, t, x, avail=None):
+        env, k = self.env, self.team
+        h = int(env.home[t]); local = env.node == h
+        av = np.ones(self.N, bool) if avail is None else avail
+        self._h, self._x = h, x
+        if self.kind == "node_random":
+            free = np.where(av & local)[0]
+            return self.rng.choice(free if len(free) >= k else np.where(av)[0], size=k, replace=False)
+        if self.kind == "node_oracle":
+            role, team = env.roles_at(t), []
+            for j in range(k):
+                for mask in (av & local & (role == j), av & (role == j), av & local, av):
+                    cand = np.setdiff1d(np.where(mask)[0], team)
+                    if len(cand):
+                        break
+                team.append(int(self.rng.choice(cand)))
+            return np.array(team)
+        if self.kind == "shard_sparse":
+            return self.b[h].choose(t, x, av & local if (av & local).sum() >= k else av)
+        pen = None if (self.eps and self.rng.random() < self.eps) else env.comm_cost * (~local)
+        return self.b[0 if self.kind == "central_sparse" else h].choose(t, x, av, pen)
+
+    def update(self, team, succ):
+        if not self.b:
+            return
+        if self.kind == "central_sparse":
+            return self.b[0].update(team, succ)
+        self.b[self._h].update(team, succ)
+        if self.kind == "node_sparse":
+            for n in set(int(v) for v in self.env.node[np.asarray(team)]) - {self._h}:
+                self.b[n].update(team, succ, self._x)
 
 
 class TeamPolicy:
@@ -282,7 +337,7 @@ class TeamPolicy:
 
 
 def run_router(env_cfg, seed, N=40, model="linucb", team="solo", team_size=3, c=0.3,
-               alpha=0.4, gamma=0.995, lr=0.05, team_gamma=1.0, reset_at=None, role_k=None):
+               alpha=0.4, gamma=0.995, lr=0.05, team_gamma=1.0, reset_at=None, role_k=None, eps=0.0):
     """Returns dict(R=rewards, q=team factor, cover=coverage).
     team_gamma / reset_at: forgetting in the team policy (H16). role_k: replace the hidden roles (K x N) by a
     given population, e.g. the one a swarm with inheritance ended with (H16c)."""
@@ -294,6 +349,8 @@ def run_router(env_cfg, seed, N=40, model="linucb", team="solo", team_size=3, c=
     lin = LinUCB(env.M, env.D, alpha, gamma) if model == "linucb" else None
     if team == "cluster_pair_mean_sparse":
         tp = SparsePairMean(N, team_size, rng)
+    elif team in ("central_sparse", "node_sparse", "shard_sparse", "node_random", "node_oracle"):
+        tp = NodeBandits(team, N, team_size, rng, env, eps)
     else:
         tp = TeamPolicy(team, N, team_size, rng, env, c, lr=lr, seed=seed, gamma=team_gamma, reset_at=reset_at) \
             if env.kind != "homogeneous" else None
@@ -319,7 +376,7 @@ def run_router(env_cfg, seed, N=40, model="linucb", team="solo", team_size=3, c=
             tp.update(members, succ)
             COV[t] = float(env.coverage(members, t))
         R[t], Q[t] = r, q
-    return dict(R=R, q=Q, cover=COV, policy=tp)
+    return dict(R=R, q=Q, cover=COV, policy=tp, env=env)
 
 
 def summary(out, T):

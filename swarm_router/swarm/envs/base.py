@@ -63,6 +63,13 @@ class SimEnv:
     def commit(self, t: int, members) -> None:
         pass
 
+    # distributed setting (H19): None = single node
+    def home_mask(self, t: int):
+        return None
+
+    def remote_pen(self, t: int):
+        return None
+
     def clone(self, src: int, dst: int, mutate: bool, rng) -> None:
         """Inheritance (H12): primitive dst becomes a copy of src. No hidden properties here."""
         pass

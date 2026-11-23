@@ -29,7 +29,8 @@ class RolesEnv(SimEnv):
     kind = "roles"
 
     def __init__(self, T, seed, N=40, role_fractions=None, strong=0.95, weak=0.6, member_cost=0.0,
-                 role_by_type=False, busy=0, role_shift=0.0):
+                 role_by_type=False, busy=0, role_shift=0.0,
+                 nodes=0, comm_cost=0.0, node_skew=0.0):
         super().__init__(T, seed, N, member_cost)
         self.role = assign_roles(N, role_fractions, seed)
         self.strong, self.weak = strong, weak
@@ -46,6 +47,31 @@ class RolesEnv(SimEnv):
         self.busy_until = np.full(N, -1)
         # role_shift (H16): at T/2 the hidden roles of this fraction of primitives are permuted among them
         self.role_shift, self._shifted = role_shift, False
+        # distributed setting (H19)
+        self.nodes, self.comm_cost = nodes, comm_cost
+        if nodes:
+            self.node = np.arange(N) * nodes // N
+            self.home = np.random.default_rng(seed + 2700).integers(nodes, size=T)
+            self.remote_calls = np.zeros(T, int); self._last_remote = 0
+            if node_skew:
+                rs = np.random.default_rng(seed + 2800)
+                for k in range(self.K):
+                    for h in range(nodes):
+                        idx = rs.permutation(np.where(self.node == h)[0])
+                        miss = (h + (k if role_by_type else 0)) % N_ROLES
+                        present = [r for r in range(N_ROLES) if r != miss]
+                        self.role_k[k, idx] = np.array(present)[np.arange(len(idx)) % 2]
+                self.role = self.role_k[0].copy()
+
+    def home_mask(self, t):
+        return self.node == self.home[t] if self.nodes else None
+
+    def remote_pen(self, t):
+        return self.comm_cost * (self.node != self.home[t]) if self.nodes else None
+
+    def reward(self, succ, m, members):
+        r = super().reward(succ, m, members)
+        return r - self.comm_cost * self._last_remote if self.nodes else r
 
     def _shift(self):
         self._shifted = True
@@ -88,6 +114,9 @@ class RolesEnv(SimEnv):
         return self.busy_until < t
 
     def commit(self, t, members):
+        if self.nodes:            # remote calls of the team just committed; charged by reward() for this task
+            self._last_remote = int((self.node[np.asarray(members)] != self.home[t]).sum())
+            self.remote_calls[t] = self._last_remote
         if self.busy:
             self.busy_until[np.asarray(members)] = t + self.busy
 

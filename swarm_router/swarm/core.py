@@ -106,7 +106,11 @@ class Swarm:
         # 1. bids: how much the task looks like "mine"
         bids = (self.aff @ x) * (1 - 0.5 * self.F) + 0.02 * self.rng.normal(size=N)
         bids[~free] = -np.inf
-        leader = int(np.argmax(bids))
+        hm = env.home_mask(t) if hasattr(env, "home_mask") else None     # H19: the leader lives on the task's node
+        if hm is not None and (free & hm).any():
+            leader = int(np.argmax(np.where(hm, bids, -np.inf)))
+        else:
+            leader = int(np.argmax(bids))
 
         # 2. team: score = (1-s) W[leader] + s sim   (legacy multiplied by a phase gate; `* 1.0` keeps
         #    the float result bit-identical to the legacy no-Kuramoto path)
@@ -130,6 +134,9 @@ class Swarm:
                 return R
             Wl = Wrows(leader)[0]
             sc = ((1 - cfg.sim_w) * Wl + cfg.sim_w * sim) * 1.0
+            base_sc = sc
+            if cfg.comm_aware and hasattr(env, "remote_pen") and env.remote_pen(t) is not None:
+                sc = sc - env.remote_pen(t)
             if cfg.explore == "ucb":
                 sc = sc + cfg.explore_c * np.sqrt(np.log(self.t_seen + 2) / (self.n_co[leader] + 1))
             elif cfg.explore == "noise":
@@ -146,7 +153,7 @@ class Swarm:
                     if len(c):
                         members.append(int(c[np.argmax(sc[c])]))
             elif cfg.recruit_rule == "conditional":
-                bonus = sc - ((1 - cfg.sim_w) * Wl + cfg.sim_w * sim)       # exploration term, if any
+                bonus = sc - base_sc       # exploration term and remote-call penalty, if any
                 for _ in range(cfg.team - 1):
                     Wt = Wrows(members)
                     link = Wt.min(0) if cfg.recruit_agg == "min" else Wt.mean(0)

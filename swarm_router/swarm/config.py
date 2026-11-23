@@ -63,6 +63,7 @@ class SwarmConfig:
     # per-primitive fitness; links: pair sums and counts of the mean_* link rules
     forget_geno: float = 1.0
     forget_links: float = 1.0
+    comm_aware: bool = False      # H19: subtract the env's remote-call cost from the score of remote candidates
 
 
 # Defaults of the original swarm.py constructor minus Kuramoto. Legacy rows with kuramoto=True are
@@ -82,6 +83,11 @@ class EnvConfig:
     role_by_type: bool = False    # strong role of a primitive depends on task type
     busy: int = 0                 # steps a primitive stays busy after a task (capacity); 0 = unlimited
     role_shift: float = 0.0       # H16: fraction of primitives whose hidden roles are reshuffled at T/2
+    # H19 (distributed): primitives live on `nodes` nodes, each task arrives at a home node, every team member
+    # from another node costs comm_cost; node_skew=1: every node lacks one role per task type
+    nodes: int = 0
+    comm_cost: float = 0.0
+    node_skew: float = 0.0
 
 
 def to_dict(*cfgs) -> dict:
