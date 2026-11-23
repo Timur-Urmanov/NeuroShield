@@ -1,0 +1,120 @@
+{
+ "experiment": "h19e_control",
+ "git_commit": "56f507d",
+ "argv": [
+  "h19e_control.py"
+ ],
+ "created": "2026-11-23T22:32:46",
+ "test_seeds": [
+  0,
+  1,
+  2,
+  3,
+  4
+ ],
+ "dev_seeds": [
+  100,
+  101,
+  102,
+  103,
+  104
+ ],
+ "table": {
+  "swarm full": {
+   "post": 0.523727,
+   "sd": 0.017893346738382988,
+   "calls": 0.6472,
+   "cover": 0.7824
+  },
+  "shard (migrated)": {
+   "post": 0.531538,
+   "sd": 0.035788665559084484,
+   "calls": 0.0,
+   "cover": 0.6898
+  },
+  "oracle (migrated)": {
+   "post": 0.6183289999999999,
+   "sd": 0.025517184748713978,
+   "calls": 0.0002,
+   "cover": 1.0
+  },
+  "random local (migrated)": {
+   "post": 0.380892,
+   "sd": 0.03027138161696621,
+   "calls": 0.0,
+   "cover": 0.1984
+  },
+  "node eps=0.4 (original)": {
+   "post": 0.423472,
+   "sd": 0.029027036879433643,
+   "calls": 1.3576000000000001,
+   "cover": 0.55
+  },
+  "node eps=0.6 (original)": {
+   "post": 0.437019,
+   "sd": 0.0343547703019537,
+   "calls": 1.6378,
+   "cover": 0.6468
+  },
+  "node eps=0.8 (original)": {
+   "post": 0.443455,
+   "sd": 0.03480253600673376,
+   "calls": 1.7948,
+   "cover": 0.7205999999999999
+  },
+  "node eps=1.0 (original)": {
+   "post": 0.452097,
+   "sd": 0.03475468558338573,
+   "calls": 1.9444,
+   "cover": 0.7818
+  },
+  "node eps=0.0 (migrated)": {
+   "post": 0.531538,
+   "sd": 0.035788665559084484,
+   "calls": 0.0,
+   "cover": 0.6898
+  },
+  "node eps=0.1 (migrated)": {
+   "post": 0.5272889999999999,
+   "sd": 0.04406460504191547,
+   "calls": 0.22640000000000002,
+   "cover": 0.717
+  },
+  "node eps=0.4 (migrated)": {
+   "post": 0.512825,
+   "sd": 0.041411957663216065,
+   "calls": 0.7574,
+   "cover": 0.7238
+  }
+ },
+ "dev_post": {
+  "swarm full": 0.5198419999999999,
+  "shard (migrated)": 0.54064,
+  "oracle (migrated)": 0.618317,
+  "random local (migrated)": 0.37859499999999996,
+  "node eps=0.4 (original)": 0.418992,
+  "node eps=0.6 (original)": 0.44292,
+  "node eps=0.8 (original)": 0.450487,
+  "node eps=1.0 (original)": 0.442767,
+  "node eps=0.0 (migrated)": 0.54064,
+  "node eps=0.1 (migrated)": 0.51971,
+  "node eps=0.4 (migrated)": 0.49755200000000005
+ },
+ "comparisons": {
+  "swarm full - best node bandits on original population [node eps=0.8 (original)]": {
+   "diff": 0.080272,
+   "sd": 0.023490698850821803,
+   "effect": true
+  },
+  "swarm full - best bandit on migrated population [shard (migrated)]": {
+   "diff": -0.007810999999999957,
+   "sd": 0.019019366905867283,
+   "effect": false
+  },
+  "swarm full - shard (migrated)": {
+   "diff": -0.007810999999999957,
+   "sd": 0.019019366905867283,
+   "effect": false
+  }
+ }
+}
