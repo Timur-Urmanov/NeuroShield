@@ -15,6 +15,7 @@ Team policies (only matter in roles/ordered envs; team size = `team`):
   cluster_pair_ucb - online k-means on x (told the number of task types) + one pair_ucb per cluster.
   seq_ucb   - order-aware variant: UCB over *directed* pairs (a acts before b); the sequence is grown
               greedily at the head or tail. Team order = returned order.
+  mf / mf_ctx - centralised version of the swarm's computed links (H11, swarm/links.py).
   pair_mean - centralised version of the swarm's link estimator (neutral prior, greedy, conditional third).
 All team policies respect the env's capacity mask (busy primitives).
   oracle    - a team covering all roles (and in the right order for the ordered env)
@@ -24,6 +25,7 @@ from __future__ import annotations
 import numpy as np
 
 from .envs import make_env
+from .links import FactorLinks
 
 
 class LinUCB:
@@ -63,8 +65,9 @@ class OnlineClusters:
 
 class TeamPolicy:
     """kind in solo | random | oracle | agent_ucb | pair_ucb | cluster_pair_ucb."""
-    def __init__(self, kind, N, team, rng, env, c=0.3, n_clusters=3):
+    def __init__(self, kind, N, team, rng, env, c=0.3, n_clusters=3, lr=0.05, d=4, seed=0):
         self.kind, self.N, self.team, self.rng, self.env, self.c = kind, N, team, rng, env, c
+        self.fl = FactorLinks(N, env.D, d, lr, kind == "mf_ctx", seed) if kind in ("mf", "mf_ctx") else None
         self.t = 0
         self.ctx = 0
         C = n_clusters if kind == "cluster_pair_ucb" else 1
@@ -129,6 +132,21 @@ class TeamPolicy:
                 sc = E[team].mean(0); sc[team] = -np.inf
                 team.append(int(np.argmax(sc)))
             return np.array(team)
+        if self.kind in ("mf", "mf_ctx"):
+            # centralised counterpart of the swarm's computed links (H11): same model and update rule,
+            # but the best free pair is chosen globally, then the third by mean link to the team.
+            p0 = self.succ_sum / self.succ_n if self.succ_n else 0.5
+            E = self.fl.full(x, p0) + 1e-9 * self.rng.random((N, N))
+            np.fill_diagonal(E, -np.inf)
+            if avail is not None:
+                E[~avail] = -np.inf; E[:, ~avail] = -np.inf
+            a, b = np.unravel_index(int(np.argmax(E)), E.shape)
+            team = [int(a), int(b)]
+            while len(team) < k:
+                sc = E[team].mean(0); sc[team] = -np.inf
+                team.append(int(np.argmax(sc)))
+            self._x = x
+            return np.array(team)
         if self.kind == "seq_ucb":
             # directed pairs: n[a, b] counts teams where a acts before b
             U = self._ucb(); np.fill_diagonal(U, -np.inf)
@@ -148,6 +166,8 @@ class TeamPolicy:
 
     def update(self, team, succ):
         self.t += 1
+        if self.kind in ("mf", "mf_ctx"):
+            self.fl.update(team, succ, self.succ_sum / self.succ_n if self.succ_n else 0.5, self._x)
         self.succ_sum += succ; self.succ_n += 1
         if not hasattr(self, "n"):
             return
@@ -166,13 +186,13 @@ class TeamPolicy:
 
 
 def run_router(env_cfg, seed, N=40, model="linucb", team="solo", team_size=3, c=0.3,
-               alpha=0.4, gamma=0.995):
+               alpha=0.4, gamma=0.995, lr=0.05):
     """Returns dict(R=rewards, q=team factor, cover=coverage)."""
     env = make_env(env_cfg, seed, N)
     T = env_cfg.T
     rng = np.random.default_rng(seed + 7)
     lin = LinUCB(env.M, env.D, alpha, gamma) if model == "linucb" else None
-    tp = TeamPolicy(team, N, team_size, rng, env, c) if env.kind != "homogeneous" else None
+    tp = TeamPolicy(team, N, team_size, rng, env, c, lr=lr, seed=seed) if env.kind != "homogeneous" else None
     R = np.zeros(T); Q = np.zeros(T); COV = np.full(T, np.nan)
     for t in range(T):
         x, k, u = env.X[t], env.ks[t], env.U[t]

@@ -20,6 +20,7 @@ from __future__ import annotations
 import numpy as np
 
 from .config import SwarmConfig
+from .links import FactorLinks
 
 
 class Swarm:
@@ -42,6 +43,8 @@ class Swarm:
         self.W0 = self.W.copy()                                # prior for w_rule=mean_* (H8)
         self.nW_pair = np.zeros((N, N)); self.sW_pair = np.zeros((N, N))
         self.s_fast = 0.5                                      # EMA of success (w_rule=hebb_succ)
+        self.fl = (FactorLinks(N, D, cfg.factor_d, cfg.factor_lr, cfg.w_rule == "factor_ctx", seed)
+                   if cfg.w_rule.startswith("factor") else None)
         self.team_succ_sum = 0.0; self.team_n = 0              # running mean team success (w_prior=mean)
         self.t_seen = 0
         self.F = np.zeros(N); self.asleep = np.zeros(N, bool); self.timer = np.zeros(N, int)
@@ -104,12 +107,15 @@ class Swarm:
         if cfg.coupling:
             sim = np.clip(self.aff @ x, 0, None)
             neutral = cfg.w_prior == "mean" and cfg.w_rule.startswith("mean")
-            p0 = (self.team_succ_sum / self.team_n if self.team_n else 0.5) if neutral else None
+            factor = self.fl is not None
+            p0 = (self.team_succ_sum / self.team_n if self.team_n else 0.5) if (neutral or factor) else None
 
             def Wrows(idx):
                 """Rows idx of the effective link matrix (untried pairs -> p0 under the neutral prior).
                 Row-wise on purpose: building the full N x N matrix every step is O(N^2)."""
                 idx = np.atleast_1d(idx)
+                if factor:
+                    return self.fl.rows(idx, x, p0)
                 if not neutral:
                     return self.W[idx]
                 R = np.where(self.nW_pair[idx] > 0, self.W[idx], p0)
@@ -211,6 +217,9 @@ class Swarm:
                     prior = self.team_succ_sum / self.team_n if self.team_n else 0.5
                 self.W[ix] = (self.sW_pair[ix] + prior) / (self.nW_pair[ix] + 1)
                 np.fill_diagonal(self.W, 0)
+        elif rule in ("factor", "factor_ctx"):
+            if len(members) > 1 and cfg.plastic_W:
+                self.fl.update(members, succ, self.team_succ_sum / self.team_n if self.team_n else 0.5, x)
         else:
             raise ValueError(rule)
         if len(members) > 1:

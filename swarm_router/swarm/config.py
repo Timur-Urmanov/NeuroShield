@@ -18,7 +18,10 @@ class SwarmConfig:
     hebb_bias: float = 0.0        # unconditional Hebbian increment (legacy: 0.3); 0 = reward-only Hebb
     # W learning rule (H8): mean_succ (default since H8c: per-pair mean success) | mean_r |
     #   hebb_r (Hebb on r - EMA(r); default up to H8, used by every experiment before H8c) | hebb_succ
+    #   factor | factor_ctx (H11): links computed from per-primitive vectors (swarm/links.py)
     w_rule: str = "mean_succ"
+    factor_d: int = 4
+    factor_lr: float = 0.05
     # H9: recruit_rule independent (each recruit by W[leader]) | conditional (one by one, mean W to the
     #     current team); w_prior (mean_* rules): w0 (random initial W) | mean (running mean team success)
     #     defaults since H9d: conditional + mean; every experiment before H9d is pinned to independent + w0
