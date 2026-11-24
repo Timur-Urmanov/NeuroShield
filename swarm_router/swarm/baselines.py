@@ -190,14 +190,16 @@ class EvolvingBandit:
     Value of a primitive = its best per-cluster LCB. frac = share of the population rewritten per generation.
     nov > 0 (H22): score = LCB - nov * crowd for parents and victims alike, crowd(i) = share of the other
     primitives whose configuration differs from i's in at most one gene (pattern: mean over the triple)."""
-    def __init__(self, mode, N, team, rng, env, frac=0.02, pm=0.1, every=100, seed=0, nov=0.0, beta=1.0):
+    def __init__(self, mode, N, team, rng, env, frac=0.02, pm=0.1, every=100, seed=0, nov=0.0, beta=1.0, victim="contrib"):
         self.mode, self.N, self.team, self.env, self.frac, self.pm, self.every = mode, N, team, env, frac, pm, every
+        self.victim = victim      # H24: contrib | rate | nodrift | noinherit (decomposition of the eviction rule)
         self.beta = beta          # H23: sharpness of the deficit quotas
         self.nov = nov            # H22: weight of the crowding penalty (MER Novelty) in parent and victim scores
         self.b = SparsePairMean(N, team, rng)
         self.rg = np.random.default_rng(seed + 8000)
         C = self.b.C
         self.is_ = np.zeros((C, N)); self.in_ = np.zeros((C, N))
+        self.ctr = np.zeros(N); self.ih_s = np.zeros((C, N)); self.ih_n = np.zeros((C, N))      # H24
         self.cr = np.full(C, 0.5); self.cn = np.full(C, 1.0 / C)      # H23: recent success rate / task share per cluster
         self.tri = {}; self.epoch = np.zeros(N, int); self.t = 0; self.births = 0
 
@@ -216,6 +218,7 @@ class EvolvingBandit:
         b = self.b; b.update(team, succ); c = b.ctx; self.t += 1
         team = [int(i) for i in team]
         self.is_[c, team] += succ; self.in_[c, team] += 1
+        self.ctr[team] += succ - self.cr[c]
         self.cr[c] += 0.001 * (succ - self.cr[c]); self.cn *= 0.999; self.cn[c] += 0.001
         if self.mode == "pattern" and len(team) == 3:
             key = (c, *sorted(team)); ep = tuple(int(self.epoch[i]) for i in key[1:])
@@ -267,7 +270,14 @@ class EvolvingBandit:
                     if len(parents) >= 3 * R:
                         break
             if self.mode in ("colony", "colony_v"):      # victim: least contribution to the colony's successes
-                val = (self.is_ - self.in_ * self.cr[:, None]).sum(0) + 1e-9 * rg.random(N)
+                val = (self.is_ - self.in_ * self.cr[:, None]).sum(0)
+                if self.victim == "rate":            # per use: no usage weight
+                    val = val / (self.in_.sum(0) + 1)
+                elif self.victim == "nodrift":       # against the colony rate at the time of each task
+                    val = self.ctr.copy()
+                elif self.victim == "noinherit":     # own record only, without the inherited half
+                    val = ((self.is_ - self.ih_s) - (self.in_ - self.ih_n) * self.cr[:, None]).sum(0)
+                val = val + 1e-9 * rg.random(N)
             val[parents] = np.inf
             for p, kid in zip(parents, (int(v) for v in np.argsort(val)[: len(parents)])):
                 env.clone(p, kid, bool(rg.random() < self.pm), rg); self._rewrite(kid)
@@ -276,6 +286,7 @@ class EvolvingBandit:
                         if j != kid:
                             _sp_set(b, c, kid, j, b.s[c][row] / 2, b.n[c][row] / 2)
                 self.is_[:, kid] = self.is_[:, p] / 2; self.in_[:, kid] = self.in_[:, p] / 2
+                self.ih_s[:, kid] = self.is_[:, kid]; self.ih_n[:, kid] = self.in_[:, kid]; self.ctr[kid] = self.ctr[p] / 2
             return
         pen = (lambda key: 0.0) if crowd is None else (lambda key: self.nov * float(crowd[list(key[1:])].mean()))
         cand = sorted(((self._lcb(st[0], st[1]) - pen(key), key) for key, st in self.tri.items()
@@ -497,7 +508,7 @@ class TeamPolicy:
 
 
 def run_router(env_cfg, seed, N=40, model="linucb", team="solo", team_size=3, c=0.3,
-               alpha=0.4, gamma=0.995, lr=0.05, team_gamma=1.0, reset_at=None, role_k=None, eps=0.0, frac=0.02, pm=0.1, nov=0.0, beta=1.0):
+               alpha=0.4, gamma=0.995, lr=0.05, team_gamma=1.0, reset_at=None, role_k=None, eps=0.0, frac=0.02, pm=0.1, nov=0.0, beta=1.0, victim="contrib"):
     """Returns dict(R=rewards, q=team factor, cover=coverage).
     team_gamma / reset_at: forgetting in the team policy (H16). role_k: replace the hidden roles (K x N) by a
     given population, e.g. the one a swarm with inheritance ended with (H16c)."""
@@ -510,7 +521,7 @@ def run_router(env_cfg, seed, N=40, model="linucb", team="solo", team_size=3, c=
     if team == "cluster_pair_mean_sparse":
         tp = SparsePairMean(N, team_size, rng)
     elif team.startswith("evo_"):
-        tp = EvolvingBandit(team[4:], N, team_size, rng, env, frac, pm, seed=seed, nov=nov, beta=beta)
+        tp = EvolvingBandit(team[4:], N, team_size, rng, env, frac, pm, seed=seed, nov=nov, beta=beta, victim=victim)
     elif team in ("central_sparse", "node_sparse", "shard_sparse", "node_random", "node_oracle"):
         tp = NodeBandits(team, N, team_size, rng, env, eps)
     else:
