@@ -187,9 +187,12 @@ class EvolvingBandit:
       mode individual - best primitives (LCB of own success, per cluster) are copied over the least valuable ones
       mode pattern    - best triples (LCB of the triple's success in a cluster) are copied as a unit
     A copy is mutated with probability pm (env.clone) and inherits half of the parent's pair statistics.
-    Value of a primitive = its best per-cluster LCB. frac = share of the population rewritten per generation."""
-    def __init__(self, mode, N, team, rng, env, frac=0.02, pm=0.1, every=100, seed=0):
+    Value of a primitive = its best per-cluster LCB. frac = share of the population rewritten per generation.
+    nov > 0 (H22): score = LCB - nov * crowd for parents and victims alike, crowd(i) = share of the other
+    primitives whose configuration differs from i's in at most one gene (pattern: mean over the triple)."""
+    def __init__(self, mode, N, team, rng, env, frac=0.02, pm=0.1, every=100, seed=0, nov=0.0):
         self.mode, self.N, self.team, self.env, self.frac, self.pm, self.every = mode, N, team, env, frac, pm, every
+        self.nov = nov            # H22: weight of the crowding penalty (MER Novelty) in parent and victim scores
         self.b = SparsePairMean(N, team, rng)
         self.rg = np.random.default_rng(seed + 8000)
         C = self.b.C
@@ -228,12 +231,18 @@ class EvolvingBandit:
         N, rg, b, env = self.N, self.rg, self.b, self.env
         R = max(1, int(round(self.frac * N / 3)))
         val = self._lcb(self.is_, self.in_).max(0) + 1e-9 * rg.random(N)
+        crowd = None
+        if self.nov:
+            crowd = ((env.config_distance() <= 1).sum(1) - 1) / (N - 1)
+            val = val - self.nov * crowd
         if self.mode == "random":
             for kid in np.argsort(val)[: 3 * R]:
                 env.randomize(int(kid), rg); self._rewrite(int(kid))
             return
         if self.mode == "individual":
             L = self._lcb(self.is_, self.in_) + 1e-9 * rg.random(self.is_.shape)
+            if crowd is not None:
+                L = L - self.nov * crowd[None, :]
             parents, seen = [], set()
             for flat in np.argsort(-L, axis=None):
                 c, i = divmod(int(flat), N)
@@ -250,7 +259,8 @@ class EvolvingBandit:
                             _sp_set(b, c, kid, j, b.s[c][row] / 2, b.n[c][row] / 2)
                 self.is_[:, kid] = self.is_[:, p] / 2; self.in_[:, kid] = self.in_[:, p] / 2
             return
-        cand = sorted(((self._lcb(st[0], st[1]), key) for key, st in self.tri.items()
+        pen = (lambda key: 0.0) if crowd is None else (lambda key: self.nov * float(crowd[list(key[1:])].mean()))
+        cand = sorted(((self._lcb(st[0], st[1]) - pen(key), key) for key, st in self.tri.items()
                        if st[2] == tuple(int(self.epoch[i]) for i in key[1:])), key=lambda v: -v[0])
         parents, used = [], set()
         for _, key in cand:
@@ -469,7 +479,7 @@ class TeamPolicy:
 
 
 def run_router(env_cfg, seed, N=40, model="linucb", team="solo", team_size=3, c=0.3,
-               alpha=0.4, gamma=0.995, lr=0.05, team_gamma=1.0, reset_at=None, role_k=None, eps=0.0, frac=0.02, pm=0.1):
+               alpha=0.4, gamma=0.995, lr=0.05, team_gamma=1.0, reset_at=None, role_k=None, eps=0.0, frac=0.02, pm=0.1, nov=0.0):
     """Returns dict(R=rewards, q=team factor, cover=coverage).
     team_gamma / reset_at: forgetting in the team policy (H16). role_k: replace the hidden roles (K x N) by a
     given population, e.g. the one a swarm with inheritance ended with (H16c)."""
@@ -482,7 +492,7 @@ def run_router(env_cfg, seed, N=40, model="linucb", team="solo", team_size=3, c=
     if team == "cluster_pair_mean_sparse":
         tp = SparsePairMean(N, team_size, rng)
     elif team.startswith("evo_"):
-        tp = EvolvingBandit(team[4:], N, team_size, rng, env, frac, pm, seed=seed)
+        tp = EvolvingBandit(team[4:], N, team_size, rng, env, frac, pm, seed=seed, nov=nov)
     elif team in ("central_sparse", "node_sparse", "shard_sparse", "node_random", "node_oracle"):
         tp = NodeBandits(team, N, team_size, rng, env, eps)
     else:

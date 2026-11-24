@@ -22,6 +22,11 @@ GRID = {"A fixed": [dict(team="evo_fixed")],
         "P pattern selection": [dict(team="evo_pattern", frac=f, pm=p) for f in FRAC for p in PM],
         "P0 pattern copy, no mutation": [dict(team="evo_pattern", frac=f, pm=0.0) for f in FRAC],
         "S full swarm": [dict(swarm=True, frac=f, pm=p) for f in FRAC for p in PM]}
+NOV = [float(w) for w in ENV_KW.pop("nov", "").split(",") if w]          # H22: adds variants with the crowding penalty
+if NOV:
+    TAG = TAG[:TAG.index("_nov")]                                         # same checkpoint and env as the base run
+    GRID["IN individual + novelty"] = [dict(team="evo_individual", frac=0.05, pm=0.1, nov=w) for w in NOV]
+    GRID["PN pattern + novelty"] = [dict(team="evo_pattern", frac=0.05, pm=0.1, nov=w) for w in NOV]
 
 
 def job(spec):
@@ -69,7 +74,13 @@ if __name__ == "__main__":
             "H20c P - R": paired(c(P), c("R random search")), "H20d P - P0": paired(c(P), c("P0 pattern copy, no mutation")),
             "H20e S - P": paired(c("S full swarm"), c(P)), "I - A": paired(c("I individual selection"), c("A fixed")),
             "I - R": paired(c("I individual selection"), c("R random search")), "S - A": paired(c("S full swarm"), c("A fixed"))}
+    if NOV:
+        PN, IN = "PN pattern + novelty", "IN individual + novelty"
+        cmp_.update({"H22a PN - P": paired(c(PN), c(P)), "H22b PN - A": paired(c(PN), c("A fixed")),
+                     "H22b PN - R": paired(c(PN), c("R random search")), "H22c PN - IN": paired(c(PN), c(IN)),
+                     "IN - I": paired(c(IN), c("I individual selection")), "IN - A": paired(c(IN), c("A fixed")),
+                     "IN - R": paired(c(IN), c("R random search"))})
     for k, v in cmp_.items():
         print(f"  {k}: {v['diff']:+.3f}±{v['sd']:.3f} effect={v['effect']}")
     orc = float(np.mean([res[("A fixed", 0, sd)]["oracle"] for sd in TEST])); print("oracle (perfect population):", round(orc, 3))
-    save("h20_cycle" + TAG, dict(T=T, N=N, busy=BUSY, env_kw=ENV_KW, test_seeds=TEST, dev_seeds=DEV, table=tab, comparisons=cmp_, oracle=orc))
+    save(("h22_novelty" if NOV else "h20_cycle") + TAG, dict(T=T, N=N, busy=BUSY, env_kw=ENV_KW, test_seeds=TEST, dev_seeds=DEV, table=tab, comparisons=cmp_, oracle=orc))

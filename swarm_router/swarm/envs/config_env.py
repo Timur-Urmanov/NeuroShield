@@ -49,3 +49,7 @@ class ConfigEnv(RolesEnv):
     def randomize(self, dst, rng):
         self.genes[dst] = rng.integers(self.A, size=self.L)
         self._recompute(np.array([dst]))
+
+    def config_distance(self):
+        """N x N Hamming distance between configurations (the system writes them, so it may read them)."""
+        return (self.genes[:, None, :] != self.genes[None, :, :]).sum(-1)
