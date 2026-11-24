@@ -7,6 +7,12 @@ from .roles import RolesEnv, assign_roles
 
 
 def make_env(env_cfg, seed: int, N: int):
+    env = _make_env(env_cfg, seed, N)
+    env.shift_at = getattr(env_cfg, "shift_at", 0)
+    return env
+
+
+def _make_env(env_cfg, seed: int, N: int):
     kw = dict(N=N, role_fractions=env_cfg.role_fractions, strong=env_cfg.strong, weak=env_cfg.weak,
               member_cost=env_cfg.member_cost, role_by_type=env_cfg.role_by_type, busy=env_cfg.busy,
               role_shift=getattr(env_cfg, 'role_shift', 0.0), nodes=env_cfg.nodes,

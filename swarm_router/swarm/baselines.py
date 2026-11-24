@@ -202,6 +202,7 @@ class EvolvingBandit:
         self.ctr = np.zeros(N); self.ih_s = np.zeros((C, N)); self.ih_n = np.zeros((C, N))      # H24
         self.cr = np.full(C, 0.5); self.cn = np.full(C, 1.0 / C)      # H23: recent success rate / task share per cluster
         self.tri = {}; self.epoch = np.zeros(N, int); self.t = 0; self.births = 0
+        self.lin = np.arange(N); self.trace_every = 0; self.trace = []      # H25: lineage ids and snapshots (measurement only)
 
     @property
     def state_size(self):
@@ -228,6 +229,8 @@ class EvolvingBandit:
             st[0] += succ; st[1] += 1
         if self.mode != "fixed" and self.t % self.every == 0:
             self._generation()
+        if self.trace_every and self.t % self.trace_every == 0:
+            self.trace.append((self.t, self.env.genes.astype(np.int8), self.lin.copy(), self.epoch.copy()))
 
     def _rewrite(self, kid):
         _sp_drop(self.b, kid); self.epoch[kid] += 1; self.births += 1
@@ -243,7 +246,7 @@ class EvolvingBandit:
             val = val - self.nov * crowd
         if self.mode == "random":
             for kid in np.argsort(val)[: 3 * R]:
-                env.randomize(int(kid), rg); self._rewrite(int(kid))
+                env.randomize(int(kid), rg); self._rewrite(int(kid)); self.lin[kid] = self.N + self.births
             return
         if self.mode in ("individual", "colony", "colony_q", "colony_v"):
             L = self._lcb(self.is_, self.in_) + 1e-9 * rg.random(self.is_.shape)
@@ -280,7 +283,7 @@ class EvolvingBandit:
                 val = val + 1e-9 * rg.random(N)
             val[parents] = np.inf
             for p, kid in zip(parents, (int(v) for v in np.argsort(val)[: len(parents)])):
-                env.clone(p, kid, bool(rg.random() < self.pm), rg); self._rewrite(kid)
+                env.clone(p, kid, bool(rg.random() < self.pm), rg); self._rewrite(kid); self.lin[kid] = self.lin[p]
                 for c in range(b.C):
                     for j, row in list(b.nb[c].get(p, {}).items()):
                         if j != kid:
@@ -305,7 +308,7 @@ class EvolvingBandit:
             team, kids = key[1:], victims[3 * k: 3 * k + 3]
             st = self.tri[key]
             for p, kid in zip(team, kids):
-                env.clone(p, kid, bool(rg.random() < self.pm), rg); self._rewrite(kid)
+                env.clone(p, kid, bool(rg.random() < self.pm), rg); self._rewrite(kid); self.lin[kid] = self.lin[p]
                 self.is_[:, kid] = self.is_[:, p] / 2; self.in_[:, kid] = self.in_[:, p] / 2
             for c in range(b.C):                                  # the copy inherits the triple's pair statistics
                 for u in range(3):
@@ -508,7 +511,7 @@ class TeamPolicy:
 
 
 def run_router(env_cfg, seed, N=40, model="linucb", team="solo", team_size=3, c=0.3,
-               alpha=0.4, gamma=0.995, lr=0.05, team_gamma=1.0, reset_at=None, role_k=None, eps=0.0, frac=0.02, pm=0.1, nov=0.0, beta=1.0, victim="contrib"):
+               alpha=0.4, gamma=0.995, lr=0.05, team_gamma=1.0, reset_at=None, role_k=None, eps=0.0, frac=0.02, pm=0.1, nov=0.0, beta=1.0, victim="contrib", trace_every=0):
     """Returns dict(R=rewards, q=team factor, cover=coverage).
     team_gamma / reset_at: forgetting in the team policy (H16). role_k: replace the hidden roles (K x N) by a
     given population, e.g. the one a swarm with inheritance ended with (H16c)."""
@@ -522,6 +525,7 @@ def run_router(env_cfg, seed, N=40, model="linucb", team="solo", team_size=3, c=
         tp = SparsePairMean(N, team_size, rng)
     elif team.startswith("evo_"):
         tp = EvolvingBandit(team[4:], N, team_size, rng, env, frac, pm, seed=seed, nov=nov, beta=beta, victim=victim)
+        tp.trace_every = trace_every
     elif team in ("central_sparse", "node_sparse", "shard_sparse", "node_random", "node_oracle"):
         tp = NodeBandits(team, N, team_size, rng, env, eps)
     else:

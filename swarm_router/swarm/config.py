@@ -87,6 +87,7 @@ class EnvConfig:
     # from another node costs comm_cost; node_skew=1: every node lacks one role per task type
     genes_L: int = 6              # H20 (kind='config'): genes per primitive configuration
     genes_A: int = 4              # H20: values per gene
+    shift_at: int = 0             # H25: task index of the model regime shift (0 = T/2, as before)
     genes_pow: float = 2.0        # H20: skill = weak + (strong - weak) * (matches / L) ** genes_pow
     nodes: int = 0
     comm_cost: float = 0.0

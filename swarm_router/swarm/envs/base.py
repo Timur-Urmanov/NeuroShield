@@ -51,7 +51,7 @@ class SimEnv:
         self.ks, self.X, self.U = make_stream(T, seed)
 
     def acc(self, t: int):
-        return ACC0 if t < self.T // 2 else ACC1
+        return ACC0 if t < (getattr(self, 'shift_at', 0) or self.T // 2) else ACC1
 
     def team_factor(self, members, t=None) -> float:
         return 1.0
