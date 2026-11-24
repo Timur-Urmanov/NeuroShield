@@ -168,6 +168,16 @@ def _sp_drop(b, i):
         for j, row in b.nb[c].pop(i, {}).items():
             b.nb[c][j].pop(i, None); b.idx[c].pop((min(i, j), max(i, j)), None)
             b.s[c][row] = 0.0; b.n[c][row] = 0.0       # dead row: estimate = p0, never preferred
+        live = len(b.idx[c])
+        if b.m[c] > 4096 and b.m[c] > 2 * live:         # compact dead rows (order kept, so choices are unchanged)
+            rows = np.array(sorted(b.idx[c].values()), int)
+            remap = {int(r): k for k, r in enumerate(rows)}
+            size = max(64, 1 << int(np.ceil(np.log2(live + 1))))
+            for arr in (b.A, b.B, b.s, b.n):
+                new = np.zeros(size, arr[c].dtype); new[:live] = arr[c][rows]; arr[c] = new
+            b.idx[c] = {k: remap[r] for k, r in b.idx[c].items()}
+            b.nb[c] = {a: {j: remap[r] for j, r in d.items()} for a, d in b.nb[c].items()}
+            b.m[c] = live
 
 
 class EvolvingBandit:
