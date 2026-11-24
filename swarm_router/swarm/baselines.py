@@ -202,6 +202,7 @@ class EvolvingBandit:
         self.ctr = np.zeros(N); self.ih_s = np.zeros((C, N)); self.ih_n = np.zeros((C, N))      # H24
         self.cr = np.full(C, 0.5); self.cn = np.full(C, 1.0 / C)      # H23: recent success rate / task share per cluster
         self.tri = {}; self.epoch = np.zeros(N, int); self.t = 0; self.births = 0
+        self.frozen = False       # H26: no further generations (the bandit keeps learning)
         self.lin = np.arange(N); self.trace_every = 0; self.trace = []      # H25: lineage ids and snapshots (measurement only)
 
     @property
@@ -227,7 +228,7 @@ class EvolvingBandit:
             if st is None or st[2] != ep:
                 st = self.tri[key] = [0.0, 0.0, ep]
             st[0] += succ; st[1] += 1
-        if self.mode != "fixed" and self.t % self.every == 0:
+        if self.mode != "fixed" and not self.frozen and self.t % self.every == 0:
             self._generation()
         if self.trace_every and self.t % self.trace_every == 0:
             self.trace.append((self.t, self.env.genes.astype(np.int8), self.lin.copy(), self.epoch.copy()))
@@ -511,7 +512,7 @@ class TeamPolicy:
 
 
 def run_router(env_cfg, seed, N=40, model="linucb", team="solo", team_size=3, c=0.3,
-               alpha=0.4, gamma=0.995, lr=0.05, team_gamma=1.0, reset_at=None, role_k=None, eps=0.0, frac=0.02, pm=0.1, nov=0.0, beta=1.0, victim="contrib", trace_every=0):
+               alpha=0.4, gamma=0.995, lr=0.05, team_gamma=1.0, reset_at=None, role_k=None, eps=0.0, frac=0.02, pm=0.1, nov=0.0, beta=1.0, victim="contrib", trace_every=0, hook=None):
     """Returns dict(R=rewards, q=team factor, cover=coverage).
     team_gamma / reset_at: forgetting in the team policy (H16). role_k: replace the hidden roles (K x N) by a
     given population, e.g. the one a swarm with inheritance ended with (H16c)."""
@@ -553,6 +554,8 @@ def run_router(env_cfg, seed, N=40, model="linucb", team="solo", team_size=3, c=
             tp.update(members, succ)
             COV[t] = float(env.coverage(members, t))
         R[t], Q[t] = r, q
+        if hook is not None:          # measurement / intervention point for experiments (H26)
+            hook(t, tp, env, members, m, succ, q)
     return dict(R=R, q=Q, cover=COV, policy=tp, env=env)
 
 
