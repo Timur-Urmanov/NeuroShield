@@ -1,11 +1,11 @@
 """H20: variation -> selection -> retention over patterns in an env with rewritable configurations
 (notes/hypotheses.md). Hyperparameters of every variant are chosen on dev seeds."""
-import sys
-from concurrent.futures import ProcessPoolExecutor
+import json, os, sys
+from concurrent.futures import ProcessPoolExecutor, as_completed
 
 import numpy as np
 
-from common import save
+from common import ROOT, save
 from h16_shift import DEV, paired
 from swarm import EnvConfig, SwarmConfig, run_swarm
 from swarm.baselines import run_router
@@ -41,8 +41,17 @@ def job(spec):
 
 if __name__ == "__main__":
     keys = [(v, i, sd) for v in GRID for i in range(len(GRID[v])) for sd in [*DEV, *TEST]]
-    with ProcessPoolExecutor(max_workers=4) as ex:
-        res = dict(zip(keys, ex.map(job, keys, chunksize=1)))
+    ck = os.path.join(ROOT, ".cache", f"h20{TAG}.jsonl"); res = {}          # checkpoint: safe to restart
+    if os.path.exists(ck):
+        for line in open(ck):
+            r = json.loads(line); res[tuple(r["key"])] = r["res"]
+    todo = [k for k in keys if k not in res]
+    print(f"{len(res)} from checkpoint, {len(todo)} to do", flush=True)
+    with ProcessPoolExecutor(max_workers=4) as ex, open(ck, "a") as f:
+        futs = {ex.submit(job, k): k for k in todo}
+        for fu in as_completed(futs):
+            k = futs[fu]; res[k] = fu.result()
+            f.write(json.dumps(dict(key=list(k), res=res[k])) + "\n"); f.flush()
     col = lambda v, i, m="post", S=TEST: np.array([res[(v, i, sd)][m] for sd in S])
     chosen, tab = {}, {}
     for v in GRID:
