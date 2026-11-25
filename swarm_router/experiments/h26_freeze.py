@@ -15,6 +15,7 @@ FORKS = tuple(int(x) for x in os.environ.get("H26_FORKS", "400000,600000,800000"
 N, BUSY, BLK = 640, 48, T // 160
 VAR = {"C": dict(team="evo_colony", frac=0.05, pm=0.1, beta=1.0), "NI": dict(team="evo_colony", frac=0.05, pm=0.1, beta=1.0, victim="noinherit"),
        "A": dict(team="evo_fixed")}
+SWITCH = os.environ.get("H26_SWITCH", "") == "1"      # H27: also branch to the noinherit eviction rule at the fork points
 OUT = os.path.join(ROOT, ".cache", os.environ.get("H26_DIR", "h26"))
 KEYS = ("succ", "q_pop", "q_avail", "q_team", "er", "er_best", "min_free", "cap_obs", "good_obs")
 
@@ -40,15 +41,20 @@ class Diag:
             cc = tp.b.ctx; n = tp.in_[cc]; good = (n >= 5) & (tp.is_[cc] > tp.cr[cc] * n)
             a["cap_obs"][b] += (good & av).sum(); a["good_obs"][b] += good.sum()
             if self.tag == "C" and tp.t in FORKS:                        # branch: the child continues with a frozen population
-                pid = os.fork()
-                if pid == 0:
-                    tp.frozen = True; self.tag = f"F{tp.t // 1000}"; self.kids = []
-                else:
+                for kind in ("F", "S") if SWITCH else ("F",):
+                    pid = os.fork()
+                    if pid == 0:
+                        if kind == "F":
+                            tp.frozen = True
+                        else:
+                            tp.victim = "noinherit"                      # H27: evolution continues under the other eviction rule
+                        self.tag = f"{kind}{tp.t // 1000}"; self.kids = []
+                        break
                     self.kids.append(pid)
 
 
 def done(v, seed):
-    tags = [v] + ([f"F{f // 1000}" for f in FORKS] if v == "C" else [])
+    tags = [v] + ([f"{k}{f // 1000}" for f in FORKS for k in ("FS" if SWITCH else "F")] if v == "C" else [])
     return all(os.path.exists(os.path.join(OUT, f"{g}_{seed}.npz")) for g in tags)
 
 
