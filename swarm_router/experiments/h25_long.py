@@ -11,7 +11,7 @@ from swarm.baselines import run_router
 
 T, SHIFT, N, BUSY, SNAP, BLK = 1_600_000, 100_000, 640, 48, 20_000, 10_000
 SEEDS = list(range(20, 30))
-VAR = {"C": dict(team="evo_colony", frac=0.05, pm=0.1, beta=1.0), "A": dict(team="evo_fixed"),
+VAR = {"C": dict(team="evo_colony", frac=0.05, pm=0.1, beta=1.0, victim="contrib"), "A": dict(team="evo_fixed"),
        "PN": dict(team="evo_pattern", frac=0.05, pm=0.1, nov=2.0)}
 OUT = os.path.join(ROOT, ".cache", "h25")
 

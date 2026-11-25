@@ -12,8 +12,8 @@ from swarm.baselines import run_router
 
 T = int(os.environ.get("H26_T", 1_600_000)); SHIFT = int(os.environ.get("H26_SHIFT", 100_000))
 FORKS = tuple(int(x) for x in os.environ.get("H26_FORKS", "400000,600000,800000").split(",") if x)
-N, BUSY, BLK = 640, 48, T // 160
-VAR = {"C": dict(team="evo_colony", frac=0.05, pm=0.1, beta=1.0), "NI": dict(team="evo_colony", frac=0.05, pm=0.1, beta=1.0, victim="noinherit"),
+N, BUSY, GL, BLK = int(os.environ.get("H26_N", 640)), int(os.environ.get("H26_BUSY", 48)), int(os.environ.get("H26_L", 5)), T // 160      # H28: other environments
+VAR = {"C": dict(team="evo_colony", frac=0.05, pm=0.1, beta=1.0, victim="contrib"), "NI": dict(team="evo_colony", frac=0.05, pm=0.1, beta=1.0, victim="noinherit"),
        "A": dict(team="evo_fixed")}
 SWITCH = os.environ.get("H26_SWITCH", "") == "1"      # H27: also branch to the noinherit eviction rule at the fork points
 OUT = os.path.join(ROOT, ".cache", os.environ.get("H26_DIR", "h26"))
@@ -63,7 +63,7 @@ if __name__ == "__main__":
     if done(v, seed):
         sys.exit(0)
     d = Diag(v)
-    o = run_router(EnvConfig("config", T, busy=BUSY, genes_L=5, genes_pow=1.0, shift_at=SHIFT), seed, N=N, model="linucb",
+    o = run_router(EnvConfig("config", T, busy=BUSY, genes_L=GL, genes_pow=1.0, shift_at=SHIFT), seed, N=N, model="linucb",
                    trace_every=T // 80, hook=d, **VAR[v])
     tp, env = o["policy"], o["env"]; f = os.path.join(OUT, f"{d.tag}_{seed}")
     np.savez_compressed(f + ".tmp.npz", R=o["R"].reshape(160, -1).mean(1), q=o["q"].reshape(160, -1).mean(1), blk=BLK,

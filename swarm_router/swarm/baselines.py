@@ -190,9 +190,9 @@ class EvolvingBandit:
     Value of a primitive = its best per-cluster LCB. frac = share of the population rewritten per generation.
     nov > 0 (H22): score = LCB - nov * crowd for parents and victims alike, crowd(i) = share of the other
     primitives whose configuration differs from i's in at most one gene (pattern: mean over the triple)."""
-    def __init__(self, mode, N, team, rng, env, frac=0.02, pm=0.1, every=100, seed=0, nov=0.0, beta=1.0, victim="contrib"):
+    def __init__(self, mode, N, team, rng, env, frac=0.02, pm=0.1, every=100, seed=0, nov=0.0, beta=1.0, victim="noinherit"):
         self.mode, self.N, self.team, self.env, self.frac, self.pm, self.every = mode, N, team, env, frac, pm, every
-        self.victim = victim      # H24: contrib | rate | nodrift | noinherit (decomposition of the eviction rule)
+        self.victim = victim      # H24: contrib | rate | nodrift | noinherit; default noinherit since H27 (contrib before)
         self.beta = beta          # H23: sharpness of the deficit quotas
         self.nov = nov            # H22: weight of the crowding penalty (MER Novelty) in parent and victim scores
         self.b = SparsePairMean(N, team, rng)
@@ -512,7 +512,7 @@ class TeamPolicy:
 
 
 def run_router(env_cfg, seed, N=40, model="linucb", team="solo", team_size=3, c=0.3,
-               alpha=0.4, gamma=0.995, lr=0.05, team_gamma=1.0, reset_at=None, role_k=None, eps=0.0, frac=0.02, pm=0.1, nov=0.0, beta=1.0, victim="contrib", trace_every=0, hook=None):
+               alpha=0.4, gamma=0.995, lr=0.05, team_gamma=1.0, reset_at=None, role_k=None, eps=0.0, frac=0.02, pm=0.1, nov=0.0, beta=1.0, victim="noinherit", trace_every=0, hook=None):
     """Returns dict(R=rewards, q=team factor, cover=coverage).
     team_gamma / reset_at: forgetting in the team policy (H16). role_k: replace the hidden roles (K x N) by a
     given population, e.g. the one a swarm with inheritance ended with (H16c)."""

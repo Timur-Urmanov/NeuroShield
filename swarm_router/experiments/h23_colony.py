@@ -9,9 +9,9 @@ from common import ROOT, save
 from h16_shift import DEV
 import h20_cycle as h
 
-NEW = {"C colony": [dict(team="evo_colony", frac=0.05, pm=0.1, beta=b) for b in (1.0, 4.0)],
+NEW = {"C colony": [dict(team="evo_colony", frac=0.05, pm=0.1, beta=b, victim="contrib") for b in (1.0, 4.0)],
        "Cq quotas only": [dict(team="evo_colony_q", frac=0.05, pm=0.1, beta=1.0)],
-       "Cv victims only": [dict(team="evo_colony_v", frac=0.05, pm=0.1)]}
+       "Cv victims only": [dict(team="evo_colony_v", frac=0.05, pm=0.1, victim="contrib")]}
 h.GRID.update(NEW)
 CTRL = {"A fixed": 0, "R random search": 1, "I individual selection": 2, "P pattern selection": 2,
         "IN individual + novelty": 1, "PN pattern + novelty": 1}
