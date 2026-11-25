@@ -1,0 +1,206 @@
+seeds [30, 31, 32, 33, 34, 35, 36, 37] wall min {'C': 84.33479209889968, 'NI': 41.87804852326711, 'F400': 61.95335019578536, 'F600': 64.30220805307229, 'F800': 61.728807816902794}
+
+reward by 100k block:
+  C     0.307 0.378 0.401 0.421 0.444 0.446 0.461 0.465 0.442 0.415 0.401 0.404 0.392 0.382 0.371 0.355
+  NI    0.338 0.457 0.500 0.521 0.544 0.557 0.569 0.571 0.571 0.570 0.570 0.572 0.568 0.566 0.569 0.568
+  F400  0.307 0.378 0.401 0.421 0.440 0.437 0.435 0.433 0.433 0.429 0.431 0.431 0.431 0.430 0.431 0.430
+  F600  0.307 0.378 0.401 0.421 0.444 0.446 0.459 0.458 0.459 0.454 0.451 0.449 0.449 0.450 0.449 0.450
+  F800  0.307 0.378 0.401 0.421 0.444 0.446 0.461 0.465 0.462 0.462 0.460 0.456 0.451 0.448 0.448 0.451
+
+stage 1 (reward): levels, d32 = S3 - S2, difference to C on S3, level kept since the 100k before freezing
+  C     S1 0.454±0.057 S2 0.415±0.070 S3 0.375±0.044 | d32: -0.0406 sd 0.0511 se 0.0181 t -2.2 wins 1/8 SE=True 2sd=False
+  NI    S1 0.560±0.019 S2 0.571±0.015 S3 0.568±0.014 | d32: -0.0028 sd 0.0068 se 0.0024 t -1.1 wins 3/8 SE=False 2sd=False
+        - C on S3: +0.1931 sd 0.0386 se 0.0136 t 14.2 wins 8/8 SE=True 2sd=True
+        - C on last 100k: +0.2128 sd 0.0332 se 0.0117 t 18.1 wins 8/8 SE=True 2sd=True
+  F400  S1 0.436±0.068 S2 0.431±0.067 S3 0.431±0.066 | d32: -0.0003 sd 0.0059 se 0.0021 t -0.2 wins 4/8 SE=False 2sd=False
+        - C on S3: +0.0560 sd 0.0939 se 0.0332 t 1.7 wins 5/8 SE=False 2sd=False
+        - C on last 100k: +0.0752 sd 0.0807 se 0.0285 t 2.6 wins 6/8 SE=True 2sd=False
+        S3 - level before freeze: +0.0099 sd 0.0187 se 0.0066 t 1.5 wins 6/8 SE=False 2sd=False kept=True
+        first 100k after freeze - before: +0.0192 sd 0.0180 se 0.0064 t 3.0 wins 7/8 SE=True 2sd=False
+  F600  S1 0.452±0.063 S2 0.453±0.066 S3 0.450±0.060 | d32: -0.0036 sd 0.0103 se 0.0036 t -1.0 wins 4/8 SE=False 2sd=False
+        - C on S3: +0.0751 sd 0.0808 se 0.0286 t 2.6 wins 7/8 SE=True 2sd=False
+        - C on last 100k: +0.0954 sd 0.0848 se 0.0300 t 3.2 wins 6/8 SE=True 2sd=False
+        S3 - level before freeze: +0.0042 sd 0.0205 se 0.0072 t 0.6 wins 4/8 SE=False 2sd=False kept=True
+        first 100k after freeze - before: +0.0132 sd 0.0239 se 0.0084 t 1.6 wins 5/8 SE=False 2sd=False
+  F800  S1 0.454±0.057 S2 0.460±0.083 S3 0.450±0.074 | d32: -0.0103 sd 0.0168 se 0.0059 t -1.7 wins 3/8 SE=False 2sd=False
+        - C on S3: +0.0749 sd 0.0835 se 0.0295 t 2.5 wins 7/8 SE=True 2sd=False
+        - C on last 100k: +0.0961 sd 0.0819 se 0.0290 t 3.3 wins 8/8 SE=True 2sd=False
+        S3 - level before freeze: -0.0151 sd 0.0318 se 0.0112 t -1.3 wins 4/8 SE=False 2sd=False kept=False
+        first 100k after freeze - before: -0.0029 sd 0.0344 se 0.0122 t -0.2 wins 4/8 SE=False 2sd=False
+
+stage 2: quality account (q_ideal = 0.857): competence = q_ideal - q_pop, busy = q_pop - q_avail, routing = q_avail - q_team
+  C
+    q_team          S1 0.6628 S2 0.6169 S3 0.5683 | S3-S1: -0.0945 sd 0.0876 se 0.0310 t -3.1 wins 0/8 SE=True 2sd=False
+    competence      S1 0.0704 S2 0.0631 S3 0.0847 | S3-S1: +0.0143 sd 0.0435 se 0.0154 t 0.9 wins 6/8 SE=False 2sd=False
+    busy            S1 0.0345 S2 0.0694 S3 0.0842 | S3-S1: +0.0498 sd 0.0472 se 0.0167 t 3.0 wins 7/8 SE=True 2sd=False
+    routing         S1 0.0896 S2 0.1080 S3 0.1200 | S3-S1: +0.0304 sd 0.0171 se 0.0060 t 5.0 wins 8/8 SE=True 2sd=False
+    model           S1 0.0313 S2 0.0326 S3 0.0340 | S3-S1: +0.0026 sd 0.0032 se 0.0011 t 2.3 wins 5/8 SE=True 2sd=False
+    min_free        S1 2.1417 S2 2.0711 S3 0.4932 | S3-S1: -1.6485 sd 2.0719 se 0.7325 t -2.3 wins 0/8 SE=True 2sd=False
+    cap_obs         S1 171.5283 S2 194.5218 S3 191.5700 | S3-S1: +20.0417 sd 39.0217 se 13.7963 t 1.5 wins 6/8 SE=False 2sd=False
+    good_obs        S1 223.0514 S2 251.8139 S3 253.7001 | S3-S1: +30.6487 sd 47.3381 se 16.7365 t 1.8 wins 6/8 SE=False 2sd=False
+    cat_absent      S1 0.5978 S2 0.5124 S3 0.6088 | S3-S1: +0.0110 sd 0.2438 se 0.0862 t 0.1 wins 4/8 SE=False 2sd=False
+    cat_busy        S1 0.0844 S2 0.1967 S3 0.2365 | S3-S1: +0.1521 sd 0.1278 se 0.0452 t 3.4 wins 7/8 SE=True 2sd=False
+    cat_routing     S1 0.1253 S2 0.1054 S3 0.0608 | S3-S1: -0.0645 sd 0.1017 se 0.0359 t -1.8 wins 2/8 SE=False 2sd=False
+    cat_full        S1 0.1926 S2 0.1855 S3 0.0939 | S3-S1: -0.0986 sd 0.1865 se 0.0659 t -1.5 wins 3/8 SE=False 2sd=False
+    role_absent     S1 0.3423 S2 0.2330 S3 0.2873 | S3-S1: -0.0550 sd 0.1483 se 0.0524 t -1.0 wins 3/8 SE=False 2sd=False
+    role_busy       S1 0.0804 S2 0.1666 S3 0.2012 | S3-S1: +0.1208 sd 0.0980 se 0.0347 t 3.5 wins 8/8 SE=True 2sd=False
+    role_notpicked  S1 0.1474 S2 0.1507 S3 0.1493 | S3-S1: +0.0019 sd 0.0636 se 0.0225 t 0.1 wins 4/8 SE=False 2sd=False
+    role_perfect    S1 0.4299 S2 0.4497 S3 0.3622 | S3-S1: -0.0677 sd 0.1874 se 0.0663 t -1.0 wins 2/8 SE=False 2sd=False
+    succ_absent     S1 0.4244 S2 0.4188 S3 0.4105 | S3-S1: -0.0139 sd 0.1517 se 0.0536 t -0.3 wins 1/8 SE=False 2sd=False
+    succ_busy       S1 0.4121 S2 0.4109 S3 0.3686 | S3-S1: -0.0436 sd 0.1704 se 0.0603 t -0.7 wins 3/8 SE=False 2sd=False
+    succ_routing    S1 0.4555 S2 0.4730 S3 0.4202 | S3-S1: -0.0353 sd 0.1827 se 0.0646 t -0.5 wins 3/8 SE=False 2sd=False
+    succ_full       S1 0.5021 S2 0.6111 S3 0.5233 | S3-S1: +0.0212 sd 0.2722 se 0.0962 t 0.2 wins 4/8 SE=False 2sd=False
+    shares of the S1->S3 drop in q_team: {'competence': 0.15, 'busy': 0.53, 'routing': 0.32} (drop 0.0945)
+  NI
+    q_team          S1 0.7871 S2 0.7989 S3 0.7961 | S3-S1: +0.0090 sd 0.0080 se 0.0028 t 3.2 wins 7/8 SE=True 2sd=False
+    competence      S1 0.0053 S2 0.0004 S3 0.0000 | S3-S1: -0.0053 sd 0.0038 se 0.0013 t -4.0 wins 0/8 SE=True 2sd=False
+    busy            S1 0.0011 S2 0.0000 S3 0.0000 | S3-S1: -0.0011 sd 0.0009 se 0.0003 t -3.3 wins 1/8 SE=True 2sd=False
+    routing         S1 0.0638 S2 0.0581 S3 0.0612 | S3-S1: -0.0026 sd 0.0070 se 0.0025 t -1.1 wins 4/8 SE=False 2sd=False
+    model           S1 0.0282 S2 0.0279 S3 0.0287 | S3-S1: +0.0004 sd 0.0017 se 0.0006 t 0.7 wins 3/8 SE=False 2sd=False
+    min_free        S1 25.6448 S2 36.0488 S3 35.2278 | S3-S1: +9.5830 sd 5.1846 se 1.8331 t 5.2 wins 8/8 SE=True 2sd=False
+    cap_obs         S1 164.0427 S2 166.3544 S3 165.2672 | S3-S1: +1.2245 sd 3.6987 se 1.3077 t 0.9 wins 4/8 SE=False 2sd=False
+    good_obs        S1 212.8547 S2 215.1441 S3 214.1513 | S3-S1: +1.2966 sd 3.6806 se 1.3013 t 1.0 wins 4/8 SE=False 2sd=False
+    cat_absent      S1 0.0768 S2 0.0059 S3 0.0000 | S3-S1: -0.0768 sd 0.0607 se 0.0214 t -3.6 wins 0/8 SE=True 2sd=False
+    cat_busy        S1 0.0109 S2 0.0003 S3 0.0004 | S3-S1: -0.0105 sd 0.0078 se 0.0028 t -3.8 wins 1/8 SE=True 2sd=False
+    cat_routing     S1 0.2843 S2 0.2593 S3 0.2793 | S3-S1: -0.0050 sd 0.0492 se 0.0174 t -0.3 wins 6/8 SE=False 2sd=False
+    cat_full        S1 0.6280 S2 0.7344 S3 0.7203 | S3-S1: +0.0923 sd 0.0613 se 0.0217 t 4.3 wins 7/8 SE=True 2sd=False
+    role_absent     S1 0.0283 S2 0.0020 S3 0.0000 | S3-S1: -0.0283 sd 0.0199 se 0.0070 t -4.0 wins 0/8 SE=True 2sd=False
+    role_busy       S1 0.0044 S2 0.0001 S3 0.0001 | S3-S1: -0.0043 sd 0.0028 se 0.0010 t -4.4 wins 1/8 SE=True 2sd=False
+    role_notpicked  S1 0.1656 S2 0.1379 S3 0.1448 | S3-S1: -0.0209 sd 0.0295 se 0.0104 t -2.0 wins 3/8 SE=False 2sd=False
+    role_perfect    S1 0.8017 S2 0.8600 S3 0.8551 | S3-S1: +0.0534 sd 0.0379 se 0.0134 t 4.0 wins 7/8 SE=True 2sd=False
+    succ_absent     S1 0.1427 S2 0.0138 S3 0.0000 | S3-S1: -0.1427 sd 0.1177 se 0.0416 t -3.4 wins 0/8 SE=True 2sd=False
+    succ_busy       S1 0.2344 S2 0.0500 S3 0.0479 | S3-S1: -0.1865 sd 0.0861 se 0.0304 t -6.1 wins 0/8 SE=True 2sd=True
+    succ_routing    S1 0.5161 S2 0.5041 S3 0.5061 | S3-S1: -0.0100 sd 0.0112 se 0.0040 t -2.5 wins 2/8 SE=True 2sd=False
+    succ_full       S1 0.6924 S2 0.6913 S3 0.6909 | S3-S1: -0.0015 sd 0.0041 se 0.0015 t -1.0 wins 4/8 SE=False 2sd=False
+    shares of the S1->S3 drop in q_team: {'competence': 0.59, 'busy': 0.12, 'routing': 0.29} (drop -0.0090)
+  F400
+    q_team          S1 0.6414 S2 0.6345 S3 0.6334 | S3-S1: -0.0079 sd 0.0145 se 0.0051 t -1.5 wins 2/8 SE=False 2sd=False
+    competence      S1 0.0870 S2 0.0870 S3 0.0870 | S3-S1: +0.0000 sd 0.0001 se 0.0000 t 0.5 wins 3/8 SE=False 2sd=False
+    busy            S1 0.0412 S2 0.0407 S3 0.0429 | S3-S1: +0.0017 sd 0.0066 se 0.0023 t 0.7 wins 5/8 SE=False 2sd=False
+    routing         S1 0.0878 S2 0.0951 S3 0.0940 | S3-S1: +0.0062 sd 0.0172 se 0.0061 t 1.0 wins 5/8 SE=False 2sd=False
+    model           S1 0.0313 S2 0.0316 S3 0.0313 | S3-S1: -0.0000 sd 0.0010 se 0.0004 t -0.0 wins 3/8 SE=False 2sd=False
+    min_free        S1 2.0260 S2 1.9404 S3 1.9413 | S3-S1: -0.0847 sd 0.1315 se 0.0465 t -1.8 wins 0/8 SE=False 2sd=False
+    cap_obs         S1 163.6133 S2 146.0310 S3 125.9230 | S3-S1: -37.6903 sd 23.2954 se 8.2362 t -4.6 wins 0/8 SE=True 2sd=False
+    good_obs        S1 212.8239 S2 193.5317 S3 168.9681 | S3-S1: -43.8559 sd 30.9725 se 10.9504 t -4.0 wins 0/8 SE=True 2sd=False
+    cat_absent      S1 0.7875 S2 0.7873 S3 0.7875 | S3-S1: -0.0000 sd 0.0004 se 0.0001 t -0.0 wins 1/8 SE=False 2sd=False
+    cat_busy        S1 0.0426 S2 0.0657 S3 0.0769 | S3-S1: +0.0342 sd 0.0641 se 0.0227 t 1.5 wins 2/8 SE=False 2sd=False
+    cat_routing     S1 0.0691 S2 0.0403 S3 0.0284 | S3-S1: -0.0406 sd 0.0718 se 0.0254 t -1.6 wins 0/8 SE=False 2sd=False
+    cat_full        S1 0.1008 S2 0.1067 S3 0.1072 | S3-S1: +0.0064 sd 0.0143 se 0.0050 t 1.3 wins 2/8 SE=False 2sd=False
+    role_absent     S1 0.4250 S2 0.4248 S3 0.4250 | S3-S1: +0.0000 sd 0.0003 se 0.0001 t 0.5 wins 2/8 SE=False 2sd=False
+    role_busy       S1 0.1137 S2 0.1163 S3 0.1256 | S3-S1: +0.0119 sd 0.0126 se 0.0045 t 2.7 wins 7/8 SE=True 2sd=False
+    role_notpicked  S1 0.1433 S2 0.1389 S3 0.1276 | S3-S1: -0.0157 sd 0.0121 se 0.0043 t -3.7 wins 1/8 SE=True 2sd=False
+    role_perfect    S1 0.3180 S2 0.3199 S3 0.3217 | S3-S1: +0.0037 sd 0.0044 se 0.0016 t 2.4 wins 6/8 SE=True 2sd=False
+    succ_absent     S1 0.4212 S2 0.4140 S3 0.4142 | S3-S1: -0.0070 sd 0.0123 se 0.0044 t -1.6 wins 2/8 SE=False 2sd=False
+    succ_busy       S1 0.1303 S2 0.1347 S3 0.1342 | S3-S1: +0.0039 sd 0.0087 se 0.0031 t 1.3 wins 2/8 SE=False 2sd=False
+    succ_routing    S1 0.1828 S2 0.1724 S3 0.1622 | S3-S1: -0.0206 sd 0.0416 se 0.0147 t -1.4 wins 1/8 SE=False 2sd=False
+    succ_full       S1 0.1749 S2 0.1750 S3 0.1753 | S3-S1: +0.0003 sd 0.0017 se 0.0006 t 0.5 wins 1/8 SE=False 2sd=False
+    shares of the S1->S3 drop in q_team: {'competence': 0.0, 'busy': 0.22, 'routing': 0.78} (drop 0.0079)
+  F600
+    q_team          S1 0.6598 S2 0.6611 S3 0.6561 | S3-S1: -0.0037 sd 0.0279 se 0.0099 t -0.4 wins 4/8 SE=False 2sd=False
+    competence      S1 0.0777 S2 0.0719 S3 0.0720 | S3-S1: -0.0057 sd 0.0126 se 0.0045 t -1.3 wins 2/8 SE=False 2sd=False
+    busy            S1 0.0320 S2 0.0366 S3 0.0395 | S3-S1: +0.0075 sd 0.0198 se 0.0070 t 1.1 wins 4/8 SE=False 2sd=False
+    routing         S1 0.0878 S2 0.0877 S3 0.0898 | S3-S1: +0.0019 sd 0.0244 se 0.0086 t 0.2 wins 3/8 SE=False 2sd=False
+    model           S1 0.0312 S2 0.0313 S3 0.0309 | S3-S1: -0.0004 sd 0.0010 se 0.0004 t -1.0 wins 2/8 SE=False 2sd=False
+    min_free        S1 1.5297 S2 1.4397 S3 1.2540 | S3-S1: -0.2757 sd 0.7064 se 0.2498 t -1.1 wins 2/8 SE=False 2sd=False
+    cap_obs         S1 167.4121 S2 142.0836 S3 125.8788 | S3-S1: -41.5333 sd 34.2826 se 12.1207 t -3.4 wins 0/8 SE=True 2sd=False
+    good_obs        S1 217.7952 S2 187.2695 S3 168.9146 | S3-S1: -48.8807 sd 41.0804 se 14.5241 t -3.4 wins 0/8 SE=True 2sd=False
+    cat_absent      S1 0.6424 S2 0.6121 S3 0.6125 | S3-S1: -0.0299 sd 0.0825 se 0.0292 t -1.0 wins 5/8 SE=False 2sd=False
+    cat_busy        S1 0.0826 S2 0.1077 S3 0.1184 | S3-S1: +0.0358 sd 0.0791 se 0.0280 t 1.3 wins 3/8 SE=False 2sd=False
+    cat_routing     S1 0.0991 S2 0.0755 S3 0.0603 | S3-S1: -0.0388 sd 0.0386 se 0.0137 t -2.8 wins 0/8 SE=True 2sd=False
+    cat_full        S1 0.1758 S2 0.2047 S3 0.2087 | S3-S1: +0.0329 sd 0.0623 se 0.0220 t 1.5 wins 4/8 SE=False 2sd=False
+    role_absent     S1 0.3656 S2 0.3290 S3 0.3292 | S3-S1: -0.0363 sd 0.0532 se 0.0188 t -1.9 wins 2/8 SE=False 2sd=False
+    role_busy       S1 0.0846 S2 0.1267 S3 0.1417 | S3-S1: +0.0571 sd 0.0798 se 0.0282 t 2.0 wins 5/8 SE=True 2sd=False
+    role_notpicked  S1 0.1372 S2 0.0978 S3 0.0814 | S3-S1: -0.0558 sd 0.0410 se 0.0145 t -3.9 wins 1/8 SE=True 2sd=False
+    role_perfect    S1 0.4126 S2 0.4465 S3 0.4477 | S3-S1: +0.0351 sd 0.0567 se 0.0201 t 1.7 wins 6/8 SE=False 2sd=False
+    succ_absent     S1 0.4321 S2 0.4280 S3 0.4195 | S3-S1: -0.0126 sd 0.0277 se 0.0098 t -1.3 wins 3/8 SE=False 2sd=False
+    succ_busy       S1 0.3414 S2 0.2970 S3 0.2987 | S3-S1: -0.0427 sd 0.0929 se 0.0328 t -1.3 wins 2/8 SE=False 2sd=False
+    succ_routing    S1 0.3990 S2 0.3689 S3 0.3536 | S3-S1: -0.0455 sd 0.0470 se 0.0166 t -2.7 wins 0/8 SE=True 2sd=False
+    succ_full       S1 0.4883 S2 0.5172 S3 0.5188 | S3-S1: +0.0305 sd 0.0722 se 0.0255 t 1.2 wins 4/8 SE=False 2sd=False
+    shares of the S1->S3 drop in q_team: {'competence': -1.54, 'busy': 2.02, 'routing': 0.53} (drop 0.0037)
+  F800
+    q_team          S1 0.6628 S2 0.6691 S3 0.6563 | S3-S1: -0.0065 sd 0.0665 se 0.0235 t -0.3 wins 3/8 SE=False 2sd=False
+    competence      S1 0.0704 S2 0.0519 S3 0.0520 | S3-S1: -0.0185 sd 0.0404 se 0.0143 t -1.3 wins 2/8 SE=False 2sd=False
+    busy            S1 0.0345 S2 0.0451 S3 0.0508 | S3-S1: +0.0163 sd 0.0325 se 0.0115 t 1.4 wins 5/8 SE=False 2sd=False
+    routing         S1 0.0896 S2 0.0912 S3 0.0983 | S3-S1: +0.0086 sd 0.0230 se 0.0081 t 1.1 wins 5/8 SE=False 2sd=False
+    model           S1 0.0313 S2 0.0309 S3 0.0317 | S3-S1: +0.0004 sd 0.0023 se 0.0008 t 0.5 wins 4/8 SE=False 2sd=False
+    min_free        S1 2.1417 S2 1.7437 S3 1.4999 | S3-S1: -0.6418 sd 1.5960 se 0.5643 t -1.1 wins 3/8 SE=False 2sd=False
+    cap_obs         S1 171.5283 S2 167.2793 S3 159.3248 | S3-S1: -12.2035 sd 15.6738 se 5.5415 t -2.2 wins 2/8 SE=True 2sd=False
+    good_obs        S1 223.0514 S2 217.1804 S3 209.5815 | S3-S1: -13.4699 sd 21.5860 se 7.6318 t -1.8 wins 2/8 SE=False 2sd=False
+    cat_absent      S1 0.5978 S2 0.4746 S3 0.4751 | S3-S1: -0.1227 sd 0.2253 se 0.0797 t -1.5 wins 2/8 SE=False 2sd=False
+    cat_busy        S1 0.0844 S2 0.1253 S3 0.1404 | S3-S1: +0.0561 sd 0.1120 se 0.0396 t 1.4 wins 6/8 SE=False 2sd=False
+    cat_routing     S1 0.1253 S2 0.0956 S3 0.0784 | S3-S1: -0.0469 sd 0.0901 se 0.0319 t -1.5 wins 2/8 SE=False 2sd=False
+    cat_full        S1 0.1926 S2 0.3045 S3 0.3061 | S3-S1: +0.1135 sd 0.1403 se 0.0496 t 2.3 wins 7/8 SE=True 2sd=False
+    role_absent     S1 0.3423 S2 0.2331 S3 0.2334 | S3-S1: -0.1089 sd 0.1468 se 0.0519 t -2.1 wins 2/8 SE=True 2sd=False
+    role_busy       S1 0.0804 S2 0.1132 S3 0.1297 | S3-S1: +0.0493 sd 0.0647 se 0.0229 t 2.2 wins 5/8 SE=True 2sd=False
+    role_notpicked  S1 0.1474 S2 0.1298 S3 0.1154 | S3-S1: -0.0320 sd 0.0852 se 0.0301 t -1.1 wins 1/8 SE=False 2sd=False
+    role_perfect    S1 0.4299 S2 0.5239 S3 0.5215 | S3-S1: +0.0916 sd 0.1393 se 0.0493 t 1.9 wins 6/8 SE=False 2sd=False
+    succ_absent     S1 0.4244 S2 0.3990 S3 0.3706 | S3-S1: -0.0537 sd 0.0571 se 0.0202 t -2.7 wins 1/8 SE=True 2sd=False
+    succ_busy       S1 0.4121 S2 0.4025 S3 0.4337 | S3-S1: +0.0216 sd 0.2533 se 0.0895 t 0.2 wins 6/8 SE=False 2sd=False
+    succ_routing    S1 0.4555 S2 0.4304 S3 0.4122 | S3-S1: -0.0433 sd 0.2849 se 0.1007 t -0.4 wins 2/8 SE=False 2sd=False
+    succ_full       S1 0.5021 S2 0.5772 S3 0.6119 | S3-S1: +0.1098 sd 0.3662 se 0.1295 t 0.8 wins 4/8 SE=False 2sd=False
+    shares of the S1->S3 drop in q_team: {'competence': -2.83, 'busy': 2.51, 'routing': 1.33} (drop 0.0065)
+
+H26e: frozen minus C on S3, by component
+  NI: q_team +0.2278 (se 0.0161, t 14.2) | competence -0.0847 (se 0.0144, t -5.9) | busy -0.0842 (se 0.0135, t -6.2) | routing -0.0588 (se 0.0043, t -13.8) | model -0.0053 (se 0.0008, t -6.4) | reward +0.1931 (se 0.0136, t 14.2)
+  F400: q_team +0.0651 (se 0.0385, t 1.7) | competence +0.0023 (se 0.0231, t 0.1) | busy -0.0413 (se 0.0202, t -2.0) | routing -0.0261 (se 0.0096, t -2.7) | model -0.0027 (se 0.0013, t -2.1) | reward +0.0560 (se 0.0332, t 1.7)
+  F600: q_team +0.0878 (se 0.0337, t 2.6) | competence -0.0128 (se 0.0188, t -0.7) | busy -0.0447 (se 0.0201, t -2.2) | routing -0.0303 (se 0.0111, t -2.7) | model -0.0031 (se 0.0013, t -2.4) | reward +0.0751 (se 0.0286, t 2.6)
+  F800: q_team +0.0880 (se 0.0345, t 2.5) | competence -0.0328 (se 0.0159, t -2.1) | busy -0.0334 (se 0.0230, t -1.5) | routing -0.0218 (se 0.0119, t -1.8) | model -0.0023 (se 0.0013, t -1.7) | reward +0.0749 (se 0.0295, t 2.5)
+
+observable proxy vs hidden deficit (within-seed correlation over 10k blocks from 200k, mean over seeds):
+  C: corr(cap_obs, .) = {'busy': 0.44, 'min_free': -0.11, 'q_team': -0.41, 'reward': -0.41}
+  NI: corr(cap_obs, .) = {'busy': -0.0, 'min_free': 0.15, 'q_team': 0.06, 'reward': 0.07}
+/usr/local/lib/python3.13/site-packages/numpy/lib/_function_base_impl.py:3036: RuntimeWarning: invalid value encountered in divide
+  c /= stddev[:, None]
+/usr/local/lib/python3.13/site-packages/numpy/lib/_function_base_impl.py:3037: RuntimeWarning: invalid value encountered in divide
+  c /= stddev[None, :]
+  F400: corr(cap_obs, .) = {'busy': -0.27, 'min_free': nan, 'q_team': -0.24, 'reward': -0.37}
+  F600: corr(cap_obs, .) = {'busy': 0.08, 'min_free': -0.15, 'q_team': -0.46, 'reward': -0.48}
+  F800: corr(cap_obs, .) = {'busy': -0.0, 'min_free': -0.19, 'q_team': -0.31, 'reward': -0.32}
+
+composition (means over seeds at 400k / 600k / 800k / 1.2M / 1.6M):
+  C    eff_cfg         3.97 4.59 3.78 2.47 2.09
+  C    eff_lin         2.49 2.46 2.03 1.66 1.53
+  C    perfect_share   0.48 0.63 0.69 0.69 0.57
+  C    niches          5.12 5.88 6.75 6.50 6.25
+  C    eff_niches      2.13 2.22 2.37 2.63 2.30
+  C    largest_niche   207.88 267.62 302.75 293.38 276.62
+  C    median_niche    6.25 12.00 14.00 14.38 6.75
+  C    niches_ge16     2.75 3.00 4.12 3.38 2.25
+  C    second_niche    43.75 67.12 50.25 68.88 56.38
+  NI   eff_cfg         9.52 8.92 9.13 8.89 8.64
+  NI   eff_lin         3.60 4.00 4.12 3.88 3.96
+  NI   perfect_share   0.67 0.89 0.94 0.95 0.96
+  NI   niches          8.12 9.00 9.00 9.00 9.00
+  NI   eff_niches      5.88 7.39 8.05 8.03 7.88
+  NI   largest_niche   110.00 109.62 106.12 107.38 111.88
+  NI   median_niche    43.25 63.62 65.50 66.88 64.38
+  NI   niches_ge16     7.00 8.50 8.88 9.00 9.00
+  NI   second_niche    83.00 94.12 88.62 92.62 96.12
+  F400 eff_cfg         3.97 3.97 3.97 3.97 3.97
+  F400 eff_lin         2.49 2.49 2.49 2.49 2.49
+  F400 perfect_share   0.48 0.48 0.48 0.48 0.48
+  F400 niches          5.12 5.12 5.12 5.12 5.12
+  F400 eff_niches      2.13 2.13 2.13 2.13 2.13
+  F400 largest_niche   207.88 207.88 207.88 207.88 207.88
+  F400 median_niche    6.25 6.25 6.25 6.25 6.25
+  F400 niches_ge16     2.75 2.75 2.75 2.75 2.75
+  F400 second_niche    43.75 43.75 43.75 43.75 43.75
+  F600 eff_cfg         3.97 4.59 4.59 4.59 4.59
+  F600 eff_lin         2.49 2.46 2.46 2.46 2.46
+  F600 perfect_share   0.48 0.63 0.63 0.63 0.63
+  F600 niches          5.12 5.88 5.88 5.88 5.88
+  F600 eff_niches      2.13 2.22 2.22 2.22 2.22
+  F600 largest_niche   207.88 267.62 267.62 267.62 267.62
+  F600 median_niche    6.25 12.00 12.00 12.00 12.00
+  F600 niches_ge16     2.75 3.00 3.00 3.00 3.00
+  F600 second_niche    43.75 67.12 67.12 67.12 67.12
+  F800 eff_cfg         3.97 4.59 3.78 3.78 3.78
+  F800 eff_lin         2.49 2.46 2.03 2.03 2.03
+  F800 perfect_share   0.48 0.63 0.69 0.69 0.69
+  F800 niches          5.12 5.88 6.75 6.75 6.75
+  F800 eff_niches      2.13 2.22 2.37 2.37 2.37
+  F800 largest_niche   207.88 267.62 302.75 302.75 302.75
+  F800 median_niche    6.25 12.00 14.00 14.00 14.00
+  F800 niches_ge16     2.75 3.00 4.12 4.12 4.12
+  F800 second_niche    43.75 67.12 50.25 50.25 50.25
+saved results/h26_freeze.json
