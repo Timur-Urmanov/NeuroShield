@@ -26,6 +26,8 @@ if os.environ.get("H32_PARAMS"):                                 # H32: n_min,ma
     a_ = os.environ["H32_PARAMS"].split(","); sb.ES_PARAMS.update(n_min=int(a_[0]), max_sub=int(a_[1]), rho=float(a_[2]), timeout=int(a_[3]), evict=a_[4])
     if len(a_) > 5:
         sb.ES_PARAMS.update(pq=a_[5], sub=a_[6])
+    if len(a_) > 7:
+        sb.ES_PARAMS.update(k=float(a_[7]))
 OUT = os.path.join(ROOT, ".cache", os.environ.get("H26_DIR", "h26"))
 KEYS = ("succ", "q_pop", "q_avail", "q_team", "er", "er_best", "min_free", "cap_obs", "good_obs")
 
@@ -123,7 +125,7 @@ if __name__ == "__main__":
     np.savez_compressed(f + ".tmp.npz", R=o["R"].reshape(160, -1).mean(1), q=o["q"].reshape(160, -1).mean(1), blk=BLK,
                         t=np.array([s[0] for s in tp.trace]), genes=np.array([s[1] for s in tp.trace]), lin=np.array([s[2] for s in tp.trace]),
                         epoch=np.array([s[3] for s in tp.trace]), targets=env.targets, genes0=np.random.default_rng(seed + 2900).integers(env.A, size=(N, env.L)),
-                        cat_n=d.cat_n, cat_s=d.cat_s, role=d.role / BLK, conf=d.conf, split=d.split, ev=d.ev, subs=d.subs, alive_perf_age=np.where(d.isperf, T - d.born, -1) if d.isperf is not None else np.zeros(1), vict=d.vict, pop=d.pop, prot=d.prot, vn=d.vn, vuse=d.vuse, vinh=d.vinh, wall=time.time() - d.t0, state=tp.state_size, births=tp.births,
+                        cat_n=d.cat_n, cat_s=d.cat_s, role=d.role / BLK, conf=d.conf, split=d.split, ev=d.ev, subs=d.subs, n_skip=getattr(tp, "n_skip", 0), alive_perf_age=np.where(d.isperf, T - d.born, -1) if d.isperf is not None else np.zeros(1), vict=d.vict, pop=d.pop, prot=d.prot, vn=d.vn, vuse=d.vuse, vinh=d.vinh, wall=time.time() - d.t0, state=tp.state_size, births=tp.births,
                         **{k: x / BLK for k, x in d.a.items()})
     os.replace(f + ".tmp.npz", f + ".npz")
     print(f"{d.tag} seed {seed}: {(time.time() - d.t0) / 60:.1f} min", flush=True)

@@ -180,7 +180,7 @@ def _sp_drop(b, i):
             b.m[c] = live
 
 
-ES_PARAMS = dict(n_min=2, max_sub=3, rho=0.1, timeout=300, evict="mean", pq="flat", sub="parent")
+ES_PARAMS = dict(n_min=2, max_sub=3, rho=0.1, timeout=300, evict="mean", pq="flat", sub="parent", k=1.0)
 # pq: parents by own LCB over all clusters (flat) or the same number from every cluster (equal: plain niching, no deficit signal)
 # sub: a newcomer replaces its parent (parent) or any team member carrying the parent's configuration (config; the
 #      system writes the configurations itself, so comparing them uses no hidden information)      # H32: trial mechanism (set by the experiment before a run)
@@ -218,7 +218,7 @@ class EvolvingBandit:
             self.mode = "colony"
         if self.trial:
             self.tp = dict(ES_PARAMS); self.prob = np.zeros(N, bool); self.own_n = np.zeros(N); self.par = np.full(N, -1)
-            self.born_t = np.zeros(N, int); self.kidq = {}; self.n_sub = 0; self.n_sub_tasks = 0; self.cfgq = {}; self.ref = {}
+            self.born_t = np.zeros(N, int); self.kidq = {}; self.n_sub = 0; self.n_sub_tasks = 0; self.cfgq = {}; self.ref = {}; self.n_skip = 0
         self.frozen = False       # H26: no further generations (the bandit keeps learning)
         self.lin = np.arange(N); self.trace_every = 0; self.trace = []      # H25: lineage ids and snapshots (measurement only)
 
@@ -297,12 +297,15 @@ class EvolvingBandit:
         if self.es_evict == "lcb" and self.tp["evict"] == "mean":      # own success rate over all uses, shrunk to the colony mean
             p0 = self.b.succ_sum / self.b.succ_n if self.b.succ_n else 0.5
             val = (self.is_.sum(0) + p0) / (self.in_.sum(0) + 1) + 1e-9 * rg.random(N)
+        elif self.es_evict == "lcb" and self.tp["evict"] == "crate":   # own success per use relative to the rate of the cluster of each use
+            val = (self.is_ - self.in_ * self.cr[:, None]).sum(0) / (self.in_.sum(0) + self.tp["k"]) + 1e-9 * rg.random(N)
         elif self.es_evict == "lcb":
             val = L.max(0)
         else:
             val = (self.is_ - self.in_ * self.cr[:, None]).sum(0) + 1e-9 * rg.random(N)
         val = val.copy(); val[self.prob] = np.inf; val[parents] = np.inf
         victims = [int(v) for v in np.argsort(val)[: len(parents) + n_imm] if np.isfinite(val[v])]
+        self.n_skip += len(parents) + n_imm - len(victims)
         for j, kid in enumerate(victims):
             p = parents[j] if j < len(parents) else -1
             if p >= 0:
@@ -400,6 +403,7 @@ class EvolvingBandit:
                 val[self.prob] = np.inf
             for p, kid in zip(parents, (int(v) for v in np.argsort(val)[: len(parents)])):
                 if self.trial and not np.isfinite(val[kid]):      # nobody left to evict (everyone else is on probation)
+                    self.n_skip += 1
                     continue
                 if self.kids == "random":
                     env.randomize(kid, rg); self._rewrite(kid); self.lin[kid] = self.N + self.births
