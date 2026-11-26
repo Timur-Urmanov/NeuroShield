@@ -1,4 +1,4 @@
-"""H29 analysis: NI against the baselines with search (R random search, PN pattern + novelty) on the long horizon
+"""H29 / H29r analysis (RC = repaired random search added after the review): NI against the baselines with search (R random search, PN pattern + novelty) on the long horizon
 (criteria in notes/hypotheses.md). Written before the runs finished. Original environment: NI, R from .cache/h29,
 PN, A, C from H25 (.cache/h25, same seeds and task stream); busy=24 and genes_L=7: everything in .cache/h28_*."""
 import os
@@ -9,9 +9,9 @@ from common import ROOT, save
 from h25_analyze import st
 
 SEG = {"S1": (40, 80), "S2": (80, 120), "S3": (120, 160)}
-ENV = {"orig": (range(20, 30), {"NI": "h29", "R": "h29", "PN": "h25", "A": "h25", "C": "h25"}),
-       "b24": (range(50, 55), {t: "h28_b24" for t in ("NI", "R", "PN", "A", "C")}),
-       "l7": (range(50, 55), {t: "h28_l7" for t in ("NI", "R", "PN", "A", "C")})}
+ENV = {"orig": (range(20, 30), {"NI": "h29", "R": "h29", "RC": "h29", "PN": "h25", "A": "h25", "C": "h25"}),
+       "b24": (range(50, 55), {t: "h28_b24" for t in ("NI", "R", "RC", "PN", "A", "C")}),
+       "l7": (range(50, 55), {t: "h28_l7" for t in ("NI", "R", "RC", "PN", "A", "C")})}
 
 
 def sg(y, s):
@@ -42,19 +42,20 @@ if __name__ == "__main__":
             lv = o["levels"][t] = dict(**{s: st(sg(R[t], s)) for s in SEG}, d32=st(sg(R[t], "S3") - sg(R[t], "S2")), total=st(R[t].mean(1)))
             print(f"  {t:<3} " + " ".join(f"{s} {lv[s]['mean']:.3f}±{lv[s]['sd']:.3f}" for s in SEG) + f" | whole run {lv['total']['mean']:.3f} | " + line("d32", lv["d32"]))
         T = o["tests"] = {}
-        for b in ("PN", "R", "A", "C"):
+        for b in ("PN", "R", "RC", "A", "C"):
             T[f"NI-{b}"] = st(sg(R["NI"], "S3") - sg(R[b], "S3")); print("  " + line(f"NI - {b} on S3", T[f"NI-{b}"]))
             T[f"NI-{b} whole run"] = st(R["NI"].mean(1) - R[b].mean(1)); print("  " + line(f"NI - {b} whole run", T[f"NI-{b} whole run"]))
-        for b in ("PN", "R"):
+        for b in ("PN", "R", "RC"):
             T[f"{b}-A"] = st(sg(R[b], "S3") - sg(R["A"], "S3")); print("  " + line(f"{b} - A on S3", T[f"{b}-A"]))
             cross = [next((i for i in range(16) if R["NI"][j].reshape(16, 10).mean(1)[i] > R[b][j].reshape(16, 10).mean(1)[i]), None) for j in range(n)]
             T[f"first 100k block NI > {b}"] = cross; print(f"  first 100k block where NI > {b}, per seed: {cross}")
-        for b in ("PN", "R"):
+        for b in ("PN", "R", "RC"):
             p = bool(T[f"NI-{b}"]["mean"] > 0 and T[f"NI-{b}"]["t"] >= 2.5); o[f"NI>{b}"] = p; ok.append(p)
-        print(f"  H29a (NI > PN) {o['NI>PN']}  H29b (NI > R) {o['NI>R']}")
-        print("  per-seed S3: " + " | ".join(f"{t} " + " ".join(f"{x:.3f}" for x in sg(R[t], "S3")) for t in ("NI", "PN", "R")))
+        print(f"  H29a (NI > PN) {o['NI>PN']}  H29b (NI > R, defective baseline) {o['NI>R']}  H29r-a (NI > RC) {o['NI>RC']}")
+        T["d32(RC)"] = st(sg(R["RC"], "S3") - sg(R["RC"], "S2"))
+        print("  per-seed S3: " + " | ".join(f"{t} " + " ".join(f"{x:.3f}" for x in sg(R[t], "S3")) for t in ("NI", "PN", "R", "RC")))
         o["composition"] = {}
-        for t in ("NI", "PN", "R"):
+        for t in ("NI", "PN", "R", "RC"):
             rows = []
             for f in F[t]:
                 tg = f["targets"]; r = []
@@ -64,5 +65,5 @@ if __name__ == "__main__":
                 rows.append(r)
             m = np.mean(rows, 0); o["composition"][t] = m.tolist()
             print(f"  {t:<3} niches filled " + " ".join(f"{x:.1f}" for x in m[:, 0]) + " | largest " + " ".join(f"{x:.0f}" for x in m[:, 1]) + " | median " + " ".join(f"{x:.0f}" for x in m[:, 2]))
-    out["all_six"] = bool(all(ok)); print("\nall six comparisons pass:", out["all_six"])
+    out["all_pass"] = bool(all(ok)); print("\nall comparisons pass:", out["all_pass"])
     save("h29_baselines", out)
