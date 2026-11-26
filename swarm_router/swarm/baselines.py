@@ -180,7 +180,10 @@ def _sp_drop(b, i):
             b.m[c] = live
 
 
-ES_PARAMS = dict(n_min=2, max_sub=3, rho=0.1, timeout=300, evict="mean")      # H32: trial mechanism (set by the experiment before a run)
+ES_PARAMS = dict(n_min=2, max_sub=3, rho=0.1, timeout=300, evict="mean", pq="flat", sub="parent")
+# pq: parents by own LCB over all clusters (flat) or the same number from every cluster (equal: plain niching, no deficit signal)
+# sub: a newcomer replaces its parent (parent) or any team member carrying the parent's configuration (config; the
+#      system writes the configurations itself, so comparing them uses no hidden information)      # H32: trial mechanism (set by the experiment before a run)
 
 
 class EvolvingBandit:
@@ -215,7 +218,7 @@ class EvolvingBandit:
             self.mode = "colony"
         if self.trial:
             self.tp = dict(ES_PARAMS); self.prob = np.zeros(N, bool); self.own_n = np.zeros(N); self.par = np.full(N, -1)
-            self.born_t = np.zeros(N, int); self.kidq = {}; self.n_sub = 0; self.n_sub_tasks = 0
+            self.born_t = np.zeros(N, int); self.kidq = {}; self.n_sub = 0; self.n_sub_tasks = 0; self.cfgq = {}; self.ref = {}
         self.frozen = False       # H26: no further generations (the bandit keeps learning)
         self.lin = np.arange(N); self.trace_every = 0; self.trace = []      # H25: lineage ids and snapshots (measurement only)
 
@@ -230,7 +233,7 @@ class EvolvingBandit:
             for pos, p in enumerate(list(team)):
                 if done >= self.tp["max_sub"]:
                     break
-                for k in self.kidq.get(p, ()):
+                for k in (self.kidq.get(p, ()) if self.tp["sub"] == "parent" else self.cfgq.get(self.env.genes[p].tobytes(), ())):
                     if self.prob[k] and k not in team and (avail is None or avail[k]):
                         team[pos] = k; done += 1
                         break
@@ -250,10 +253,18 @@ class EvolvingBandit:
         if p >= 0 and k in self.kidq.get(p, ()):
             self.kidq[p].remove(k)
         self.par[k] = -1
+        key = self.ref.pop(k, None)
+        if key is not None and k in self.cfgq.get(key, ()):
+            self.cfgq[key].remove(k)
+            if not self.cfgq[key]:
+                del self.cfgq[key]
 
     def _start_trial(self, kid, parent):
         for k in self.kidq.pop(kid, ()):             # the slot was a parent itself: its kids on probation become orphans
-            self.par[k] = -1
+            if self.tp["sub"] == "parent" or k not in self.ref:
+                self.par[k] = -1
+        if parent >= 0 and self.tp["sub"] == "config":
+            key = self.ref_key; self.ref[kid] = key; self.cfgq.setdefault(key, []).append(kid)
         self.prob[kid] = True; self.own_n[kid] = 0; self.par[kid] = parent; self.born_t[kid] = self.t
         if parent >= 0:
             self.kidq.setdefault(parent, []).append(kid)
@@ -267,12 +278,22 @@ class EvolvingBandit:
         n_new = 3 * max(1, int(round(self.frac * N / 3))); n_imm = int(round(self.tp["rho"] * n_new))
         L = self._lcb(self.is_, self.in_) + 1e-9 * rg.random(self.is_.shape)
         parents, seen = [], set()
-        for flat in np.argsort(-L, axis=None):
-            c, i = divmod(int(flat), N)
-            if i not in seen and self.in_[c, i] > 0 and not self.prob[i]:
-                seen.add(i); parents.append(i)
-            if len(parents) >= n_new - n_imm:
-                break
+        if self.tp["pq"] == "equal":                 # plain niching: the same number of parents from every cluster
+            order = [np.argsort(-L[c]) for c in range(L.shape[0])]; pos = [0] * L.shape[0]; c = 0; idle = 0
+            while len(parents) < n_new - n_imm and idle < L.shape[0]:
+                while pos[c] < N:
+                    i = int(order[c][pos[c]]); pos[c] += 1
+                    if i not in seen and self.in_[c, i] > 0 and not self.prob[i]:
+                        seen.add(i); parents.append(i); idle = -1
+                        break
+                idle += 1; c = (c + 1) % L.shape[0]
+        else:
+            for flat in np.argsort(-L, axis=None):
+                c, i = divmod(int(flat), N)
+                if i not in seen and self.in_[c, i] > 0 and not self.prob[i]:
+                    seen.add(i); parents.append(i)
+                if len(parents) >= n_new - n_imm:
+                    break
         if self.es_evict == "lcb" and self.tp["evict"] == "mean":      # own success rate over all uses, shrunk to the colony mean
             p0 = self.b.succ_sum / self.b.succ_n if self.b.succ_n else 0.5
             val = (self.is_.sum(0) + p0) / (self.in_.sum(0) + 1) + 1e-9 * rg.random(N)
@@ -285,6 +306,7 @@ class EvolvingBandit:
         for j, kid in enumerate(victims):
             p = parents[j] if j < len(parents) else -1
             if p >= 0:
+                self.ref_key = env.genes[p].tobytes()
                 env.clone(p, kid, bool(rg.random() < self.pm), rg); self.lin[kid] = self.lin[p]
             else:
                 env.randomize(kid, rg); self.lin[kid] = self.N + self.births
@@ -391,7 +413,7 @@ class EvolvingBandit:
                 self.is_[:, kid] = self.is_[:, p] / 2; self.in_[:, kid] = self.in_[:, p] / 2
                 self.ih_s[:, kid] = self.is_[:, kid]; self.ih_n[:, kid] = self.in_[:, kid]; self.ctr[kid] = self.ctr[p] / 2
                 if self.trial:
-                    self._start_trial(kid, p)
+                    self.ref_key = env.genes[p].tobytes(); self._start_trial(kid, p)
             return
         pen = (lambda key: 0.0) if crowd is None else (lambda key: self.nov * float(crowd[list(key[1:])].mean()))
         cand = sorted(((self._lcb(st[0], st[1]) - pen(key), key) for key, st in self.tri.items()

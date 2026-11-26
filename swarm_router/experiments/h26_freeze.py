@@ -23,7 +23,9 @@ KINDS = os.environ.get("H26_KINDS", "FS" if SWITCH else "F")      # branch kinds
 VICT = os.environ.get("H26_VICT", "") == "1"                      # H31: who is evicted under each rule, on the same states
 BASE = os.environ.get("H26_BASE", "C")                           # the variant that is branched
 if os.environ.get("H32_PARAMS"):                                 # H32: n_min,max_sub,rho,timeout,evict of the trial mechanism
-    a_, b_, c_, d_, e_ = os.environ["H32_PARAMS"].split(","); sb.ES_PARAMS.update(n_min=int(a_), max_sub=int(b_), rho=float(c_), timeout=int(d_), evict=e_)
+    a_ = os.environ["H32_PARAMS"].split(","); sb.ES_PARAMS.update(n_min=int(a_[0]), max_sub=int(a_[1]), rho=float(a_[2]), timeout=int(a_[3]), evict=a_[4])
+    if len(a_) > 5:
+        sb.ES_PARAMS.update(pq=a_[5], sub=a_[6])
 OUT = os.path.join(ROOT, ".cache", os.environ.get("H26_DIR", "h26"))
 KEYS = ("succ", "q_pop", "q_avail", "q_team", "er", "er_best", "min_free", "cap_obs", "good_obs")
 
