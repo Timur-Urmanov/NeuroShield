@@ -17,6 +17,7 @@ VAR = {"C": dict(team="evo_colony", frac=0.05, pm=0.1, beta=1.0, victim="contrib
        "A": dict(team="evo_fixed"), "R": dict(team="evo_random", frac=0.05), "RC": dict(team="evo_colony_r", frac=0.05, pm=0.1, beta=1.0), "PN": dict(team="evo_pattern", frac=0.05, pm=0.1, nov=2.0)}      # H29: baselines with search
 SWITCH = os.environ.get("H26_SWITCH", "") == "1"      # H27: also branch to the noinherit eviction rule at the fork points
 KINDS = os.environ.get("H26_KINDS", "FS" if SWITCH else "F")      # branch kinds at the fork points (H30: F, O, G)
+VICT = os.environ.get("H26_VICT", "") == "1"                      # H31: who is evicted under each rule, on the same states
 BASE = os.environ.get("H26_BASE", "C")                           # the variant that is branched
 OUT = os.path.join(ROOT, ".cache", os.environ.get("H26_DIR", "h26"))
 KEYS = ("succ", "q_pop", "q_avail", "q_team", "er", "er_best", "min_free", "cap_obs", "good_obs")
@@ -30,6 +31,8 @@ class Diag:
         self.conf = np.zeros((160, 3, 3)); self.cum = np.zeros((3, 3))        # H30: cluster x hidden type
         self.split = np.zeros((160, 4, 2))                                   # routing loss and count: cluster ok | wrong | young member | no young member
         self.ep = None; self.born = None
+        self.vict = np.zeros((160, 2, 4)); self.pop = np.zeros((160, 4)); self.prot = np.zeros((160, 4)); self.vn = np.zeros(160)
+        self.vuse = np.zeros((160, 2)); self.vinh = np.zeros((160, 2))
 
     def __call__(self, t, tp, env, members, m, succ, q):
         b = t // BLK; k = env.ks[t]; sk = env.skill[k]; a = self.a
@@ -51,6 +54,16 @@ class Diag:
                 self.born[ch] = t; self.ep = tp.epoch.copy()
             i = 0 if self.cum[cc].argmax() == k else 1; j = 2 if (t - self.born[members] < 5000).any() else 3
             self.split[b, i] += (rl, 1); self.split[b, j] += (rl, 1)
+        if VICT and hasattr(tp, "ih_s") and tp.t % tp.every == tp.every - 1:      # H31: state one task before a generation
+            eq = (env.genes[:, None, None, :] == env.targets[None]).all(-1); cnt = eq.sum(0); big = np.unravel_index(cnt.argmax(), cnt.shape)
+            perf = eq.any((1, 2)); nc = np.where(eq, cnt[None], 0).max((1, 2))      # copies in the primitive's own niche
+            cat = np.where(~perf, 3, np.where(eq[:, big[0], big[1]], 2, np.where(nc < 16, 0, 1)))      # scarce | abundant | dominant | imperfect
+            own_n = (tp.in_ - tp.ih_n).sum(0); inh = (tp.ih_s - tp.ih_n * tp.cr[:, None]).sum(0)
+            v0 = (tp.is_ - tp.in_ * tp.cr[:, None]).sum(0); v1 = v0 - inh; R3 = 3 * max(1, int(round(tp.frac * tp.N / 3)))
+            self.pop[b] += np.bincount(cat, minlength=4); self.prot[b] += np.bincount(cat[(own_n < 0.5) & (inh > 0)], minlength=4); self.vn[b] += 1
+            for r, val in enumerate((v0, v1)):
+                vi = np.argsort(val + 1e-9 * np.arange(len(val)))[:R3]
+                self.vict[b, r] += np.bincount(cat[vi], minlength=4); self.vuse[b, r] += own_n[vi].mean(); self.vinh[b, r] += inh[vi].mean()
         if hasattr(tp, "in_"):                                           # observable proxy: free primitives with above-average record
             cc = tp.b.ctx; n = tp.in_[cc]; good = (n >= 5) & (tp.is_[cc] > tp.cr[cc] * n)
             a["cap_obs"][b] += (good & av).sum(); a["good_obs"][b] += good.sum()
@@ -95,7 +108,7 @@ if __name__ == "__main__":
     np.savez_compressed(f + ".tmp.npz", R=o["R"].reshape(160, -1).mean(1), q=o["q"].reshape(160, -1).mean(1), blk=BLK,
                         t=np.array([s[0] for s in tp.trace]), genes=np.array([s[1] for s in tp.trace]), lin=np.array([s[2] for s in tp.trace]),
                         epoch=np.array([s[3] for s in tp.trace]), targets=env.targets, genes0=np.random.default_rng(seed + 2900).integers(env.A, size=(N, env.L)),
-                        cat_n=d.cat_n, cat_s=d.cat_s, role=d.role / BLK, conf=d.conf, split=d.split, wall=time.time() - d.t0, state=tp.state_size, births=tp.births,
+                        cat_n=d.cat_n, cat_s=d.cat_s, role=d.role / BLK, conf=d.conf, split=d.split, vict=d.vict, pop=d.pop, prot=d.prot, vn=d.vn, vuse=d.vuse, vinh=d.vinh, wall=time.time() - d.t0, state=tp.state_size, births=tp.births,
                         **{k: x / BLK for k, x in d.a.items()})
     os.replace(f + ".tmp.npz", f + ".npz")
     print(f"{d.tag} seed {seed}: {(time.time() - d.t0) / 60:.1f} min", flush=True)
