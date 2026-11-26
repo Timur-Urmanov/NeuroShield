@@ -180,7 +180,7 @@ def _sp_drop(b, i):
             b.m[c] = live
 
 
-ES_PARAMS = dict(n_min=2, max_sub=3, rho=0.1, timeout=300, evict="mean", pq="flat", sub="parent", k=1.0)
+ES_PARAMS = dict(n_min=1, max_sub=3, rho=0.1, timeout=300, evict="crate", pq="equal", sub="config", k=1.0)      # frozen for H32 stage 2
 # pq: parents by own LCB over all clusters (flat) or the same number from every cluster (equal: plain niching, no deficit signal)
 # sub: a newcomer replaces its parent (parent) or any team member carrying the parent's configuration (config; the
 #      system writes the configurations itself, so comparing them uses no hidden information)      # H32: trial mechanism (set by the experiment before a run)
