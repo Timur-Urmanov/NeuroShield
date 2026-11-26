@@ -1,0 +1,52 @@
+seeds [60, 61, 62, 63, 64, 65, 66, 67]
+reward by 100k block:
+  NI    0.331 0.444 0.499 0.533 0.557 0.572 0.578 0.578 0.581 0.584 0.584 0.583 0.583 0.582 0.582 0.578
+  F800  0.331 0.444 0.499 0.533 0.557 0.572 0.578 0.578 0.592 0.596 0.599 0.598 0.599 0.601 0.600 0.600
+  O800  0.331 0.444 0.499 0.533 0.557 0.572 0.578 0.578 0.592 0.596 0.599 0.599 0.597 0.598 0.598 0.595
+  G800  0.331 0.444 0.499 0.533 0.557 0.572 0.578 0.578 0.607 0.612 0.613 0.614 0.614 0.617 0.616 0.617
+
+S3 levels (mean ± sd):
+  NI    reward 0.5814±0.0096 | q_team 0.8114±0.0097 | competence 0.0000±0.0000 | busy 0.0001±0.0001 | routing 0.0459±0.0097 | model 0.0274±0.0020
+  F800  reward 0.5998±0.0137 | q_team 0.8318±0.0146 | competence 0.0000±0.0000 | busy 0.0001±0.0002 | routing 0.0255±0.0146 | model 0.0263±0.0022
+  O800  reward 0.5970±0.0031 | q_team 0.8325±0.0032 | competence 0.0000±0.0000 | busy 0.0000±0.0000 | routing 0.0248±0.0032 | model 0.0293±0.0020
+  G800  reward 0.6162±0.0041 | q_team 0.8540±0.0027 | competence 0.0000±0.0000 | busy 0.0001±0.0002 | routing 0.0033±0.0027 | model 0.0282±0.0022
+  F800 - NI on S3:
+    reward: +0.0184 sd 0.0069 se 0.0025 t 7.5 wins 8/8 t>=2.5=True 2sd=True
+    routing: -0.0204 sd 0.0079 se 0.0028 t -7.3 wins 0/8 t>=2.5=True 2sd=True
+    competence: +0.0000 sd 0.0000 se 0.0000 t nan wins 0/8 t>=2.5=False 2sd=False
+    busy: +0.0000 sd 0.0003 se 0.0001 t 0.3 wins 2/8 t>=2.5=False 2sd=False
+    model: -0.0011 sd 0.0008 se 0.0003 t -4.0 wins 1/8 t>=2.5=True 2sd=False
+    q_team: +0.0204 sd 0.0079 se 0.0028 t 7.3 wins 8/8 t>=2.5=True 2sd=True
+  O800 - NI on S3:
+    reward: +0.0156 sd 0.0099 se 0.0035 t 4.5 wins 8/8 t>=2.5=True 2sd=False
+    routing: -0.0210 sd 0.0116 se 0.0041 t -5.1 wins 0/8 t>=2.5=True 2sd=False
+    competence: +0.0000 sd 0.0000 se 0.0000 t nan wins 0/8 t>=2.5=False 2sd=False
+    busy: -0.0000 sd 0.0001 se 0.0001 t -0.6 wins 2/8 t>=2.5=False 2sd=False
+    model: +0.0019 sd 0.0009 se 0.0003 t 5.9 wins 8/8 t>=2.5=True 2sd=True
+    q_team: +0.0211 sd 0.0116 se 0.0041 t 5.1 wins 8/8 t>=2.5=True 2sd=False
+  G800 - NI on S3:
+    reward: +0.0348 sd 0.0067 se 0.0024 t 14.6 wins 8/8 t>=2.5=True 2sd=True
+    routing: -0.0426 sd 0.0085 se 0.0030 t -14.2 wins 0/8 t>=2.5=True 2sd=True
+    competence: +0.0000 sd 0.0000 se 0.0000 t nan wins 0/8 t>=2.5=False 2sd=False
+    busy: +0.0000 sd 0.0003 se 0.0001 t 0.3 wins 1/8 t>=2.5=False 2sd=False
+    model: +0.0008 sd 0.0008 se 0.0003 t 2.6 wins 7/8 t>=2.5=True 2sd=False
+    q_team: +0.0425 sd 0.0085 se 0.0030 t 14.1 wins 8/8 t>=2.5=True 2sd=True
+
+share of NI routing loss removed: {'F800': 0.44, 'O800': 0.46, 'G800': 0.93}
+interaction F x O on routing loss: -0.0011 sd 0.0056 se 0.0020 t -0.6 wins 3/8 t>=2.5=False 2sd=False
+interaction F x O on reward: +0.0008 sd 0.0052 se 0.0018 t 0.4 wins 5/8 t>=2.5=False 2sd=False
+
+without intervention (S3): cluster purity; routing loss by cluster ok / wrong and by young member / none (share of tasks)
+  NI    purity 0.955 | loss ok 0.027 wrong 0.450 young 0.050 old 0.037 | share ok 0.955 wrong 0.045 young 0.688 old 0.312 | contribution wrong 0.0204 young 0.0342
+  F800  purity 0.955 | loss ok 0.006 wrong 0.446 young 0.000 old 0.025 | share ok 0.955 wrong 0.045 young 0.000 old 1.000 | contribution wrong 0.0201 young 0.0000
+  O800  purity 1.000 | loss ok 0.025 wrong 0.000 young 0.028 old 0.018 | share ok 1.000 wrong 0.000 young 0.696 old 0.304 | contribution wrong 0.0000 young 0.0193
+  G800  purity 1.000 | loss ok 0.003 wrong 0.000 young 0.000 old 0.003 | share ok 1.000 wrong 0.000 young 0.000 old 1.000 | contribution wrong 0.0000 young 0.0000
+
+categories of tasks on S3 (absent | busy | routing | full team) and success in each:
+  NI    share 0.000 0.000 0.223 0.776 | success 0.000 0.185 0.520 0.691
+  F800  share 0.000 0.001 0.073 0.925 | success 0.000 0.133 0.387 0.693
+  O800  share 0.000 0.000 0.178 0.822 | success 0.000 0.112 0.571 0.687
+  G800  share 0.000 0.001 0.026 0.973 | success 0.000 0.073 0.560 0.689
+
+per-seed S3 reward: NI 0.572 0.585 0.565 0.582 0.580 0.590 0.581 0.596 | F800 0.592 0.611 0.570 0.600 0.605 0.610 0.601 0.610 | O800 0.600 0.594 0.594 0.596 0.595 0.595 0.602 0.599 | G800 0.615 0.620 0.607 0.617 0.617 0.619 0.617 0.618
+saved results/h30_routing.json
