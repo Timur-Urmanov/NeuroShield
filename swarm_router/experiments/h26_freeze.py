@@ -8,17 +8,22 @@ import numpy as np
 
 from common import ROOT
 from swarm import EnvConfig
+import swarm.baselines as sb
 from swarm.baselines import run_router
 
 T = int(os.environ.get("H26_T", 1_600_000)); SHIFT = int(os.environ.get("H26_SHIFT", 100_000))
 FORKS = tuple(int(x) for x in os.environ.get("H26_FORKS", "400000,600000,800000").split(",") if x)
 N, BUSY, GL, BLK = int(os.environ.get("H26_N", 640)), int(os.environ.get("H26_BUSY", 48)), int(os.environ.get("H26_L", 5)), T // 160      # H28: other environments
 VAR = {"C": dict(team="evo_colony", frac=0.05, pm=0.1, beta=1.0, victim="contrib"), "NI": dict(team="evo_colony", frac=0.05, pm=0.1, beta=1.0, victim="noinherit"),
-       "A": dict(team="evo_fixed"), "R": dict(team="evo_random", frac=0.05), "RC": dict(team="evo_colony_r", frac=0.05, pm=0.1, beta=1.0), "PN": dict(team="evo_pattern", frac=0.05, pm=0.1, nov=2.0)}      # H29: baselines with search
+       "A": dict(team="evo_fixed"), "R": dict(team="evo_random", frac=0.05), "RC": dict(team="evo_colony_r", frac=0.05, pm=0.1, beta=1.0),
+       "ES": dict(team="evo_es", frac=0.05, pm=0.1), "EC": dict(team="evo_es_c", frac=0.05, pm=0.1), "NT": dict(team="evo_colony_t", frac=0.05, pm=0.1, beta=1.0),      # H32
+       "PN": dict(team="evo_pattern", frac=0.05, pm=0.1, nov=2.0)}      # H29: baselines with search
 SWITCH = os.environ.get("H26_SWITCH", "") == "1"      # H27: also branch to the noinherit eviction rule at the fork points
 KINDS = os.environ.get("H26_KINDS", "FS" if SWITCH else "F")      # branch kinds at the fork points (H30: F, O, G)
 VICT = os.environ.get("H26_VICT", "") == "1"                      # H31: who is evicted under each rule, on the same states
 BASE = os.environ.get("H26_BASE", "C")                           # the variant that is branched
+if os.environ.get("H32_PARAMS"):                                 # H32: n_min,max_sub,rho,timeout,evict of the trial mechanism
+    a_, b_, c_, d_, e_ = os.environ["H32_PARAMS"].split(","); sb.ES_PARAMS.update(n_min=int(a_), max_sub=int(b_), rho=float(c_), timeout=int(d_), evict=e_)
 OUT = os.path.join(ROOT, ".cache", os.environ.get("H26_DIR", "h26"))
 KEYS = ("succ", "q_pop", "q_avail", "q_team", "er", "er_best", "min_free", "cap_obs", "good_obs")
 
@@ -31,6 +36,7 @@ class Diag:
         self.conf = np.zeros((160, 3, 3)); self.cum = np.zeros((3, 3))        # H30: cluster x hidden type
         self.split = np.zeros((160, 4, 2))                                   # routing loss and count: cluster ok | wrong | young member | no young member
         self.ep = None; self.born = None
+        self.ev = np.zeros((160, 6)); self.subs = np.zeros(160); self.uses = None; self.isperf = None; self.sub0 = 0      # H32: search accounting
         self.vict = np.zeros((160, 2, 4)); self.pop = np.zeros((160, 4)); self.prot = np.zeros((160, 4)); self.vn = np.zeros(160)
         self.vuse = np.zeros((160, 2)); self.vinh = np.zeros((160, 2))
 
@@ -49,9 +55,16 @@ class Diag:
             cc = tp.b.ctx; self.conf[b, cc, k] += 1; self.cum[cc, k] += 1; rl = ba.prod() - q
             if self.ep is None:
                 self.ep = tp.epoch.copy(); self.born = np.full(len(self.ep), -10 ** 9)
+                self.uses = np.zeros(len(self.ep)); self.isperf = (env.genes[:, None, None, :] == env.targets[None]).all(-1).any((1, 2))
+            self.uses[members] += 1
             ch = tp.epoch != self.ep
-            if ch.any():
+            if ch.any():                                                 # H32: births, evictions, fate of perfect configurations (hidden; diagnostics)
+                pn = (env.genes[ch][:, None, None, :] == env.targets[None]).all(-1).any((1, 2)); po = self.isperf[ch]; u = self.uses[ch]
+                self.ev[b] += (ch.sum(), pn.sum(), (u == 0).sum(), u.sum(), po.sum(), (po & (t - self.born[ch] >= 5000)).sum())
+                self.isperf[ch] = pn; self.uses[ch] = 0
                 self.born[ch] = t; self.ep = tp.epoch.copy()
+            if getattr(tp, "trial", False):
+                self.subs[b] += tp.n_sub - self.sub0; self.sub0 = tp.n_sub
             i = 0 if self.cum[cc].argmax() == k else 1; j = 2 if (t - self.born[members] < 5000).any() else 3
             self.split[b, i] += (rl, 1); self.split[b, j] += (rl, 1)
         if VICT and hasattr(tp, "ih_s") and tp.t % tp.every == tp.every - 1:      # H31: state one task before a generation
@@ -108,7 +121,7 @@ if __name__ == "__main__":
     np.savez_compressed(f + ".tmp.npz", R=o["R"].reshape(160, -1).mean(1), q=o["q"].reshape(160, -1).mean(1), blk=BLK,
                         t=np.array([s[0] for s in tp.trace]), genes=np.array([s[1] for s in tp.trace]), lin=np.array([s[2] for s in tp.trace]),
                         epoch=np.array([s[3] for s in tp.trace]), targets=env.targets, genes0=np.random.default_rng(seed + 2900).integers(env.A, size=(N, env.L)),
-                        cat_n=d.cat_n, cat_s=d.cat_s, role=d.role / BLK, conf=d.conf, split=d.split, vict=d.vict, pop=d.pop, prot=d.prot, vn=d.vn, vuse=d.vuse, vinh=d.vinh, wall=time.time() - d.t0, state=tp.state_size, births=tp.births,
+                        cat_n=d.cat_n, cat_s=d.cat_s, role=d.role / BLK, conf=d.conf, split=d.split, ev=d.ev, subs=d.subs, alive_perf_age=np.where(d.isperf, T - d.born, -1) if d.isperf is not None else np.zeros(1), vict=d.vict, pop=d.pop, prot=d.prot, vn=d.vn, vuse=d.vuse, vinh=d.vinh, wall=time.time() - d.t0, state=tp.state_size, births=tp.births,
                         **{k: x / BLK for k, x in d.a.items()})
     os.replace(f + ".tmp.npz", f + ".npz")
     print(f"{d.tag} seed {seed}: {(time.time() - d.t0) / 60:.1f} min", flush=True)

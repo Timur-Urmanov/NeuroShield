@@ -180,6 +180,9 @@ def _sp_drop(b, i):
             b.m[c] = live
 
 
+ES_PARAMS = dict(n_min=2, max_sub=3, rho=0.1, timeout=300, evict="mean")      # H32: trial mechanism (set by the experiment before a run)
+
+
 class EvolvingBandit:
     """H20: sparse context bandit (fast layer) + a slow layer that rewrites configurations every `every` tasks.
       mode fixed      - no slow layer
@@ -205,6 +208,14 @@ class EvolvingBandit:
         self.kids = "clone"       # H29: "random" = same quotas and eviction, but the freed slots get random configurations
         if mode == "colony_r":    #      (random search with the colony's eviction rule; replaces the defective mode "random")
             self.mode, self.kids = "colony", "random"
+        # H32: trial of newcomers (probation + substitution for the parent). es = evolutionary search with trials and
+        # eviction by own LCB; es_c = the same with the colony's eviction; colony_t = the colony plus the trial mechanism
+        self.trial = mode in ("es", "es_c", "colony_t"); self.es = mode in ("es", "es_c"); self.es_evict = "lcb" if mode == "es" else "contrib"
+        if mode == "colony_t":
+            self.mode = "colony"
+        if self.trial:
+            self.tp = dict(ES_PARAMS); self.prob = np.zeros(N, bool); self.own_n = np.zeros(N); self.par = np.full(N, -1)
+            self.born_t = np.zeros(N, int); self.kidq = {}; self.n_sub = 0; self.n_sub_tasks = 0
         self.frozen = False       # H26: no further generations (the bandit keeps learning)
         self.lin = np.arange(N); self.trace_every = 0; self.trace = []      # H25: lineage ids and snapshots (measurement only)
 
@@ -213,7 +224,72 @@ class EvolvingBandit:
         return self.b.state_size
 
     def choose(self, t, x, avail=None):
-        return self.b.choose(t, x, avail)
+        team = self.b.choose(t, x, avail)
+        if self.trial and self.prob.any():           # H32: a newcomer on probation takes its parent's place in the team
+            team = [int(i) for i in team]; done = 0
+            for pos, p in enumerate(list(team)):
+                if done >= self.tp["max_sub"]:
+                    break
+                for k in self.kidq.get(p, ()):
+                    if self.prob[k] and k not in team and (avail is None or avail[k]):
+                        team[pos] = k; done += 1
+                        break
+            if done < self.tp["max_sub"]:            # orphans and immigrants: in place of a random member
+                free = np.where(self.prob & (self.par < 0) & (True if avail is None else avail))[0]
+                free = [int(k) for k in free if k not in team]
+                if free:
+                    k = free[int(np.argmin(self.own_n[free]))]; pos = int(self.rg.integers(len(team)))
+                    if not self.prob[team[pos]]:
+                        team[pos] = k; done += 1
+            self.n_sub += done; self.n_sub_tasks += done > 0
+            team = np.array(team)
+        return team
+
+    def _end_trial(self, k):
+        self.prob[k] = False; p = int(self.par[k])
+        if p >= 0 and k in self.kidq.get(p, ()):
+            self.kidq[p].remove(k)
+        self.par[k] = -1
+
+    def _start_trial(self, kid, parent):
+        for k in self.kidq.pop(kid, ()):             # the slot was a parent itself: its kids on probation become orphans
+            self.par[k] = -1
+        self.prob[kid] = True; self.own_n[kid] = 0; self.par[kid] = parent; self.born_t[kid] = self.t
+        if parent >= 0:
+            self.kidq.setdefault(parent, []).append(kid)
+
+    def _gen_es(self):
+        """H32: steady-state evolutionary search. Parents by own LCB (no quotas), kids without any inheritance,
+        victims among the primitives that finished probation: lowest own LCB (es) or lowest own contribution (es_c)."""
+        N, rg, env = self.N, self.rg, self.env
+        for k in np.where(self.prob & (self.t - self.born_t > self.tp["timeout"]))[0]:
+            self._end_trial(int(k))
+        n_new = 3 * max(1, int(round(self.frac * N / 3))); n_imm = int(round(self.tp["rho"] * n_new))
+        L = self._lcb(self.is_, self.in_) + 1e-9 * rg.random(self.is_.shape)
+        parents, seen = [], set()
+        for flat in np.argsort(-L, axis=None):
+            c, i = divmod(int(flat), N)
+            if i not in seen and self.in_[c, i] > 0 and not self.prob[i]:
+                seen.add(i); parents.append(i)
+            if len(parents) >= n_new - n_imm:
+                break
+        if self.es_evict == "lcb" and self.tp["evict"] == "mean":      # own success rate over all uses, shrunk to the colony mean
+            p0 = self.b.succ_sum / self.b.succ_n if self.b.succ_n else 0.5
+            val = (self.is_.sum(0) + p0) / (self.in_.sum(0) + 1) + 1e-9 * rg.random(N)
+        elif self.es_evict == "lcb":
+            val = L.max(0)
+        else:
+            val = (self.is_ - self.in_ * self.cr[:, None]).sum(0) + 1e-9 * rg.random(N)
+        val = val.copy(); val[self.prob] = np.inf; val[parents] = np.inf
+        victims = [int(v) for v in np.argsort(val)[: len(parents) + n_imm] if np.isfinite(val[v])]
+        for j, kid in enumerate(victims):
+            p = parents[j] if j < len(parents) else -1
+            if p >= 0:
+                env.clone(p, kid, bool(rg.random() < self.pm), rg); self.lin[kid] = self.lin[p]
+            else:
+                env.randomize(kid, rg); self.lin[kid] = self.N + self.births
+            self._rewrite(kid); self.ih_s[:, kid] = 0; self.ih_n[:, kid] = 0; self.ctr[kid] = 0
+            self._start_trial(kid, p)
 
     def _lcb(self, s_, n_):
         p0 = self.b.succ_sum / self.b.succ_n if self.b.succ_n else 0.5
@@ -225,6 +301,11 @@ class EvolvingBandit:
         self.is_[c, team] += succ; self.in_[c, team] += 1
         self.ctr[team] += succ - self.cr[c]
         self.cr[c] += 0.001 * (succ - self.cr[c]); self.cn *= 0.999; self.cn[c] += 0.001
+        if self.trial:
+            self.own_n[team] += 1
+            for k in team:
+                if self.prob[k] and self.own_n[k] >= self.tp["n_min"]:
+                    self._end_trial(k)
         if self.mode == "pattern" and len(team) == 3:
             key = (c, *sorted(team)); ep = tuple(int(self.epoch[i]) for i in key[1:])
             st = self.tri.get(key)
@@ -241,7 +322,12 @@ class EvolvingBandit:
         self.is_[:, kid] = 0; self.in_[:, kid] = 0
 
     def _generation(self):
+        if self.es:
+            return self._gen_es()
         N, rg, b, env = self.N, self.rg, self.b, self.env
+        if self.trial:
+            for k in np.where(self.prob & (self.t - self.born_t > self.tp["timeout"]))[0]:
+                self._end_trial(int(k))
         R = max(1, int(round(self.frac * N / 3)))
         val = self._lcb(self.is_, self.in_).max(0) + 1e-9 * rg.random(N)
         crowd = None
@@ -288,7 +374,11 @@ class EvolvingBandit:
                     val = ((self.is_ - self.ih_s) - (self.in_ - self.ih_n) * self.cr[:, None]).sum(0)
                 val = val + 1e-9 * rg.random(N)
             val[parents] = np.inf
+            if self.trial:                       # H32 (colony_t): primitives on probation cannot be evicted
+                val[self.prob] = np.inf
             for p, kid in zip(parents, (int(v) for v in np.argsort(val)[: len(parents)])):
+                if self.trial and not np.isfinite(val[kid]):      # nobody left to evict (everyone else is on probation)
+                    continue
                 if self.kids == "random":
                     env.randomize(kid, rg); self._rewrite(kid); self.lin[kid] = self.N + self.births
                     self.ih_s[:, kid] = 0; self.ih_n[:, kid] = 0; self.ctr[kid] = 0
@@ -300,6 +390,8 @@ class EvolvingBandit:
                             _sp_set(b, c, kid, j, b.s[c][row] / 2, b.n[c][row] / 2)
                 self.is_[:, kid] = self.is_[:, p] / 2; self.in_[:, kid] = self.in_[:, p] / 2
                 self.ih_s[:, kid] = self.is_[:, kid]; self.ih_n[:, kid] = self.in_[:, kid]; self.ctr[kid] = self.ctr[p] / 2
+                if self.trial:
+                    self._start_trial(kid, p)
             return
         pen = (lambda key: 0.0) if crowd is None else (lambda key: self.nov * float(crowd[list(key[1:])].mean()))
         cand = sorted(((self._lcb(st[0], st[1]) - pen(key), key) for key, st in self.tri.items()
