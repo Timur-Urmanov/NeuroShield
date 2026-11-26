@@ -202,6 +202,9 @@ class EvolvingBandit:
         self.ctr = np.zeros(N); self.ih_s = np.zeros((C, N)); self.ih_n = np.zeros((C, N))      # H24
         self.cr = np.full(C, 0.5); self.cn = np.full(C, 1.0 / C)      # H23: recent success rate / task share per cluster
         self.tri = {}; self.epoch = np.zeros(N, int); self.t = 0; self.births = 0
+        self.kids = "clone"       # H29: "random" = same quotas and eviction, but the freed slots get random configurations
+        if mode == "colony_r":    #      (random search with the colony's eviction rule; replaces the defective mode "random")
+            self.mode, self.kids = "colony", "random"
         self.frozen = False       # H26: no further generations (the bandit keeps learning)
         self.lin = np.arange(N); self.trace_every = 0; self.trace = []      # H25: lineage ids and snapshots (measurement only)
 
@@ -246,6 +249,8 @@ class EvolvingBandit:
             crowd = ((env.config_distance() <= 1).sum(1) - 1) / (N - 1)
             val = val - self.nov * crowd
         if self.mode == "random":
+            # defective as random search (H29 review): a fresh slot has the lowest LCB and is rewritten again
+            # until the bandit happens to try it; kept unchanged for H21-H22. Use mode "colony_r" instead.
             for kid in np.argsort(val)[: 3 * R]:
                 env.randomize(int(kid), rg); self._rewrite(int(kid)); self.lin[kid] = self.N + self.births
             return
@@ -284,6 +289,10 @@ class EvolvingBandit:
                 val = val + 1e-9 * rg.random(N)
             val[parents] = np.inf
             for p, kid in zip(parents, (int(v) for v in np.argsort(val)[: len(parents)])):
+                if self.kids == "random":
+                    env.randomize(kid, rg); self._rewrite(kid); self.lin[kid] = self.N + self.births
+                    self.ih_s[:, kid] = 0; self.ih_n[:, kid] = 0; self.ctr[kid] = 0
+                    continue
                 env.clone(p, kid, bool(rg.random() < self.pm), rg); self._rewrite(kid); self.lin[kid] = self.lin[p]
                 for c in range(b.C):
                     for j, row in list(b.nb[c].get(p, {}).items()):
