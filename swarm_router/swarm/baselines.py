@@ -186,6 +186,15 @@ ES_PARAMS = dict(n_min=1, max_sub=3, rho=0.1, timeout=300, evict="crate", pq="eq
 #      system writes the configurations itself, so comparing them uses no hidden information)      # H32: trial mechanism (set by the experiment before a run)
 
 
+# H33: self-regulation of the number of replacements per generation in mode colony (set by the experiment; None = off).
+#   mode "g": rho -> 1 if the fast success estimate is below the best level the slow estimate ever reached by delta
+#             (alarm) or exceeds the slow one by eps (still improving), otherwise rho *= 1 - eta; replacements = rho * 3R.
+#             alarm=False: decay only (ablation).
+#   mode "z": only primitives whose RECENT own record (forgetting factor gz per generation) is reliably below the rate
+#             of their clusters (z < -z0) may be evicted.
+CTL = dict(mode=None, tf=5000.0, ts=50000.0, eps=0.01, eta=0.1, delta=0.02, alarm=True, z0=2.0, gz=0.98)
+
+
 class EvolvingBandit:
     """H20: sparse context bandit (fast layer) + a slow layer that rewrites configurations every `every` tasks.
       mode fixed      - no slow layer
@@ -219,6 +228,10 @@ class EvolvingBandit:
         if self.trial:
             self.tp = dict(ES_PARAMS); self.prob = np.zeros(N, bool); self.own_n = np.zeros(N); self.par = np.full(N, -1)
             self.born_t = np.zeros(N, int); self.kidq = {}; self.n_sub = 0; self.n_sub_tasks = 0; self.cfgq = {}; self.ref = {}; self.n_skip = 0
+        self.ctl = dict(CTL) if CTL["mode"] and mode == "colony" else None      # H33
+        self.rho, self.sf, self.ss, self.n_alarm, self.rho_log, self.sbest = 1.0, 0.5, 0.5, 0, [], 0.0
+        if self.ctl is not None and self.ctl["mode"] == "z":
+            self.zs = np.zeros((C, N)); self.zn = np.zeros((C, N))
         self.frozen = False       # H26: no further generations (the bandit keeps learning)
         self.lin = np.arange(N); self.trace_every = 0; self.trace = []      # H25: lineage ids and snapshots (measurement only)
 
@@ -326,6 +339,12 @@ class EvolvingBandit:
         self.is_[c, team] += succ; self.in_[c, team] += 1
         self.ctr[team] += succ - self.cr[c]
         self.cr[c] += 0.001 * (succ - self.cr[c]); self.cn *= 0.999; self.cn[c] += 0.001
+        if self.ctl is not None and self.ctl["mode"] == "g":
+            self.sf += (succ - self.sf) / min(self.t, self.ctl["tf"]); self.ss += (succ - self.ss) / min(self.t, self.ctl["ts"])
+            if self.t >= self.ctl["ts"]:
+                self.sbest = max(self.sbest, self.ss)
+        elif self.ctl is not None:
+            self.zs[c, team] += succ; self.zn[c, team] += 1
         if self.trial:
             self.own_n[team] += 1
             for k in team:
@@ -345,6 +364,8 @@ class EvolvingBandit:
     def _rewrite(self, kid):
         _sp_drop(self.b, kid); self.epoch[kid] += 1; self.births += 1
         self.is_[:, kid] = 0; self.in_[:, kid] = 0
+        if self.ctl is not None and self.ctl["mode"] == "z":
+            self.zs[:, kid] = 0; self.zn[:, kid] = 0
 
     def _generation(self):
         if self.es:
@@ -398,6 +419,22 @@ class EvolvingBandit:
                 elif self.victim == "noinherit":     # own record only, without the inherited half
                     val = ((self.is_ - self.ih_s) - (self.in_ - self.ih_n) * self.cr[:, None]).sum(0)
                 val = val + 1e-9 * rg.random(N)
+            if self.ctl is not None:             # H33: fewer replacements than 3R
+                if self.ctl["mode"] == "g":
+                    d = self.sf - self.ss; low = self.ctl["alarm"] and self.sf < self.sbest - self.ctl["delta"]
+                    if low or d > self.ctl["eps"]:
+                        self.n_alarm += low; self.rho = 1.0
+                    else:
+                        self.rho *= 1 - self.ctl["eta"]
+                    x = self.rho * len(parents); n = int(x) + int(rg.random() < x - int(x))
+                else:
+                    self.zs *= self.ctl["gz"]; self.zn *= self.ctl["gz"]
+                    z = (self.zs - self.zn * self.cr[:, None]).sum(0) / np.sqrt((self.zn * (self.cr * (1 - self.cr))[:, None]).sum(0) + 1)
+                    bad = z < -self.ctl["z0"]; bad[parents] = False
+                    val[~bad] = np.inf; n = min(len(parents), int(bad.sum())); self.rho = n / max(1, len(parents))
+                if n < len(parents):
+                    parents = [parents[i] for i in sorted(rg.choice(len(parents), n, replace=False))]
+                self.rho_log.append(n)
             val[parents] = np.inf
             if self.trial:                       # H32 (colony_t): primitives on probation cannot be evicted
                 val[self.prob] = np.inf

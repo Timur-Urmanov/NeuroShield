@@ -17,6 +17,7 @@ N, BUSY, GL, BLK = int(os.environ.get("H26_N", 640)), int(os.environ.get("H26_BU
 VAR = {"C": dict(team="evo_colony", frac=0.05, pm=0.1, beta=1.0, victim="contrib"), "NI": dict(team="evo_colony", frac=0.05, pm=0.1, beta=1.0, victim="noinherit"),
        "A": dict(team="evo_fixed"), "R": dict(team="evo_random", frac=0.05), "RC": dict(team="evo_colony_r", frac=0.05, pm=0.1, beta=1.0),
        "ES": dict(team="evo_es", frac=0.05, pm=0.1), "EC": dict(team="evo_es_c", frac=0.05, pm=0.1), "NT": dict(team="evo_colony_t", frac=0.05, pm=0.1, beta=1.0),      # H32
+       "N4": dict(team="evo_colony", frac=0.0125, pm=0.1, beta=1.0),      # H33: constant reduced intensity (9 replacements per generation)
        "PN": dict(team="evo_pattern", frac=0.05, pm=0.1, nov=2.0)}      # H29: baselines with search
 SWITCH = os.environ.get("H26_SWITCH", "") == "1"      # H27: also branch to the noinherit eviction rule at the fork points
 KINDS = os.environ.get("H26_KINDS", "FS" if SWITCH else "F")      # branch kinds at the fork points (H30: F, O, G)
@@ -28,6 +29,10 @@ if os.environ.get("H32_PARAMS"):                                 # H32: n_min,ma
         sb.ES_PARAMS.update(pq=a_[5], sub=a_[6])
     if len(a_) > 7:
         sb.ES_PARAMS.update(k=float(a_[7]))
+if os.environ.get("H33_CTL"):                                    # H33: g,eps,eta[,noalarm] or z,z0,gz
+    a_ = os.environ["H33_CTL"].split(",")
+    sb.CTL.update(mode="g", eps=float(a_[1]), eta=float(a_[2]), alarm=len(a_) < 4) if a_[0] == "g" else sb.CTL.update(mode="z", z0=float(a_[1]), gz=float(a_[2]))
+TSH = [int(x) for x in os.environ.get("H33_TSHIFT", "0,0").split(",")]      # H33: at task TSH[0] the targets of TSH[1] niches are redrawn
 OUT = os.path.join(ROOT, ".cache", os.environ.get("H26_DIR", "h26"))
 KEYS = ("succ", "q_pop", "q_avail", "q_team", "er", "er_best", "min_free", "cap_obs", "good_obs")
 
@@ -69,6 +74,15 @@ class Diag:
                 self.born[ch] = t; self.ep = tp.epoch.copy()
             if getattr(tp, "trial", False):
                 self.subs[b] += tp.n_sub - self.sub0; self.sub0 = tp.n_sub
+        if TSH[0] and t + 1 == TSH[0]:                                   # H33: environment event, not known to the algorithm
+            rg = np.random.default_rng(SEED + 3300); K, J, L = env.targets.shape
+            for f in rg.choice(K * J, size=TSH[1], replace=False):
+                old = env.targets[f // J, f % J].copy()
+                while (env.targets[f // J, f % J] == old).all():
+                    env.targets[f // J, f % J] = rg.integers(env.A, size=L)
+            env._recompute(np.arange(env.N))
+            if self.isperf is not None:
+                self.isperf = (env.genes[:, None, None, :] == env.targets[None]).all(-1).any((1, 2))
             i = 0 if self.cum[cc].argmax() == k else 1; j = 2 if (t - self.born[members] < 5000).any() else 3
             self.split[b, i] += (rl, 1); self.split[b, j] += (rl, 1)
         if VICT and hasattr(tp, "ih_s") and tp.t % tp.every == tp.every - 1:      # H31: state one task before a generation
@@ -115,17 +129,17 @@ def done(v, seed):
 
 
 if __name__ == "__main__":
-    v, seed = sys.argv[1], int(sys.argv[2]); os.makedirs(OUT, exist_ok=True)
+    v, seed = sys.argv[1], int(sys.argv[2]); os.makedirs(OUT, exist_ok=True); SEED = seed
     if done(v, seed):
         sys.exit(0)
-    d = Diag(v)
+    d = Diag(v); targets0 = np.random.default_rng(seed + 2901).integers(4, size=(3, 3, GL))      # targets before a possible H33 shift
     o = run_router(EnvConfig("config", T, busy=BUSY, genes_L=GL, genes_pow=1.0, shift_at=SHIFT), seed, N=N, model="linucb",
                    trace_every=T // 80, hook=d, **VAR[v])
     tp, env = o["policy"], o["env"]; f = os.path.join(OUT, f"{d.tag}_{seed}")
     np.savez_compressed(f + ".tmp.npz", R=o["R"].reshape(160, -1).mean(1), q=o["q"].reshape(160, -1).mean(1), blk=BLK,
                         t=np.array([s[0] for s in tp.trace]), genes=np.array([s[1] for s in tp.trace]), lin=np.array([s[2] for s in tp.trace]),
                         epoch=np.array([s[3] for s in tp.trace]), targets=env.targets, genes0=np.random.default_rng(seed + 2900).integers(env.A, size=(N, env.L)),
-                        cat_n=d.cat_n, cat_s=d.cat_s, role=d.role / BLK, conf=d.conf, split=d.split, ev=d.ev, subs=d.subs, n_skip=getattr(tp, "n_skip", 0), alive_perf_age=np.where(d.isperf, T - d.born, -1) if d.isperf is not None else np.zeros(1), vict=d.vict, pop=d.pop, prot=d.prot, vn=d.vn, vuse=d.vuse, vinh=d.vinh, wall=time.time() - d.t0, state=tp.state_size, births=tp.births,
+                        cat_n=d.cat_n, cat_s=d.cat_s, role=d.role / BLK, conf=d.conf, split=d.split, ev=d.ev, subs=d.subs, rho_log=np.array(getattr(tp, "rho_log", []), float), n_alarm=getattr(tp, "n_alarm", 0), targets0=targets0, n_skip=getattr(tp, "n_skip", 0), alive_perf_age=np.where(d.isperf, T - d.born, -1) if d.isperf is not None else np.zeros(1), vict=d.vict, pop=d.pop, prot=d.prot, vn=d.vn, vuse=d.vuse, vinh=d.vinh, wall=time.time() - d.t0, state=tp.state_size, births=tp.births,
                         **{k: x / BLK for k, x in d.a.items()})
     os.replace(f + ".tmp.npz", f + ".npz")
     print(f"{d.tag} seed {seed}: {(time.time() - d.t0) / 60:.1f} min", flush=True)
