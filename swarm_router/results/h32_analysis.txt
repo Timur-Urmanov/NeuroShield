@@ -1,0 +1,108 @@
+
+=== orig: seeds [80, 81, 82, 83, 84, 85, 86, 87], wall min NI 25 ES 10 EC 10 NT 25
+  NI  0.347 0.468 0.508 0.542 0.562 0.567 0.577 0.578 0.579 0.575 0.579 0.578 0.573 0.573 0.574 0.574
+  ES  0.353 0.465 0.497 0.511 0.513 0.519 0.521 0.522 0.521 0.522 0.522 0.521 0.522 0.521 0.524 0.523
+  EC  0.351 0.454 0.486 0.502 0.514 0.523 0.526 0.533 0.539 0.540 0.541 0.541 0.540 0.540 0.540 0.540
+  NT  0.337 0.465 0.518 0.535 0.544 0.543 0.549 0.549 0.549 0.545 0.544 0.544 0.546 0.542 0.540 0.538
+  NI  S1 0.571±0.010 S2 0.578±0.012 S3 0.573±0.012 | whole run 0.547 | first 400k 0.466 | d32 -0.0045 (t -2.8)
+  ES  S1 0.519±0.011 S2 0.521±0.011 S3 0.523±0.010 | whole run 0.505 | first 400k 0.456 | d32 +0.0012 (t 1.0)
+  EC  S1 0.524±0.016 S2 0.540±0.011 S3 0.540±0.011 | whole run 0.513 | first 400k 0.448 | d32 -0.0001 (t -0.1)
+  NT  S1 0.547±0.023 S2 0.546±0.021 S3 0.541±0.018 | whole run 0.524 | first 400k 0.464 | d32 -0.0044 (t -0.8)
+  H32a NI - ES on S3: +0.0508 sd 0.0058 se 0.0020 t 24.9 wins 8/8 t>=2.5=True 2sd=True
+  H32a NI - ES whole run: +0.0423 sd 0.0096 se 0.0034 t 12.5 wins 8/8 t>=2.5=True 2sd=True
+  H32a NI - ES first 400k: +0.0097 sd 0.0302 se 0.0107 t 0.9 wins 5/8 t>=2.5=False 2sd=False
+  H32b EC - ES on S3: +0.0174 sd 0.0011 se 0.0004 t 43.2 wins 8/8 t>=2.5=True 2sd=True
+  H32b EC - ES whole run: +0.0083 sd 0.0073 se 0.0026 t 3.2 wins 8/8 t>=2.5=True 2sd=False
+  H32b EC - ES first 400k: -0.0081 sd 0.0164 se 0.0058 t -1.4 wins 3/8 t>=2.5=False 2sd=False
+  H32c NI - EC on S3: +0.0334 sd 0.0051 se 0.0018 t 18.4 wins 8/8 t>=2.5=True 2sd=True
+  H32c NI - EC whole run: +0.0340 sd 0.0081 se 0.0029 t 11.9 wins 8/8 t>=2.5=True 2sd=True
+  H32c NI - EC first 400k: +0.0178 sd 0.0255 se 0.0090 t 2.0 wins 6/8 t>=2.5=False 2sd=False
+  H32d NT - NI on S3: -0.0321 sd 0.0245 se 0.0086 t -3.7 wins 0/8 t>=2.5=True 2sd=False
+  H32d NT - NI whole run: -0.0227 sd 0.0122 se 0.0043 t -5.3 wins 0/8 t>=2.5=True 2sd=False
+  H32d NT - NI first 400k: -0.0023 sd 0.0291 se 0.0103 t -0.2 wins 5/8 t>=2.5=False 2sd=False
+  NT - ES on S3: +0.0188 sd 0.0228 se 0.0081 t 2.3 wins 6/8 t>=2.5=False 2sd=False
+  NT - ES whole run: +0.0196 sd 0.0143 se 0.0051 t 3.9 wins 8/8 t>=2.5=True 2sd=False
+  NT - ES first 400k: +0.0074 sd 0.0294 se 0.0104 t 0.7 wins 4/8 t>=2.5=False 2sd=False
+  verdict H32a on S3: NI > ES
+  per-seed S3: NI 0.580 0.548 0.567 0.573 0.569 0.586 0.585 0.579 | ES 0.526 0.501 0.524 0.531 0.514 0.531 0.530 0.524 | EC 0.544 0.516 0.541 0.548 0.533 0.550 0.548 0.541 | NT 0.551 0.539 0.537 0.552 0.556 0.518 0.514 0.564
+  stage 3 (means over seeds):
+    NI  perf_births_per_100 25.1 | perf_share_of_births 0.762 | perf_dead_long_share 0.0308 | zero_use_share 0.532 | uses_of_evicted 8.72 | uses_of_evicted_S3 9.18 | subs_per_task 0 | skipped 0 | niches_found 9 | t_first_median 6e+04 | t_all_found 3.1e+05 | niches_ge16_end 9 | t_ge16_median 1.8e+05 | seeds_all_ge16 8 | perfect_copies_end 608 | largest_niche_end 120 | eff_configs_end 10.6 | min_free_S3 35 | competence_S3 1.93e-13 | busy_S3 1.51e-05 | routing_S3 0.0551 | model_S3 0.0281 | state_size 8.43e+04
+    ES  perf_births_per_100 24.3 | perf_share_of_births 0.735 | perf_dead_long_share 0.0903 | zero_use_share 0.000383 | uses_of_evicted 8.96 | uses_of_evicted_S3 9.11 | subs_per_task 0.33 | skipped 0 | niches_found 9 | t_first_median 6e+04 | t_all_found 1.8e+05 | niches_ge16_end 9 | t_ge16_median 1.4e+05 | seeds_all_ge16 8 | perfect_copies_end 580 | largest_niche_end 87.2 | eff_configs_end 14.2 | min_free_S3 40 | competence_S3 0.000805 | busy_S3 2.22e-05 | routing_S3 0.113 | model_S3 0.0299 | state_size 6.95e+03
+    EC  perf_births_per_100 23.2 | perf_share_of_births 0.703 | perf_dead_long_share 0.0398 | zero_use_share 0.00138 | uses_of_evicted 8.25 | uses_of_evicted_S3 8.62 | subs_per_task 0.329 | skipped 0 | niches_found 9 | t_first_median 6e+04 | t_all_found 2.68e+05 | niches_ge16_end 9 | t_ge16_median 1.5e+05 | seeds_all_ge16 8 | perfect_copies_end 612 | largest_niche_end 87.5 | eff_configs_end 11 | min_free_S3 45.4 | competence_S3 1.93e-13 | busy_S3 0 | routing_S3 0.0933 | model_S3 0.0292 | state_size 7.78e+03
+    NT  perf_births_per_100 24.6 | perf_share_of_births 0.746 | perf_dead_long_share 0.0301 | zero_use_share 0.0084 | uses_of_evicted 8.32 | uses_of_evicted_S3 8.47 | subs_per_task 0.303 | skipped 0 | niches_found 9 | t_first_median 6e+04 | t_all_found 3.28e+05 | niches_ge16_end 8 | t_ge16_median 1.7e+05 | seeds_all_ge16 8 | perfect_copies_end 598 | largest_niche_end 225 | eff_configs_end 8.11 | min_free_S3 16 | competence_S3 1.93e-13 | busy_S3 0.00189 | routing_S3 0.0907 | model_S3 0.0293 | state_size 8.78e+04
+  losses on S3, NI - ES: competence -0.0008 (t -1.0) | busy -0.0000 (t -0.3) | routing -0.0575 (t -27.3) | model -0.0018 (t -6.4)
+  losses on S3, EC - ES: competence -0.0008 (t -1.0) | busy -0.0000 (t -1.0) | routing -0.0193 (t -26.6) | model -0.0006 (t -3.4)
+  losses on S3, NI - EC: competence +0.0000 (t nan) | busy +0.0000 (t 1.3) | routing -0.0382 (t -18.1) | model -0.0012 (t -4.6)
+
+=== b24: seeds [80, 81, 82, 83, 84], wall min NI 25 ES 10 EC 10 NT 21
+  NI  0.349 0.460 0.501 0.536 0.554 0.566 0.566 0.571 0.570 0.566 0.568 0.562 0.571 0.568 0.568 0.568
+  ES  0.356 0.463 0.488 0.508 0.509 0.514 0.519 0.524 0.526 0.530 0.536 0.533 0.534 0.533 0.534 0.531
+  EC  0.345 0.445 0.488 0.509 0.528 0.537 0.542 0.543 0.541 0.541 0.547 0.545 0.544 0.543 0.544 0.541
+  NT  0.329 0.438 0.485 0.510 0.539 0.534 0.532 0.530 0.531 0.524 0.519 0.522 0.521 0.512 0.511 0.507
+  NI  S1 0.564±0.027 S2 0.567±0.014 S3 0.569±0.018 | whole run 0.540 | first 400k 0.462 | d32 +0.0021 (t 0.6)
+  ES  S1 0.516±0.025 S2 0.531±0.015 S3 0.533±0.012 | whole run 0.509 | first 400k 0.454 | d32 +0.0018 (t 1.0)
+  EC  S1 0.538±0.013 S2 0.543±0.013 S3 0.543±0.014 | whole run 0.518 | first 400k 0.447 | d32 -0.0003 (t -0.2)
+  NT  S1 0.534±0.024 S2 0.524±0.024 S3 0.513±0.024 | whole run 0.503 | first 400k 0.440 | d32 -0.0118 (t -4.1)
+  H32a NI - ES on S3: +0.0355 sd 0.0075 se 0.0034 t 10.5 wins 5/5 t>=2.5=True 2sd=True
+  H32a NI - ES whole run: +0.0317 sd 0.0125 se 0.0056 t 5.7 wins 5/5 t>=2.5=True 2sd=True
+  H32a NI - ES first 400k: +0.0081 sd 0.0350 se 0.0156 t 0.5 wins 2/5 t>=2.5=False 2sd=False
+  H32b EC - ES on S3: +0.0098 sd 0.0028 se 0.0012 t 7.9 wins 5/5 t>=2.5=True 2sd=True
+  H32b EC - ES whole run: +0.0090 sd 0.0080 se 0.0036 t 2.5 wins 4/5 t>=2.5=True 2sd=False
+  H32b EC - ES first 400k: -0.0069 sd 0.0273 se 0.0122 t -0.6 wins 2/5 t>=2.5=False 2sd=False
+  H32c NI - EC on S3: +0.0258 sd 0.0072 se 0.0032 t 8.0 wins 5/5 t>=2.5=True 2sd=True
+  H32c NI - EC whole run: +0.0227 sd 0.0136 se 0.0061 t 3.7 wins 5/5 t>=2.5=True 2sd=False
+  H32c NI - EC first 400k: +0.0150 sd 0.0375 se 0.0168 t 0.9 wins 3/5 t>=2.5=False 2sd=False
+  H32d NT - NI on S3: -0.0563 sd 0.0108 se 0.0049 t -11.6 wins 0/5 t>=2.5=True 2sd=True
+  H32d NT - NI whole run: -0.0375 sd 0.0199 se 0.0089 t -4.2 wins 0/5 t>=2.5=True 2sd=False
+  H32d NT - NI first 400k: -0.0211 sd 0.0495 se 0.0221 t -1.0 wins 2/5 t>=2.5=False 2sd=False
+  NT - ES on S3: -0.0207 sd 0.0125 se 0.0056 t -3.7 wins 0/5 t>=2.5=True 2sd=False
+  NT - ES whole run: -0.0058 sd 0.0106 se 0.0047 t -1.2 wins 1/5 t>=2.5=False 2sd=False
+  NT - ES first 400k: -0.0130 sd 0.0268 se 0.0120 t -1.1 wins 2/5 t>=2.5=False 2sd=False
+  verdict H32a on S3: NI > ES
+  per-seed S3: NI 0.582 0.541 0.579 0.580 0.563 | ES 0.541 0.514 0.534 0.544 0.533 | EC 0.548 0.521 0.546 0.557 0.543 | NT 0.529 0.473 0.511 0.535 0.514
+  stage 3 (means over seeds):
+    NI  perf_births_per_100 25.5 | perf_share_of_births 0.773 | perf_dead_long_share 0.0333 | zero_use_share 0.667 | uses_of_evicted 8.8 | uses_of_evicted_S3 8.94 | subs_per_task 0 | skipped 0 | niches_found 9 | t_first_median 6e+04 | t_all_found 2.88e+05 | niches_ge16_end 8 | t_ge16_median 1.4e+05 | seeds_all_ge16 5 | perfect_copies_end 599 | largest_niche_end 129 | eff_configs_end 10.3 | min_free_S3 25.5 | competence_S3 1.93e-13 | busy_S3 0.000313 | routing_S3 0.0604 | model_S3 0.0281 | state_size 7.67e+04
+    ES  perf_births_per_100 23.2 | perf_share_of_births 0.702 | perf_dead_long_share 0.0946 | zero_use_share 0.000652 | uses_of_evicted 8.98 | uses_of_evicted_S3 9.07 | subs_per_task 0.33 | skipped 0 | niches_found 9 | t_first_median 6e+04 | t_all_found 2.2e+05 | niches_ge16_end 9 | t_ge16_median 1.6e+05 | seeds_all_ge16 5 | perfect_copies_end 583 | largest_niche_end 91.4 | eff_configs_end 13.7 | min_free_S3 47.3 | competence_S3 1.93e-13 | busy_S3 0 | routing_S3 0.101 | model_S3 0.0296 | state_size 7.04e+03
+    EC  perf_births_per_100 23 | perf_share_of_births 0.698 | perf_dead_long_share 0.0327 | zero_use_share 0.000255 | uses_of_evicted 8.19 | uses_of_evicted_S3 8.35 | subs_per_task 0.33 | skipped 0 | niches_found 9 | t_first_median 6e+04 | t_all_found 2.48e+05 | niches_ge16_end 9 | t_ge16_median 2.2e+05 | seeds_all_ge16 5 | perfect_copies_end 618 | largest_niche_end 85.6 | eff_configs_end 10.6 | min_free_S3 55.9 | competence_S3 1.93e-13 | busy_S3 0 | routing_S3 0.0896 | model_S3 0.0293 | state_size 8.08e+03
+    NT  perf_births_per_100 22.3 | perf_share_of_births 0.676 | perf_dead_long_share 0.0249 | zero_use_share 0.018 | uses_of_evicted 7.94 | uses_of_evicted_S3 7.52 | subs_per_task 0.312 | skipped 0 | niches_found 9 | t_first_median 8e+04 | t_all_found 6.88e+05 | niches_ge16_end 5.2 | t_ge16_median 2e+05 | seeds_all_ge16 3 | perfect_copies_end 553 | largest_niche_end 253 | eff_configs_end 7.09 | min_free_S3 7.57 | competence_S3 0.00641 | busy_S3 0.00411 | routing_S3 0.116 | model_S3 0.0288 | state_size 5.89e+04
+  losses on S3, NI - ES: competence +0.0000 (t nan) | busy +0.0003 (t 1.8) | routing -0.0408 (t -11.9) | model -0.0015 (t -2.8)
+  losses on S3, EC - ES: competence +0.0000 (t nan) | busy +0.0000 (t nan) | routing -0.0116 (t -7.8) | model -0.0002 (t -0.6)
+  losses on S3, NI - EC: competence +0.0000 (t nan) | busy +0.0003 (t 1.8) | routing -0.0292 (t -8.6) | model -0.0013 (t -4.5)
+
+=== l7: seeds [80, 81, 82, 83, 84], wall min NI 24 ES 10 EC 10 NT 24
+  NI  0.289 0.381 0.432 0.458 0.475 0.498 0.513 0.525 0.538 0.549 0.550 0.556 0.567 0.569 0.571 0.573
+  ES  0.283 0.354 0.396 0.420 0.442 0.451 0.466 0.478 0.478 0.482 0.493 0.495 0.498 0.501 0.507 0.513
+  EC  0.299 0.374 0.399 0.426 0.449 0.466 0.479 0.489 0.496 0.500 0.503 0.510 0.515 0.515 0.517 0.523
+  NT  0.279 0.351 0.382 0.397 0.412 0.433 0.463 0.485 0.491 0.493 0.504 0.518 0.523 0.530 0.532 0.535
+  NI  S1 0.503±0.013 S2 0.548±0.005 S3 0.570±0.013 | whole run 0.503 | first 400k 0.390 | d32 +0.0218 (t 4.8)
+  ES  S1 0.459±0.020 S2 0.487±0.010 S3 0.505±0.006 | whole run 0.454 | first 400k 0.363 | d32 +0.0174 (t 3.6)
+  EC  S1 0.471±0.045 S2 0.502±0.044 S3 0.517±0.037 | whole run 0.466 | first 400k 0.375 | d32 +0.0150 (t 2.6)
+  NT  S1 0.448±0.032 S2 0.501±0.033 S3 0.530±0.033 | whole run 0.458 | first 400k 0.352 | d32 +0.0288 (t 3.5)
+  H32a NI - ES on S3: +0.0654 sd 0.0097 se 0.0043 t 15.1 wins 5/5 t>=2.5=True 2sd=True
+  H32a NI - ES whole run: +0.0492 sd 0.0051 se 0.0023 t 21.7 wins 5/5 t>=2.5=True 2sd=True
+  H32a NI - ES first 400k: +0.0271 sd 0.0095 se 0.0042 t 6.4 wins 5/5 t>=2.5=True 2sd=True
+  H32b EC - ES on S3: +0.0126 sd 0.0324 se 0.0145 t 0.9 wins 3/5 t>=2.5=False 2sd=False
+  H32b EC - ES whole run: +0.0126 sd 0.0319 se 0.0143 t 0.9 wins 4/5 t>=2.5=False 2sd=False
+  H32b EC - ES first 400k: +0.0114 sd 0.0139 se 0.0062 t 1.8 wins 4/5 t>=2.5=False 2sd=False
+  H32c NI - EC on S3: +0.0528 sd 0.0244 se 0.0109 t 4.8 wins 5/5 t>=2.5=True 2sd=True
+  H32c NI - EC whole run: +0.0366 sd 0.0278 se 0.0124 t 2.9 wins 5/5 t>=2.5=True 2sd=False
+  H32c NI - EC first 400k: +0.0157 sd 0.0127 se 0.0057 t 2.8 wins 4/5 t>=2.5=True 2sd=False
+  H32d NT - NI on S3: -0.0398 sd 0.0282 se 0.0126 t -3.2 wins 0/5 t>=2.5=True 2sd=False
+  H32d NT - NI whole run: -0.0448 sd 0.0203 se 0.0091 t -4.9 wins 0/5 t>=2.5=True 2sd=True
+  H32d NT - NI first 400k: -0.0382 sd 0.0323 se 0.0144 t -2.6 wins 1/5 t>=2.5=True 2sd=False
+  NT - ES on S3: +0.0256 sd 0.0308 se 0.0138 t 1.9 wins 3/5 t>=2.5=False 2sd=False
+  NT - ES whole run: +0.0044 sd 0.0247 se 0.0110 t 0.4 wins 2/5 t>=2.5=False 2sd=False
+  NT - ES first 400k: -0.0111 sd 0.0260 se 0.0116 t -1.0 wins 3/5 t>=2.5=False 2sd=False
+  verdict H32a on S3: NI > ES
+  per-seed S3: NI 0.573 0.551 0.578 0.583 0.565 | ES 0.508 0.495 0.510 0.503 0.507 | EC 0.542 0.459 0.533 0.549 0.504 | NT 0.553 0.490 0.499 0.559 0.550
+  stage 3 (means over seeds):
+    NI  perf_births_per_100 18.1 | perf_share_of_births 0.549 | perf_dead_long_share 0.0323 | zero_use_share 0.505 | uses_of_evicted 8.77 | uses_of_evicted_S3 9.07 | subs_per_task 0 | skipped 0 | niches_found 9 | t_first_median 2.8e+05 | t_all_found 9.08e+05 | niches_ge16_end 8.8 | t_ge16_median 5e+05 | seeds_all_ge16 4 | perfect_copies_end 586 | largest_niche_end 98.4 | eff_configs_end 11.9 | min_free_S3 29.8 | competence_S3 0.00157 | busy_S3 0.000313 | routing_S3 0.0577 | model_S3 0.0277 | state_size 7.29e+04
+    ES  perf_births_per_100 16 | perf_share_of_births 0.486 | perf_dead_long_share 0.0903 | zero_use_share 0.0011 | uses_of_evicted 8.97 | uses_of_evicted_S3 9.22 | subs_per_task 0.329 | skipped 0 | niches_found 9 | t_first_median 2.8e+05 | t_all_found 1.14e+06 | niches_ge16_end 8.4 | t_ge16_median 5e+05 | seeds_all_ge16 2 | perfect_copies_end 542 | largest_niche_end 80.8 | eff_configs_end 14.4 | min_free_S3 27.3 | competence_S3 0.0162 | busy_S3 0.000966 | routing_S3 0.118 | model_S3 0.0302 | state_size 6.81e+03
+    EC  perf_births_per_100 14.7 | perf_share_of_births 0.444 | perf_dead_long_share 0.0404 | zero_use_share 0.000184 | uses_of_evicted 8.51 | uses_of_evicted_S3 8.94 | subs_per_task 0.33 | skipped 0 | niches_found 8.8 | t_first_median 2.7e+05 | t_all_found nan | niches_ge16_end 8.4 | t_ge16_median 5e+05 | seeds_all_ge16 3 | perfect_copies_end 555 | largest_niche_end 81 | eff_configs_end 12.7 | min_free_S3 30.5 | competence_S3 0.0172 | busy_S3 0.00137 | routing_S3 0.101 | model_S3 0.0303 | state_size 6.27e+03
+    NT  perf_births_per_100 11.8 | perf_share_of_births 0.358 | perf_dead_long_share 0.0283 | zero_use_share 0.0126 | uses_of_evicted 8.62 | uses_of_evicted_S3 8.55 | subs_per_task 0.295 | skipped 0 | niches_found 8.8 | t_first_median 4.6e+05 | t_all_found nan | niches_ge16_end 7.6 | t_ge16_median 6.5e+05 | seeds_all_ge16 2 | perfect_copies_end 426 | largest_niche_end 144 | eff_configs_end 9.45 | min_free_S3 9.33 | competence_S3 0.0192 | busy_S3 0.00228 | routing_S3 0.0861 | model_S3 0.0271 | state_size 7.79e+04
+  losses on S3, NI - ES: competence -0.0146 (t -5.3) | busy -0.0007 (t -1.9) | routing -0.0598 (t -28.2) | model -0.0025 (t -8.7)
+  losses on S3, EC - ES: competence +0.0011 (t 0.1) | busy +0.0004 (t 0.3) | routing -0.0166 (t -5.6) | model +0.0001 (t 0.2)
+  losses on S3, NI - EC: competence -0.0157 (t -1.4) | busy -0.0011 (t -0.9) | routing -0.0433 (t -35.2) | model -0.0025 (t -6.4)
+
+H32a by environment: {'orig': 'NI > ES', 'b24': 'NI > ES', 'l7': 'NI > ES'}
+saved results/h32_mechanisms.json
