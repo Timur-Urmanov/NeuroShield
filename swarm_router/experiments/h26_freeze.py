@@ -78,6 +78,8 @@ class Diag:
                 self.born[ch] = t; self.ep = tp.epoch.copy()
             if getattr(tp, "trial", False):
                 self.subs[b] += tp.n_sub - self.sub0; self.sub0 = tp.n_sub
+            i = 0 if self.cum[cc].argmax() == k else 1; j = 2 if (t - self.born[members] < 5000).any() else 3
+            self.split[b, i] += (rl, 1); self.split[b, j] += (rl, 1)
         if TSH[0] and t + 1 == TSH[0]:                                   # H33: environment event, not known to the algorithm
             rg = np.random.default_rng(SEED + 3300); K, J, L = env.targets.shape
             for f in rg.choice(K * J, size=TSH[1], replace=False):
@@ -90,8 +92,6 @@ class Diag:
             env._recompute(np.arange(env.N))
             if self.isperf is not None:
                 self.isperf = (env.genes[:, None, None, :] == env.targets[None]).all(-1).any((1, 2))
-            i = 0 if self.cum[cc].argmax() == k else 1; j = 2 if (t - self.born[members] < 5000).any() else 3
-            self.split[b, i] += (rl, 1); self.split[b, j] += (rl, 1)
         if VICT and hasattr(tp, "ih_s") and tp.t % tp.every == tp.every - 1:      # H31: state one task before a generation
             eq = (env.genes[:, None, None, :] == env.targets[None]).all(-1); cnt = eq.sum(0); big = np.unravel_index(cnt.argmax(), cnt.shape)
             perf = eq.any((1, 2)); nc = np.where(eq, cnt[None], 0).max((1, 2))      # copies in the primitive's own niche
