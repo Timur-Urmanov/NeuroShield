@@ -32,7 +32,11 @@ if os.environ.get("H32_PARAMS"):                                 # H32: n_min,ma
 if os.environ.get("H33_CTL"):                                    # H33: g,eps,eta[,noalarm] or z,z0,gz
     a_ = os.environ["H33_CTL"].split(",")
     sb.CTL.update(mode="g", eps=float(a_[1]), eta=float(a_[2]), alarm=len(a_) < 4) if a_[0] == "g" else sb.CTL.update(mode="z", z0=float(a_[1]), gz=float(a_[2]))
-TSH = [int(x) for x in os.environ.get("H33_TSHIFT", "0,0").split(",")]      # H33: at task TSH[0] the targets of TSH[1] niches are redrawn
+if os.environ.get("H33_SET"):                                    # H33 main test: parameters only, the controllers are switched on at a fork
+    a_ = os.environ["H33_SET"].split(","); sb.CTL.update(eps=float(a_[0]), eta=float(a_[1]), z0=float(a_[2]), gz=float(a_[3]))
+TSH = [int(x) for x in os.environ.get("H33_TSHIFT", "0,0").split(",")] + [0]      # H33: at task TSH[0] the targets of TSH[1] niches change:
+#      redrawn (TSH[2] = 0) or TSH[2] genes of each replaced by other values
+KMAP = dict(x.split(":") for x in os.environ.get("H33_KMAP", "").split(",") if x)      # H33: fork time -> kinds, e.g. 400000:HAZQ,600000:F
 OUT = os.path.join(ROOT, ".cache", os.environ.get("H26_DIR", "h26"))
 KEYS = ("succ", "q_pop", "q_avail", "q_team", "er", "er_best", "min_free", "cap_obs", "good_obs")
 
@@ -78,6 +82,9 @@ class Diag:
             rg = np.random.default_rng(SEED + 3300); K, J, L = env.targets.shape
             for f in rg.choice(K * J, size=TSH[1], replace=False):
                 old = env.targets[f // J, f % J].copy()
+                if TSH[2]:
+                    for g in rg.choice(L, size=TSH[2], replace=False):
+                        env.targets[f // J, f % J, g] = (old[g] + rg.integers(1, env.A)) % env.A
                 while (env.targets[f // J, f % J] == old).all():
                     env.targets[f // J, f % J] = rg.integers(env.A, size=L)
             env._recompute(np.arange(env.N))
@@ -99,9 +106,15 @@ class Diag:
             cc = tp.b.ctx; n = tp.in_[cc]; good = (n >= 5) & (tp.is_[cc] > tp.cr[cc] * n)
             a["cap_obs"][b] += (good & av).sum(); a["good_obs"][b] += good.sum()
             if self.tag == BASE and tp.t in FORKS:                       # branch: the child continues with a frozen population
-                for kind in KINDS:
+                for kind in KMAP.get(str(tp.t), KINDS):
                     pid = os.fork()
                     if pid == 0:
+                        if kind in "HA":                                 # H33: global controller switched on (A: without the alarm)
+                            tp.ctl = dict(sb.CTL, mode="g", alarm=kind == "H"); tp.sf = tp.ss = float((tp.cn * tp.cr).sum() / tp.cn.sum()); tp.rho = 1.0
+                        if kind == "Z":                                  # H33: local controller switched on
+                            tp.ctl = dict(sb.CTL, mode="z"); tp.zs = np.zeros_like(tp.is_); tp.zn = np.zeros_like(tp.in_)
+                        if kind == "Q":                                  # H33: constant reduced intensity
+                            tp.frac = 0.0125
                         if kind in "FG":
                             tp.frozen = True
                         if kind == "S":
@@ -124,7 +137,7 @@ class TrueType:
 
 
 def done(v, seed):
-    tags = [v] + ([f"{k}{f // 1000}" for f in FORKS for k in KINDS] if v == BASE else [])
+    tags = [v] + ([f"{k}{f // 1000}" for f in FORKS for k in KMAP.get(str(f), KINDS)] if v == BASE else [])
     return all(os.path.exists(os.path.join(OUT, f"{g}_{seed}.npz")) for g in tags)
 
 
