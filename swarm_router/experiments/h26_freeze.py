@@ -17,6 +17,7 @@ N, BUSY, GL, BLK = int(os.environ.get("H26_N", 640)), int(os.environ.get("H26_BU
 VAR = {"C": dict(team="evo_colony", frac=0.05, pm=0.1, beta=1.0, victim="contrib"), "NI": dict(team="evo_colony", frac=0.05, pm=0.1, beta=1.0, victim="noinherit"),
        "A": dict(team="evo_fixed"), "R": dict(team="evo_random", frac=0.05), "RC": dict(team="evo_colony_r", frac=0.05, pm=0.1, beta=1.0),
        "ES": dict(team="evo_es", frac=0.05, pm=0.1), "EC": dict(team="evo_es_c", frac=0.05, pm=0.1), "NT": dict(team="evo_colony_t", frac=0.05, pm=0.1, beta=1.0),      # H32
+       "HC": dict(team="evo_hyb", frac=0.05, pm=0.1, beta=1.0), "HD": dict(team="evo_hyb_d", frac=0.05, pm=0.1, beta=1.0),      # H34: hybrids
        "N4": dict(team="evo_colony", frac=0.0125, pm=0.1, beta=1.0),      # H33: constant reduced intensity (9 replacements per generation)
        "PN": dict(team="evo_pattern", frac=0.05, pm=0.1, nov=2.0)}      # H29: baselines with search
 SWITCH = os.environ.get("H26_SWITCH", "") == "1"      # H27: also branch to the noinherit eviction rule at the fork points
@@ -34,6 +35,10 @@ if os.environ.get("H33_CTL"):                                    # H33: g,eps,et
     sb.CTL.update(mode="g", eps=float(a_[1]), eta=float(a_[2]), alarm=len(a_) < 4) if a_[0] == "g" else sb.CTL.update(mode="z", z0=float(a_[1]), gz=float(a_[2]))
 if os.environ.get("H33_SET"):                                    # H33 main test: parameters only, the controllers are switched on at a fork
     a_ = os.environ["H33_SET"].split(","); sb.CTL.update(eps=float(a_[0]), eta=float(a_[1]), z0=float(a_[2]), gz=float(a_[3]))
+if os.environ.get("H34_GEN"):                                    # H34: search generator - probability of recombination, mutation rate
+    a_ = os.environ["H34_GEN"].split(","); sb.ES_PARAMS.update(xo=float(a_[0]))
+    for v_ in ("ES", "EC", "HC", "HD"):
+        VAR[v_]["pm"] = float(a_[1])
 TSH = [int(x) for x in os.environ.get("H33_TSHIFT", "0,0").split(",")] + [0]      # H33: at task TSH[0] the targets of TSH[1] niches change:
 #      redrawn (TSH[2] = 0) or TSH[2] genes of each replaced by other values
 KMAP = dict(x.split(":") for x in os.environ.get("H33_KMAP", "").split(",") if x)      # H33: fork time -> kinds, e.g. 400000:HAZQ,600000:F
@@ -50,6 +55,7 @@ class Diag:
         self.split = np.zeros((160, 4, 2))                                   # routing loss and count: cluster ok | wrong | young member | no young member
         self.ep = None; self.born = None
         self.ev = np.zeros((160, 6)); self.subs = np.zeros(160); self.uses = None; self.isperf = None; self.sub0 = 0      # H32: search accounting
+        self.nich = np.zeros((160, 3, 3, 4)); self.fb = np.full((3, 3), -1); self.nb = np.zeros((3, 3)); self.long = np.zeros(160)      # H34: per niche
         self.vict = np.zeros((160, 2, 4)); self.pop = np.zeros((160, 4)); self.prot = np.zeros((160, 4)); self.vn = np.zeros(160)
         self.vuse = np.zeros((160, 2)); self.vinh = np.zeros((160, 2))
 
@@ -63,6 +69,7 @@ class Diag:
         a["er"][b] += ev[m]; a["er_best"][b] += ev.max(); a["min_free"][b] += free.min()
         c = 0 if not ex.all() else 1 if (free == 0).any() else 2 if not got.all() else 3      # absent | busy | routing | full team
         self.cat_n[b, c] += 1; self.cat_s[b, c] += succ
+        self.nich[b, k, :, 0] += 1; self.nich[b, k, :, 1] += ex; self.nich[b, k, :, 2] += free > 0; self.nich[b, k, :, 3] += got & (free > 0)      # H34
         self.role[b] += [(~ex).mean(), (ex & (free == 0)).mean(), ((free > 0) & ~got).mean(), got.mean()]
         if hasattr(tp, "b"):                                             # H30: where the routing loss sits (hidden type and ages; diagnostics only)
             cc = tp.b.ctx; self.conf[b, cc, k] += 1; self.cum[cc, k] += 1; rl = ba.prod() - q
@@ -74,6 +81,10 @@ class Diag:
             if ch.any():                                                 # H32: births, evictions, fate of perfect configurations (hidden; diagnostics)
                 pn = (env.genes[ch][:, None, None, :] == env.targets[None]).all(-1).any((1, 2)); po = self.isperf[ch]; u = self.uses[ch]
                 self.ev[b] += (ch.sum(), pn.sum(), (u == 0).sum(), u.sum(), po.sum(), (po & (t - self.born[ch] >= 5000)).sum())
+                self.long[b] += (t - self.born[ch] >= 5000).sum()                 # H34: evicted after at least 5000 tasks (any configuration)
+                if TSH[0] and t >= TSH[0]:                                         # H34: perfect configurations born after the target shift, per niche
+                    eqn = (env.genes[ch][:, None, None, :] == env.targets[None]).all(-1).sum(0)
+                    self.fb = np.where((self.fb < 0) & (eqn > 0), t, self.fb); self.nb += eqn
                 self.isperf[ch] = pn; self.uses[ch] = 0
                 self.born[ch] = t; self.ep = tp.epoch.copy()
             if getattr(tp, "trial", False):
@@ -152,7 +163,8 @@ if __name__ == "__main__":
     np.savez_compressed(f + ".tmp.npz", R=o["R"].reshape(160, -1).mean(1), q=o["q"].reshape(160, -1).mean(1), blk=BLK,
                         t=np.array([s[0] for s in tp.trace]), genes=np.array([s[1] for s in tp.trace]), lin=np.array([s[2] for s in tp.trace]),
                         epoch=np.array([s[3] for s in tp.trace]), targets=env.targets, genes0=np.random.default_rng(seed + 2900).integers(env.A, size=(N, env.L)),
-                        cat_n=d.cat_n, cat_s=d.cat_s, role=d.role / BLK, conf=d.conf, split=d.split, ev=d.ev, subs=d.subs, rho_log=np.array(getattr(tp, "rho_log", []), float), n_alarm=getattr(tp, "n_alarm", 0), targets0=targets0, n_skip=getattr(tp, "n_skip", 0), alive_perf_age=np.where(d.isperf, T - d.born, -1) if d.isperf is not None else np.zeros(1), vict=d.vict, pop=d.pop, prot=d.prot, vn=d.vn, vuse=d.vuse, vinh=d.vinh, wall=time.time() - d.t0, state=tp.state_size, births=tp.births,
+                        cat_n=d.cat_n, cat_s=d.cat_s, role=d.role / BLK, conf=d.conf, split=d.split, ev=d.ev, subs=d.subs, nich=d.nich, first_birth=d.fb, births_niche=d.nb, long_lived=d.long, n_xo=getattr(tp, "n_xo", 0),
+                        age_end=(T - d.born) if d.born is not None else np.zeros(1), rho_log=np.array(getattr(tp, "rho_log", []), float), n_alarm=getattr(tp, "n_alarm", 0), targets0=targets0, n_skip=getattr(tp, "n_skip", 0), alive_perf_age=np.where(d.isperf, T - d.born, -1) if d.isperf is not None else np.zeros(1), vict=d.vict, pop=d.pop, prot=d.prot, vn=d.vn, vuse=d.vuse, vinh=d.vinh, wall=time.time() - d.t0, state=tp.state_size, births=tp.births,
                         **{k: x / BLK for k, x in d.a.items()})
     os.replace(f + ".tmp.npz", f + ".npz")
     print(f"{d.tag} seed {seed}: {(time.time() - d.t0) / 60:.1f} min", flush=True)

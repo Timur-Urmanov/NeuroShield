@@ -180,7 +180,8 @@ def _sp_drop(b, i):
             b.m[c] = live
 
 
-ES_PARAMS = dict(n_min=1, max_sub=3, rho=0.1, timeout=300, evict="crate", pq="equal", sub="config", k=1.0)      # frozen for H32 stage 2
+ES_PARAMS = dict(n_min=1, max_sub=3, rho=0.1, timeout=300, evict="crate", pq="equal", sub="config", k=1.0,      # frozen for H32 stage 2
+                 xo=0.0, pm_col=0.1)      # H34: probability of recombination in the search generator; mutation rate of colony-generated kids
 # pq: parents by own LCB over all clusters (flat) or the same number from every cluster (equal: plain niching, no deficit signal)
 # sub: a newcomer replaces its parent (parent) or any team member carrying the parent's configuration (config; the
 #      system writes the configurations itself, so comparing them uses no hidden information)      # H32: trial mechanism (set by the experiment before a run)
@@ -222,12 +223,17 @@ class EvolvingBandit:
             self.mode, self.kids = "colony", "random"
         # H32: trial of newcomers (probation + substitution for the parent). es = evolutionary search with trials and
         # eviction by own LCB; es_c = the same with the colony's eviction; colony_t = the colony plus the trial mechanism
-        self.trial = mode in ("es", "es_c", "colony_t"); self.es = mode in ("es", "es_c"); self.es_evict = "lcb" if mode == "es" else "contrib"
+        self.trial = mode in ("es", "es_c", "colony_t", "hyb", "hyb_d"); self.es = mode in ("es", "es_c", "hyb", "hyb_d")
+        self.es_evict = "lcb" if mode == "es" else "contrib"
+        # H34: hyb = search generator + colony retention (a kid with a parent inherits half of its record and pair statistics,
+        # eviction by own contribution without the inherited part); hyb_d = half of the kids from the colony generator
+        self.entry = "inherit" if mode in ("hyb", "hyb_d") else "trial"; self.mix = 0.5 if mode == "hyb_d" else 0.0
         if mode == "colony_t":
             self.mode = "colony"
         if self.trial:
             self.tp = dict(ES_PARAMS); self.prob = np.zeros(N, bool); self.own_n = np.zeros(N); self.par = np.full(N, -1)
             self.born_t = np.zeros(N, int); self.kidq = {}; self.n_sub = 0; self.n_sub_tasks = 0; self.cfgq = {}; self.ref = {}; self.n_skip = 0
+            self.n_xo = 0
         self.ctl = dict(CTL) if CTL["mode"] and mode == "colony" else None      # H33
         self.rho, self.sf, self.ss, self.n_alarm, self.rho_log, self.sbest = 1.0, 0.5, 0.5, 0, [], 0.0
         if self.ctl is not None and self.ctl["mode"] == "z":
@@ -291,6 +297,19 @@ class EvolvingBandit:
         n_new = 3 * max(1, int(round(self.frac * N / 3))); n_imm = int(round(self.tp["rho"] * n_new))
         L = self._lcb(self.is_, self.in_) + 1e-9 * rg.random(self.is_.shape)
         parents, seen = [], set()
+        n_col = int(round(self.mix * (n_new - n_imm)))      # H34 (hyb_d): this many parents by the colony's deficit quotas
+        if n_col:
+            d = self.cn * (1 - self.cr) ** self.beta; d = n_col * d / d.sum(); q = np.floor(d).astype(int)
+            for c in np.argsort(-(d - q))[: n_col - q.sum()]:
+                q[c] += 1
+            for c in np.argsort(-d):
+                got = 0
+                for i in np.argsort(-L[c]):
+                    if got >= q[c]:
+                        break
+                    if int(i) not in seen and self.in_[c, i] > 0 and not self.prob[i]:
+                        seen.add(int(i)); parents.append(int(i)); got += 1
+            n_col = len(parents)
         if self.tp["pq"] == "equal":                 # plain niching: the same number of parents from every cluster
             order = [np.argsort(-L[c]) for c in range(L.shape[0])]; pos = [0] * L.shape[0]; c = 0; idle = 0
             while len(parents) < n_new - n_imm and idle < L.shape[0]:
@@ -314,8 +333,8 @@ class EvolvingBandit:
             val = (self.is_ - self.in_ * self.cr[:, None]).sum(0) / (self.in_.sum(0) + self.tp["k"]) + 1e-9 * rg.random(N)
         elif self.es_evict == "lcb":
             val = L.max(0)
-        else:
-            val = (self.is_ - self.in_ * self.cr[:, None]).sum(0) + 1e-9 * rg.random(N)
+        else:                                        # own contribution; the inherited part is zero unless entry == "inherit"
+            val = ((self.is_ - self.ih_s) - (self.in_ - self.ih_n) * self.cr[:, None]).sum(0) + 1e-9 * rg.random(N)
         val = val.copy(); val[self.prob] = np.inf; val[parents] = np.inf
         victims = [int(v) for v in np.argsort(val)[: len(parents) + n_imm] if np.isfinite(val[v])]
         self.n_skip += len(parents) + n_imm - len(victims)
@@ -323,11 +342,27 @@ class EvolvingBandit:
             p = parents[j] if j < len(parents) else -1
             if p >= 0:
                 self.ref_key = env.genes[p].tobytes()
-                env.clone(p, kid, bool(rg.random() < self.pm), rg); self.lin[kid] = self.lin[p]
+                env.clone(p, kid, bool(rg.random() < (self.tp["pm_col"] if j < n_col else self.pm)), rg); self.lin[kid] = self.lin[p]
+                if j >= n_col and self.tp["xo"] > 0 and len(parents) > 1 and rg.random() < self.tp["xo"]:      # H34: recombination
+                    p2 = parents[int(rg.integers(len(parents) - 1))]; p2 = parents[-1] if p2 == p else p2
+                    g = rg.choice(env.L, size=int(rg.integers(1, 3)), replace=False)
+                    env.genes[kid, g] = env.genes[p2, g]; env._recompute(np.array([kid])); self.n_xo += 1
             else:
                 env.randomize(kid, rg); self.lin[kid] = self.N + self.births
             self._rewrite(kid); self.ih_s[:, kid] = 0; self.ih_n[:, kid] = 0; self.ctr[kid] = 0
-            self._start_trial(kid, p)
+            if p >= 0 and self.entry == "inherit":       # H34: the colony's way in - half of the parent's pair statistics and record
+                b = self.b
+                for c in range(b.C):
+                    for jj, row in list(b.nb[c].get(p, {}).items()):
+                        if jj != kid:
+                            _sp_set(b, c, kid, jj, b.s[c][row] / 2, b.n[c][row] / 2)
+                self.is_[:, kid] = self.is_[:, p] / 2; self.in_[:, kid] = self.in_[:, p] / 2
+                self.ih_s[:, kid] = self.is_[:, kid]; self.ih_n[:, kid] = self.in_[:, kid]
+                for k in self.kidq.pop(kid, ()):
+                    self.par[k] = -1
+                self.prob[kid] = False
+            else:
+                self._start_trial(kid, p)
 
     def _lcb(self, s_, n_):
         p0 = self.b.succ_sum / self.b.succ_n if self.b.succ_n else 0.5
