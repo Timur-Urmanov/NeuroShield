@@ -1,0 +1,167 @@
+
+=== stat: seeds [130, 131, 132, 133, 134, 135, 136, 137], wall min A 25 B 10 C 20 D 21 T 11
+  A 0.336 0.455 0.511 0.537 0.561 0.566 0.571 0.575 0.577 0.575 0.574 0.574 0.577 0.580 0.576 0.577
+  B 0.328 0.413 0.453 0.483 0.501 0.513 0.518 0.518 0.521 0.521 0.521 0.520 0.522 0.523 0.522 0.521
+  C 0.345 0.474 0.526 0.544 0.560 0.567 0.568 0.568 0.566 0.570 0.570 0.572 0.572 0.570 0.568 0.568
+  D 0.345 0.450 0.508 0.540 0.552 0.562 0.569 0.570 0.568 0.566 0.563 0.561 0.561 0.562 0.561 0.564
+  T 0.340 0.451 0.484 0.511 0.525 0.536 0.538 0.539 0.539 0.539 0.538 0.539 0.541 0.541 0.541 0.539
+  A main 0.5774±0.0163 | whole 0.5450±0.0237 | cumulative 871,982
+  B main 0.5221±0.0146 | whole 0.4937±0.0215 | cumulative 789,872
+  C main 0.5695±0.0150 | whole 0.5442±0.0158 | cumulative 870,734
+  D main 0.5619±0.0200 | whole 0.5376±0.0158 | cumulative 860,139
+  T main 0.5404±0.0132 | whole 0.5150±0.0185 | cumulative 824,000
+  C - A on main: -0.0079 sd 0.0036 se 0.0013 t -6.3 wins 0/8 t>=2.5=True 2sd=True
+  C - A on whole: -0.0008 sd 0.0109 se 0.0038 t -0.2 wins 3/8 t>=2.5=False 2sd=False
+  C - B on main: +0.0474 sd 0.0034 se 0.0012 t 39.6 wins 8/8 t>=2.5=True 2sd=True
+  C - B on whole: +0.0505 sd 0.0111 se 0.0039 t 12.9 wins 8/8 t>=2.5=True 2sd=True
+  D - A on main: -0.0155 sd 0.0213 se 0.0075 t -2.1 wins 0/8 t>=2.5=False 2sd=False
+  D - A on whole: -0.0074 sd 0.0162 se 0.0057 t -1.3 wins 2/8 t>=2.5=False 2sd=False
+  D - B on main: +0.0398 sd 0.0201 se 0.0071 t 5.6 wins 7/8 t>=2.5=True 2sd=False
+  D - B on whole: +0.0439 sd 0.0170 se 0.0060 t 7.3 wins 8/8 t>=2.5=True 2sd=True
+  C - T on main: +0.0291 sd 0.0024 se 0.0008 t 34.9 wins 8/8 t>=2.5=True 2sd=True
+  C - T on whole: +0.0292 sd 0.0069 se 0.0024 t 12.0 wins 8/8 t>=2.5=True 2sd=True
+  T - B on main: +0.0182 sd 0.0027 se 0.0009 t 19.2 wins 8/8 t>=2.5=True 2sd=True
+  T - B on whole: +0.0213 sd 0.0119 se 0.0042 t 5.1 wins 8/8 t>=2.5=True 2sd=False
+  D - C on main: -0.0076 sd 0.0211 se 0.0075 t -1.0 wins 2/8 t>=2.5=False 2sd=False
+  D - C on whole: -0.0066 sd 0.0133 se 0.0047 t -1.4 wins 4/8 t>=2.5=False 2sd=False
+  A - B on main: +0.0553 sd 0.0061 se 0.0021 t 25.7 wins 8/8 t>=2.5=True 2sd=True
+  A - B on whole: +0.0513 sd 0.0157 se 0.0055 t 9.3 wins 8/8 t>=2.5=True 2sd=True
+  H34a C: beats A False, beats B True; vs best single (A) -0.0079 (t -6.3), not worse than delta True
+  H34a D: beats A False, beats B True; vs best single (A) -0.0155 (t -2.1), not worse than delta False
+  per-seed main: A 0.594 0.590 0.548 0.575 0.591 0.586 0.560 0.576 | B 0.535 0.532 0.505 0.520 0.535 0.530 0.496 0.525 | C 0.586 0.579 0.547 0.564 0.584 0.576 0.549 0.570 | D 0.526 0.584 0.546 0.560 0.583 0.576 0.551 0.569 | T 0.552 0.549 0.521 0.536 0.553 0.547 0.521 0.544
+  A losses(main) competence 0.0000 busy 0.0000 routing 0.0516 model 0.0271 | candidates_k 528 zero_use_share 0.553 settled_share 0.0339 perfect_share_of_candidates 0.752 subs_per_task 0 state_size_k 77.7 niches_ge16 9 perfect_copies 616 eff_configs 10 wall_min 24.9
+  B losses(main) competence 0.0016 busy 0.0003 routing 0.1122 model 0.0298 | candidates_k 528 zero_use_share 0.000168 settled_share 0.086 perfect_share_of_candidates 0.682 subs_per_task 0.33 state_size_k 7.03 niches_ge16 8.88 perfect_copies 590 eff_configs 13 wall_min 10.3
+  C losses(main) competence 0.0000 busy 0.0000 routing 0.0603 model 0.0274 | candidates_k 528 zero_use_share 0.436 settled_share 0.031 perfect_share_of_candidates 0.714 subs_per_task 0.03 state_size_k 39.8 niches_ge16 9 perfect_copies 455 eff_configs 37.3 wall_min 20.1
+  D losses(main) competence 0.0003 busy 0.0006 routing 0.0681 model 0.0280 | candidates_k 528 zero_use_share 0.425 settled_share 0.0313 perfect_share_of_candidates 0.695 subs_per_task 0.03 state_size_k 44.9 niches_ge16 8.88 perfect_copies 469 eff_configs 33.3 wall_min 20.9
+  T losses(main) competence 0.0000 busy 0.0000 routing 0.0934 model 0.0290 | candidates_k 528 zero_use_share 6.84e-05 settled_share 0.0407 perfect_share_of_candidates 0.71 subs_per_task 0.33 state_size_k 8.15 niches_ge16 9 perfect_copies 614 eff_configs 10.8 wall_min 10.5
+
+=== mild: seeds [130, 131, 132, 133, 134, 135, 136, 137], wall min A 30 B 10 C 23 D 25 T 11
+  A 0.336 0.455 0.511 0.537 0.561 0.566 0.571 0.575 0.523 0.508 0.497 0.494 0.495 0.499 0.503 0.506
+  B 0.328 0.413 0.453 0.483 0.501 0.513 0.518 0.518 0.479 0.487 0.499 0.511 0.517 0.521 0.524 0.524
+  C 0.345 0.474 0.526 0.544 0.560 0.567 0.568 0.568 0.522 0.520 0.519 0.510 0.508 0.518 0.524 0.528
+  D 0.345 0.450 0.508 0.540 0.552 0.562 0.569 0.570 0.518 0.510 0.493 0.488 0.490 0.493 0.502 0.514
+  T 0.340 0.451 0.484 0.511 0.525 0.536 0.538 0.539 0.501 0.497 0.499 0.503 0.511 0.518 0.519 0.527
+  A main 0.5032±0.0146 | whole 0.5085±0.0166 | 0.8-1.2M 0.5056±0.0118 | 1.2-1.6M 0.5008±0.0207 | cumulative 813,604
+  B main 0.5077±0.0166 | whole 0.4868±0.0210 | 0.8-1.2M 0.4939±0.0200 | 1.2-1.6M 0.5216±0.0151 | cumulative 778,884
+  C main 0.5187±0.0241 | whole 0.5188±0.0140 | 0.8-1.2M 0.5178±0.0173 | 1.2-1.6M 0.5196±0.0334 | cumulative 830,129
+  D main 0.5011±0.0191 | whole 0.5066±0.0152 | 0.8-1.2M 0.5024±0.0176 | 1.2-1.6M 0.4999±0.0237 | cumulative 810,536
+  T main 0.5095±0.0191 | whole 0.4999±0.0210 | 0.8-1.2M 0.5003±0.0125 | 1.2-1.6M 0.5187±0.0263 | cumulative 799,886
+  C - A on main: +0.0155 sd 0.0170 se 0.0060 t 2.6 wins 7/8 t>=2.5=True 2sd=False
+  C - A on whole: +0.0103 sd 0.0076 se 0.0027 t 3.8 wins 8/8 t>=2.5=True 2sd=False
+  C - A on 0.8-1.2M: +0.0123 sd 0.0160 se 0.0057 t 2.2 wins 6/8 t>=2.5=False 2sd=False
+  C - A on 1.2-1.6M: +0.0188 sd 0.0227 se 0.0080 t 2.3 wins 7/8 t>=2.5=False 2sd=False
+  C - B on main: +0.0110 sd 0.0214 se 0.0076 t 1.4 wins 5/8 t>=2.5=False 2sd=False
+  C - B on whole: +0.0320 sd 0.0142 se 0.0050 t 6.4 wins 8/8 t>=2.5=True 2sd=True
+  C - B on 0.8-1.2M: +0.0239 sd 0.0180 se 0.0064 t 3.8 wins 7/8 t>=2.5=True 2sd=False
+  C - B on 1.2-1.6M: -0.0020 sd 0.0320 se 0.0113 t -0.2 wins 3/8 t>=2.5=False 2sd=False
+  D - A on main: -0.0020 sd 0.0167 se 0.0059 t -0.3 wins 3/8 t>=2.5=False 2sd=False
+  D - A on whole: -0.0019 sd 0.0150 se 0.0053 t -0.4 wins 3/8 t>=2.5=False 2sd=False
+  D - A on 0.8-1.2M: -0.0032 sd 0.0151 se 0.0054 t -0.6 wins 4/8 t>=2.5=False 2sd=False
+  D - A on 1.2-1.6M: -0.0008 sd 0.0254 se 0.0090 t -0.1 wins 3/8 t>=2.5=False 2sd=False
+  D - B on main: -0.0066 sd 0.0229 se 0.0081 t -0.8 wins 4/8 t>=2.5=False 2sd=False
+  D - B on whole: +0.0198 sd 0.0168 se 0.0059 t 3.3 wins 7/8 t>=2.5=True 2sd=False
+  D - B on 0.8-1.2M: +0.0085 sd 0.0258 se 0.0091 t 0.9 wins 6/8 t>=2.5=False 2sd=False
+  D - B on 1.2-1.6M: -0.0217 sd 0.0258 se 0.0091 t -2.4 wins 1/8 t>=2.5=False 2sd=False
+  C - T on main: +0.0092 sd 0.0207 se 0.0073 t 1.3 wins 5/8 t>=2.5=False 2sd=False
+  C - T on whole: +0.0189 sd 0.0117 se 0.0042 t 4.6 wins 8/8 t>=2.5=True 2sd=False
+  C - T on 0.8-1.2M: +0.0176 sd 0.0164 se 0.0058 t 3.0 wins 7/8 t>=2.5=True 2sd=False
+  C - T on 1.2-1.6M: +0.0009 sd 0.0271 se 0.0096 t 0.1 wins 3/8 t>=2.5=False 2sd=False
+  T - B on main: +0.0017 sd 0.0081 se 0.0029 t 0.6 wins 5/8 t>=2.5=False 2sd=False
+  T - B on whole: +0.0131 sd 0.0101 se 0.0036 t 3.7 wins 7/8 t>=2.5=True 2sd=False
+  T - B on 0.8-1.2M: +0.0064 sd 0.0107 se 0.0038 t 1.7 wins 6/8 t>=2.5=False 2sd=False
+  T - B on 1.2-1.6M: -0.0029 sd 0.0192 se 0.0068 t -0.4 wins 3/8 t>=2.5=False 2sd=False
+  D - C on main: -0.0176 sd 0.0281 se 0.0099 t -1.8 wins 2/8 t>=2.5=False 2sd=False
+  D - C on whole: -0.0122 sd 0.0154 se 0.0054 t -2.3 wins 2/8 t>=2.5=False 2sd=False
+  D - C on 0.8-1.2M: -0.0155 sd 0.0255 se 0.0090 t -1.7 wins 2/8 t>=2.5=False 2sd=False
+  D - C on 1.2-1.6M: -0.0197 sd 0.0329 se 0.0116 t -1.7 wins 2/8 t>=2.5=False 2sd=False
+  A - B on main: -0.0046 sd 0.0221 se 0.0078 t -0.6 wins 4/8 t>=2.5=False 2sd=False
+  A - B on whole: +0.0217 sd 0.0168 se 0.0059 t 3.7 wins 8/8 t>=2.5=True 2sd=False
+  A - B on 0.8-1.2M: +0.0117 sd 0.0220 se 0.0078 t 1.5 wins 6/8 t>=2.5=False 2sd=False
+  A - B on 1.2-1.6M: -0.0208 sd 0.0278 se 0.0098 t -2.1 wins 2/8 t>=2.5=False 2sd=False
+  H34a C: beats A True, beats B False; vs best single (B) +0.0110 (t 1.4), not worse than delta True
+  H34a D: beats A False, beats B False; vs best single (B) -0.0066 (t -0.8), not worse than delta True
+  per-seed main: A 0.492 0.502 0.490 0.526 0.502 0.483 0.519 0.511 | B 0.519 0.515 0.482 0.512 0.533 0.505 0.487 0.509 | C 0.539 0.517 0.481 0.556 0.522 0.489 0.523 0.522 | D 0.473 0.494 0.501 0.513 0.520 0.483 0.494 0.530 | T 0.537 0.514 0.488 0.512 0.536 0.497 0.489 0.503
+  A losses(main) competence 0.0286 busy 0.0016 routing 0.1073 model 0.0295 | candidates_k 528 zero_use_share 0.562 settled_share 0.0371 perfect_share_of_candidates 0.578 subs_per_task 0 state_size_k 180 niches_ge16 7.25 perfect_copies 412 eff_configs 10.6 wall_min 29.8
+  B losses(main) competence 0.0093 busy 0.0030 routing 0.1188 model 0.0296 | candidates_k 528 zero_use_share 0.000688 settled_share 0.0853 perfect_share_of_candidates 0.636 subs_per_task 0.33 state_size_k 6.04 niches_ge16 9 perfect_copies 598 eff_configs 13.5 wall_min 10.3
+  C losses(main) competence 0.0246 busy 0.0033 routing 0.0909 model 0.0291 | candidates_k 528 zero_use_share 0.49 settled_share 0.0323 perfect_share_of_candidates 0.639 subs_per_task 0.03 state_size_k 139 niches_ge16 7.62 perfect_copies 451 eff_configs 21.4 wall_min 23
+  D losses(main) competence 0.0254 busy 0.0053 routing 0.1092 model 0.0290 | candidates_k 528 zero_use_share 0.487 settled_share 0.035 perfect_share_of_candidates 0.571 subs_per_task 0.03 state_size_k 139 niches_ge16 7.38 perfect_copies 458 eff_configs 22 wall_min 25.4
+  T losses(main) competence 0.0155 busy 0.0040 routing 0.1093 model 0.0297 | candidates_k 528 zero_use_share 0.000842 settled_share 0.0396 perfect_share_of_candidates 0.623 subs_per_task 0.33 state_size_k 7.9 niches_ge16 8.25 perfect_copies 570 eff_configs 11.5 wall_min 10.9
+  A changed niches per seed (of 3): not found 0.00 | found, lost 1.75 | kept, unused 0.00 | recovered 1.25 || median time to first perfect birth 2649.0, perfect births per niche 6368, median time to >=16 copies 240000.0, taken when free 0.3622494073960922, birth -> stable use 223501.0
+  B changed niches per seed (of 3): not found 0.00 | found, lost 0.00 | kept, unused 0.38 | recovered 2.62 || median time to first perfect birth 2949.0, perfect births per niche 16724, median time to >=16 copies 270000.0, taken when free 0.7167224537477583, birth -> stable use 272351.0
+  C changed niches per seed (of 3): not found 0.00 | found, lost 1.25 | kept, unused 0.00 | recovered 1.75 || median time to first perfect birth 3449.0, perfect births per niche 10471, median time to >=16 copies 230000.0, taken when free 0.4786156834609558, birth -> stable use 282651.0
+  D changed niches per seed (of 3): not found 0.00 | found, lost 1.25 | kept, unused 0.25 | recovered 1.50 || median time to first perfect birth 4149.0, perfect births per niche 6810, median time to >=16 copies 340000.0, taken when free 0.4317881750057387, birth -> stable use 319901.0
+  T changed niches per seed (of 3): not found 0.00 | found, lost 0.75 | kept, unused 0.62 | recovered 1.62 || median time to first perfect birth 2599.0, perfect births per niche 8554, median time to >=16 copies 420000.0, taken when free 0.4980495439378791, birth -> stable use 442501.0
+  H34b refilled niches C - A: +0.5000 sd 0.9258 se 0.3273 t 1.5 wins 4/8 t>=2.5=False 2sd=False
+  H34b refilled niches C - B: -1.2500 sd 1.2817 se 0.4532 t -2.8 wins 0/8 t>=2.5=True 2sd=False
+  H34b refilled niches D - A: +0.5000 sd 0.9258 se 0.3273 t 1.5 wins 2/8 t>=2.5=False 2sd=False
+  H34b refilled niches D - B: -1.2500 sd 1.1650 se 0.4119 t -3.0 wins 0/8 t>=2.5=True 2sd=False
+  refilled niches B - A: +1.7500 sd 0.8864 se 0.3134 t 5.6 wins 7/8 t>=2.5=True 2sd=False
+
+=== hard: seeds [130, 131, 132, 133, 134, 135, 136, 137], wall min A 39 B 10 C 28 D 31 T 12
+  A 0.336 0.455 0.511 0.537 0.561 0.566 0.571 0.575 0.434 0.420 0.425 0.427 0.430 0.432 0.433 0.435
+  B 0.328 0.413 0.453 0.483 0.501 0.513 0.518 0.518 0.413 0.421 0.437 0.457 0.486 0.499 0.504 0.516
+  C 0.345 0.474 0.526 0.544 0.560 0.567 0.568 0.568 0.439 0.425 0.435 0.444 0.451 0.468 0.486 0.502
+  D 0.345 0.450 0.508 0.540 0.552 0.562 0.569 0.570 0.435 0.421 0.426 0.428 0.437 0.449 0.461 0.476
+  T 0.340 0.451 0.484 0.511 0.525 0.536 0.538 0.539 0.427 0.423 0.425 0.429 0.439 0.449 0.454 0.466
+  A main 0.4296±0.0405 | whole 0.4717±0.0225 | 0.8-1.2M 0.4265±0.0377 | 1.2-1.6M 0.4327±0.0448 | cumulative 754,778
+  B main 0.4666±0.0161 | whole 0.4662±0.0185 | 0.8-1.2M 0.4321±0.0166 | 1.2-1.6M 0.5012±0.0231 | cumulative 745,995
+  C main 0.4564±0.0184 | whole 0.4877±0.0114 | 0.8-1.2M 0.4359±0.0163 | 1.2-1.6M 0.4769±0.0319 | cumulative 780,260
+  D main 0.4414±0.0229 | whole 0.4767±0.0139 | 0.8-1.2M 0.4273±0.0284 | 1.2-1.6M 0.4555±0.0259 | cumulative 762,761
+  T main 0.4389±0.0119 | whole 0.4646±0.0123 | 0.8-1.2M 0.4258±0.0137 | 1.2-1.6M 0.4520±0.0196 | cumulative 743,397
+  C - A on main: +0.0267 sd 0.0441 se 0.0156 t 1.7 wins 6/8 t>=2.5=False 2sd=False
+  C - A on whole: +0.0159 sd 0.0208 se 0.0073 t 2.2 wins 6/8 t>=2.5=False 2sd=False
+  C - A on 0.8-1.2M: +0.0093 sd 0.0306 se 0.0108 t 0.9 wins 6/8 t>=2.5=False 2sd=False
+  C - A on 1.2-1.6M: +0.0442 sd 0.0593 se 0.0210 t 2.1 wins 6/8 t>=2.5=False 2sd=False
+  C - B on main: -0.0103 sd 0.0195 se 0.0069 t -1.5 wins 3/8 t>=2.5=False 2sd=False
+  C - B on whole: +0.0214 sd 0.0147 se 0.0052 t 4.1 wins 8/8 t>=2.5=True 2sd=False
+  C - B on 0.8-1.2M: +0.0038 sd 0.0183 se 0.0065 t 0.6 wins 4/8 t>=2.5=False 2sd=False
+  C - B on 1.2-1.6M: -0.0243 sd 0.0235 se 0.0083 t -2.9 wins 1/8 t>=2.5=True 2sd=False
+  D - A on main: +0.0118 sd 0.0230 se 0.0081 t 1.5 wins 5/8 t>=2.5=False 2sd=False
+  D - A on whole: +0.0050 sd 0.0123 se 0.0044 t 1.1 wins 5/8 t>=2.5=False 2sd=False
+  D - A on 0.8-1.2M: +0.0008 sd 0.0110 se 0.0039 t 0.2 wins 5/8 t>=2.5=False 2sd=False
+  D - A on 1.2-1.6M: +0.0228 sd 0.0395 se 0.0140 t 1.6 wins 5/8 t>=2.5=False 2sd=False
+  D - B on main: -0.0252 sd 0.0274 se 0.0097 t -2.6 wins 1/8 t>=2.5=True 2sd=False
+  D - B on whole: +0.0105 sd 0.0188 se 0.0067 t 1.6 wins 6/8 t>=2.5=False 2sd=False
+  D - B on 0.8-1.2M: -0.0048 sd 0.0232 se 0.0082 t -0.6 wins 3/8 t>=2.5=False 2sd=False
+  D - B on 1.2-1.6M: -0.0457 sd 0.0368 se 0.0130 t -3.5 wins 1/8 t>=2.5=True 2sd=False
+  C - T on main: +0.0175 sd 0.0257 se 0.0091 t 1.9 wins 5/8 t>=2.5=False 2sd=False
+  C - T on whole: +0.0230 sd 0.0118 se 0.0042 t 5.5 wins 8/8 t>=2.5=True 2sd=False
+  C - T on 0.8-1.2M: +0.0101 sd 0.0157 se 0.0055 t 1.8 wins 6/8 t>=2.5=False 2sd=False
+  C - T on 1.2-1.6M: +0.0249 sd 0.0401 se 0.0142 t 1.8 wins 6/8 t>=2.5=False 2sd=False
+  T - B on main: -0.0278 sd 0.0167 se 0.0059 t -4.7 wins 0/8 t>=2.5=True 2sd=False
+  T - B on whole: -0.0016 sd 0.0141 se 0.0050 t -0.3 wins 4/8 t>=2.5=False 2sd=False
+  T - B on 0.8-1.2M: -0.0063 sd 0.0134 se 0.0047 t -1.3 wins 3/8 t>=2.5=False 2sd=False
+  T - B on 1.2-1.6M: -0.0492 sd 0.0287 se 0.0102 t -4.8 wins 0/8 t>=2.5=True 2sd=False
+  D - C on main: -0.0150 sd 0.0331 se 0.0117 t -1.3 wins 3/8 t>=2.5=False 2sd=False
+  D - C on whole: -0.0109 sd 0.0179 se 0.0063 t -1.7 wins 2/8 t>=2.5=False 2sd=False
+  D - C on 0.8-1.2M: -0.0086 sd 0.0215 se 0.0076 t -1.1 wins 4/8 t>=2.5=False 2sd=False
+  D - C on 1.2-1.6M: -0.0213 sd 0.0461 se 0.0163 t -1.3 wins 3/8 t>=2.5=False 2sd=False
+  A - B on main: -0.0370 sd 0.0394 se 0.0139 t -2.7 wins 2/8 t>=2.5=True 2sd=False
+  A - B on whole: +0.0055 sd 0.0226 se 0.0080 t 0.7 wins 6/8 t>=2.5=False 2sd=False
+  A - B on 0.8-1.2M: -0.0055 sd 0.0297 se 0.0105 t -0.5 wins 3/8 t>=2.5=False 2sd=False
+  A - B on 1.2-1.6M: -0.0685 sd 0.0497 se 0.0176 t -3.9 wins 0/8 t>=2.5=True 2sd=False
+  H34a C: beats A False, beats B False; vs best single (B) -0.0103 (t -1.5), not worse than delta True
+  H34a D: beats A False, beats B False; vs best single (B) -0.0252 (t -2.6), not worse than delta False
+  per-seed main: A 0.368 0.451 0.462 0.414 0.409 0.447 0.395 0.493 | B 0.469 0.488 0.464 0.465 0.465 0.436 0.460 0.486 | C 0.472 0.479 0.457 0.473 0.424 0.451 0.442 0.453 | D 0.396 0.437 0.452 0.442 0.437 0.453 0.438 0.477 | T 0.420 0.434 0.433 0.447 0.447 0.430 0.443 0.457
+  A losses(main) competence 0.0848 busy 0.0070 routing 0.1319 model 0.0319 | candidates_k 528 zero_use_share 0.576 settled_share 0.0347 perfect_share_of_candidates 0.54 subs_per_task 0 state_size_k 353 niches_ge16 6.12 perfect_copies 408 eff_configs 10.7 wall_min 38.9
+  B losses(main) competence 0.0370 busy 0.0044 routing 0.1378 model 0.0309 | candidates_k 528 zero_use_share 0.00117 settled_share 0.0847 perfect_share_of_candidates 0.6 subs_per_task 0.329 state_size_k 6.78 niches_ge16 8.75 perfect_copies 565 eff_configs 14.6 wall_min 10.4
+  C losses(main) competence 0.0350 busy 0.0063 routing 0.1506 model 0.0309 | candidates_k 528 zero_use_share 0.486 settled_share 0.0343 perfect_share_of_candidates 0.582 subs_per_task 0.03 state_size_k 204 niches_ge16 7.38 perfect_copies 415 eff_configs 22.2 wall_min 28.3
+  D losses(main) competence 0.0390 busy 0.0048 routing 0.1675 model 0.0309 | candidates_k 528 zero_use_share 0.487 settled_share 0.0339 perfect_share_of_candidates 0.524 subs_per_task 0.03 state_size_k 225 niches_ge16 7.12 perfect_copies 394 eff_configs 26.3 wall_min 31.1
+  T losses(main) competence 0.0623 busy 0.0082 routing 0.1415 model 0.0313 | candidates_k 528 zero_use_share 0.00179 settled_share 0.0374 perfect_share_of_candidates 0.588 subs_per_task 0.329 state_size_k 17.6 niches_ge16 6.75 perfect_copies 465 eff_configs 12.8 wall_min 12.4
+  A changed niches per seed (of 3): not found 1.62 | found, lost 1.00 | kept, unused 0.00 | recovered 0.38 || median time to first perfect birth 185799.0, perfect births per niche 1721, median time to >=16 copies 340000.0, taken when free 0.27967342952972163, birth -> stable use 355901.0
+  B changed niches per seed (of 3): not found 0.00 | found, lost 0.25 | kept, unused 0.38 | recovered 2.38 || median time to first perfect birth 14499.0, perfect births per niche 9538, median time to >=16 copies 460000.0, taken when free 0.601798609437199, birth -> stable use 409901.0
+  C changed niches per seed (of 3): not found 0.00 | found, lost 1.38 | kept, unused 0.25 | recovered 1.38 || median time to first perfect birth 24099.0, perfect births per niche 6049, median time to >=16 copies 480000.0, taken when free 0.4217724405711348, birth -> stable use 438201.0
+  D changed niches per seed (of 3): not found 0.00 | found, lost 1.62 | kept, unused 0.25 | recovered 1.12 || median time to first perfect birth 24099.0, perfect births per niche 4042, median time to >=16 copies 540000.0, taken when free 0.30905734415632735, birth -> stable use 462201.0
+  T changed niches per seed (of 3): not found 0.00 | found, lost 2.25 | kept, unused 0.12 | recovered 0.62 || median time to first perfect birth 28849.0, perfect births per niche 1670, median time to >=16 copies 610000.0, taken when free 0.1851655414725196, birth -> stable use 585251.0
+  H34b refilled niches C - A: +1.2500 sd 1.2817 se 0.4532 t 2.8 wins 5/8 t>=2.5=True 2sd=False
+  H34b refilled niches C - B: -1.1250 sd 0.9910 se 0.3504 t -3.2 wins 0/8 t>=2.5=True 2sd=False
+  H34b refilled niches D - A: +1.0000 sd 1.5119 se 0.5345 t 1.9 wins 4/8 t>=2.5=False 2sd=False
+  H34b refilled niches D - B: -1.3750 sd 1.0607 se 0.3750 t -3.7 wins 0/8 t>=2.5=True 2sd=False
+  refilled niches B - A: +2.3750 sd 0.7440 se 0.2631 t 9.0 wins 8/8 t>=2.5=True 2sd=True
+
+C: beats both A and B after the hard shift: False; not worse than the best single algorithm elsewhere: True; complementarity shown: False; strict (all three): False
+    {'stat': (False, True, 'A', -0.0079, -6.3), 'mild': (True, False, 'B', 0.011, 1.4), 'hard': (False, False, 'B', -0.0103, -1.5)}
+
+D: beats both A and B after the hard shift: False; not worse than the best single algorithm elsewhere: False; complementarity shown: False; strict (all three): False
+    {'stat': (False, True, 'A', -0.0155, -2.1), 'mild': (False, False, 'B', -0.0066, -0.8), 'hard': (False, False, 'B', -0.0252, -2.6)}
+saved results/h34_hybrid.json
