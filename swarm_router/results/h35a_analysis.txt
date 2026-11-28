@@ -1,0 +1,54 @@
+seeds [140, 141, 142, 143, 144, 145]
+
+stage A: loss of team quality against the frozen unperturbed control (mean over seeds); 'inf' = not within the 400k horizon
+  R05: initial +0.0054 (t 1.8) | 2k +0.0004 | 10k +0.0021 | 50k +0.0019 | 200k +0.0011 | last 100k +0.0008 (t 7.0) || tau50 44125.0 tau90 inf (mean curve); per seed tau50 [nan, 2625.0, inf, 366250.0, 343750.0, 321250.0] tau90 [nan, 336250.0, inf, 381250.0, inf, 381250.0]
+       initial loss by component: competence -0.0000 busy +0.0000 routing +0.0054 model(reward) +0.0055 | last 100k: competence -0.0000 routing +0.0009
+  R20: initial +0.0190 (t 4.7) | 2k +0.0110 | 10k +0.0082 | 50k +0.0049 | 200k +0.0028 | last 100k +0.0025 (t 3.5) || tau50 12875.0 tau90 396250.0 (mean curve); per seed tau50 [13625.0, 48125.0, 43375.0, 88750.0, 223750.0, 36625.0] tau90 [388750.0, 373750.0, inf, inf, 396250.0, 373750.0]
+       initial loss by component: competence -0.0000 busy +0.0000 routing +0.0190 model(reward) +0.0037 | last 100k: competence -0.0000 routing +0.0026
+  R50: initial +0.0446 (t 7.1) | 2k +0.0355 | 10k +0.0277 | 50k +0.0229 | 200k +0.0156 | last 100k +0.0100 (t 6.0) || tau50 88750.0 tau90 inf (mean curve); per seed tau50 [238750.0, 15375.0, 171250.0, inf, 193750.0, 88750.0] tau90 [inf, 373750.0, inf, inf, inf, 381250.0]
+       initial loss by component: competence -0.0000 busy +0.0000 routing +0.0446 model(reward) +0.0037 | last 100k: competence -0.0000 routing +0.0101
+  G05: initial +0.0012 (t 1.0) | 2k -0.0006 | 10k +0.0010 | 50k +0.0006 | 200k +0.0009 | last 100k +0.0005 (t 2.2) || tau50 388750.0 tau90 inf (mean curve); per seed tau50 [nan, 45625.0, 388750.0, nan, 388750.0, nan] tau90 [nan, 358750.0, 388750.0, nan, inf, nan]
+       initial loss by component: competence -0.0000 busy +0.0000 routing +0.0012 model(reward) -0.0020 | last 100k: competence -0.0000 routing +0.0005
+  G20: initial +0.0007 (t 0.4) | 2k -0.0036 | 10k -0.0023 | 50k -0.0022 | 200k -0.0005 | last 100k -0.0004 (t -1.0) || tau50 291250.0 tau90 388750.0 (mean curve); per seed tau50 [nan, nan, 24125.0, 366250.0, 34625.0, nan] tau90 [nan, nan, 388750.0, 366250.0, 388750.0, nan]
+       initial loss by component: competence -0.0000 busy +0.0000 routing +0.0007 model(reward) +0.0098 | last 100k: competence -0.0000 routing -0.0003
+  G50: initial +0.0184 (t 4.4) | 2k +0.0133 | 10k +0.0103 | 50k +0.0054 | 200k +0.0026 | last 100k +0.0010 (t 2.1) || tau50 13125.0 tau90 336250.0 (mean curve); per seed tau50 [4375.0, 58750.0, 22875.0, 126250.0, 381250.0, 1375.0] tau90 [inf, 366250.0, 321250.0, 321250.0, 388750.0, 373750.0]
+       initial loss by component: competence -0.0000 busy +0.0000 routing +0.0184 model(reward) +0.0000 | last 100k: competence -0.0000 routing +0.0011
+  S05: initial +0.0296 (t 4.9) | 2k +0.0134 | 10k +0.0055 | 50k +0.0032 | 200k +0.0015 | last 100k +0.0006 (t 2.5) || tau50 2375.0 tau90 47625.0 (mean curve); per seed tau50 [4125.0, 3125.0, 44125.0, 29875.0, 2375.0, 36625.0] tau90 [321250.0, 73750.0, 388750.0, 313750.0, 96250.0, 373750.0]
+       initial loss by component: competence -0.0000 busy +0.0000 routing +0.0296 model(reward) +0.0130 | last 100k: competence -0.0000 routing +0.0006
+  S20: initial +0.0666 (t 8.4) | 2k +0.0474 | 10k +0.0243 | 50k +0.0117 | 200k +0.0035 | last 100k +0.0020 (t 4.9) || tau50 4375.0 tau90 118750.0 (mean curve); per seed tau50 [3375.0, 4125.0, 43625.0, 4125.0, 3375.0, 5375.0] tau90 [96250.0, 111250.0, 193750.0, 208750.0, 321250.0, 178750.0]
+       initial loss by component: competence -0.0000 busy +0.0000 routing +0.0666 model(reward) +0.0081 | last 100k: competence -0.0000 routing +0.0021
+  S50: initial +0.1162 (t 7.1) | 2k +0.0949 | 10k +0.0897 | 50k +0.0614 | 200k +0.0199 | last 100k +0.0097 (t 5.2) || tau50 49375.0 tau90 321250.0 (mean curve); per seed tau50 [23875.0, 58750.0, 73750.0, 88750.0, 81250.0, 49375.0] tau90 [163750.0, 396250.0, inf, 388750.0, 388750.0, 373750.0]
+       initial loss by component: competence -0.0000 busy +0.0000 routing +0.1162 model(reward) +0.0047 | last 100k: competence -0.0000 routing +0.0098
+
+stage B: NI trajectory, 0.4-1.2M
+  life_median                  100.0   per seed [100.0, 100.0, 100.0, 100.0, 100.0, 100.0]
+  life_mean                    1629.2054924242423   per seed [1608.108, 1579.549, 1599.305, 1793.523, 1552.215, 1642.533]
+  life_p90                     483.3333333333333   per seed [400.0, 400.0, 500.0, 600.0, 500.0, 500.0]
+  life_p99                     31816.83333333349   per seed [29200.0, 27101.0, 34600.0, 31700.0, 35500.0, 32800.0]
+  uses_median                  0.16666666666666666   per seed [0.0, 1.0, 0.0, 0.0, 0.0, 0.0]
+  uses_mean                    8.792981060606062   per seed [8.608, 8.906, 8.563, 9.06, 8.65, 8.971]
+  zero_use                     0.5571022727272728   per seed [0.58, 0.494, 0.605, 0.606, 0.557, 0.501]
+  ever_success                 0.3226199494949495   per seed [0.304, 0.373, 0.283, 0.283, 0.326, 0.367]
+  first_success_age_median     39.833333333333336   per seed [40.0, 37.0, 43.0, 42.0, 39.0, 38.0]
+  long_5000                    0.026581439393939393   per seed [0.026, 0.024, 0.029, 0.027, 0.029, 0.026]
+  perfect_share                0.8796957070707071   per seed [0.885, 0.882, 0.883, 0.885, 0.871, 0.873]
+  life_median_perfect          100.0   per seed [100.0, 100.0, 100.0, 100.0, 100.0, 100.0]
+  life_mean_used               3543.931134538099   per seed [3657.599, 3012.426, 3812.533, 4297.46, 3329.35, 3154.219]
+  est_n                        0.0   per seed [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+  est_time_median              None   per seed [nan, nan, nan, nan, nan, nan]
+  surv_15k                     0.7182045990566038   per seed [0.733, 0.745, 0.699, 0.703, 0.702, 0.727]
+  surv_half                    70000.0   per seed [75000.0, 90000.0, 60000.0, 60000.0, 60000.0, 75000.0]
+  genotype_overlap_15k         0.9221354166666669   per seed [0.924, 0.937, 0.915, 0.917, 0.916, 0.925]
+  genotype_overlap_half        None   per seed [inf, inf, inf, inf, inf, inf]
+  genotype_overlap_300k        0.7999234068627451   per seed [0.795, 0.878, 0.787, 0.775, 0.739, 0.825]
+  niche_overlap_15k            0.9390225062311998   per seed [0.939, 0.953, 0.934, 0.934, 0.933, 0.941]
+  niche_overlap_300k           0.8355478785813139   per seed [0.824, 0.912, 0.824, 0.802, 0.784, 0.867]
+  inherited_share              0.4574858621702953   per seed [0.49, 0.445, 0.459, 0.48, 0.43, 0.442]
+  state_k                      83.65086635220126   per seed [70.533, 73.191, 85.702, 91.584, 71.306, 109.59]
+  rows_dropped_per_gen         5356.571048218029   per seed [4562.923, 4756.744, 5765.256, 5820.948, 4419.303, 6814.251]
+  rows_inherited_per_gen       5354.326247379455   per seed [4560.848, 4754.077, 5763.07, 5818.513, 4417.211, 6812.239]
+  pair_updates_per_gen         300.0   per seed [300.0, 300.0, 300.0, 300.0, 300.0, 300.0]
+  used_primitives              640.0   per seed [640.0, 640.0, 640.0, 640.0, 640.0, 640.0]
+
+  nominal turnover N*K/n = 1939 tasks
+saved results/h35a_timescales.json
