@@ -44,6 +44,7 @@ TSH = [int(x) for x in os.environ.get("H33_TSHIFT", "0,0").split(",")] + [0]    
 KMAP = dict(x.split(":") for x in os.environ.get("H33_KMAP", "").split(",") if x)      # H33: fork time -> kinds, e.g. 400000:HAZQ,600000:F
 H35F = int(os.environ.get("H35_FORK", 0))                        # H35 stage A: fork time; all branches frozen, perturbed as named
 H35K = [x for x in os.environ.get("H35_KINDS", "").split(",") if x]      # C0 | R<pct> | G<pct> | S<pct>
+H35R = os.environ.get("H35_RATE", "")                              # H35 stage C: "K,n" - generation interval and replacements per generation from the start
 H35P = os.environ.get("H35_POP", "") == "1"                      # H35 stage B: lifetimes, uses, genotype establishment
 CNT = dict(drop=0, set=0)
 if H35P:                                                          # count pair records dropped at a rewrite / created by inheritance
@@ -75,6 +76,8 @@ class Diag:
 
     def __call__(self, t, tp, env, members, m, succ, q):
         b = t // BLK; k = env.ks[t]; sk = env.skill[k]; a = self.a
+        if H35R and t == 0:                                              # H35 stage C: the rate is set before the first generation
+            tp.every, tp.frac = int(H35R.split(",")[0]), int(H35R.split(",")[1]) / tp.N
         av = env.busy_until < t; av[members] = True                      # availability at decision time
         bp = sk.max(0); ba = np.where(av[:, None], sk, 0.0).max(0); tm = sk[members].max(0)
         perf = sk >= env.strong - 1e-9; ex = perf.any(0); free = (perf & av[:, None]).sum(0); got = tm >= env.strong - 1e-9
@@ -134,7 +137,11 @@ class Diag:
             for kind in H35K:
                 pid = os.fork()
                 if pid == 0:
-                    self.tag = kind; self.kids = []; self.fine_t0 = t + 1; f_ = int(kind[1:]) / 100 if kind != "C0" else 0.0
+                    self.tag = kind; self.kids = []; self.fine_t0 = t + 1
+                    if kind[0] == "T":                                   # H35 stage C: T<K>x<n> - interval K, n replacements per generation; evolution goes on
+                        K_, n_ = kind[1:].split("x"); tp.every = int(K_); tp.frac = int(n_) / tp.N
+                        break
+                    f_ = int(kind[1:]) / 100 if kind != "C0" else 0.0
                     if kind[0] == "R":                                   # pair statistics of a share of the primitives forgotten
                         for i_ in np.random.default_rng(SEED + 3500).choice(tp.N, size=int(round(f_ * tp.N)), replace=False):
                             sb._sp_drop(tp.b, int(i_))
