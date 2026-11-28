@@ -2,7 +2,7 @@
 is lost (notes/hypotheses.md). Usage: python h26_freeze.py VARIANT SEED  (VARIANT: C | NI | A | any key of VAR).
 The C run forks at the freeze points: the child continues with the population frozen, the parent goes on evolving,
 so the frozen runs share the exact prefix of C. Diagnostics read hidden simulator state and never feed the algorithm."""
-import os, sys, time
+import copy, os, sys, time
 
 import numpy as np
 
@@ -42,6 +42,17 @@ if os.environ.get("H34_GEN"):                                    # H34: search g
 TSH = [int(x) for x in os.environ.get("H33_TSHIFT", "0,0").split(",")] + [0]      # H33: at task TSH[0] the targets of TSH[1] niches change:
 #      redrawn (TSH[2] = 0) or TSH[2] genes of each replaced by other values
 KMAP = dict(x.split(":") for x in os.environ.get("H33_KMAP", "").split(",") if x)      # H33: fork time -> kinds, e.g. 400000:HAZQ,600000:F
+H35F = int(os.environ.get("H35_FORK", 0))                        # H35 stage A: fork time; all branches frozen, perturbed as named
+H35K = [x for x in os.environ.get("H35_KINDS", "").split(",") if x]      # C0 | R<pct> | G<pct> | S<pct>
+H35P = os.environ.get("H35_POP", "") == "1"                      # H35 stage B: lifetimes, uses, genotype establishment
+CNT = dict(drop=0, set=0)
+if H35P:                                                          # count pair records dropped at a rewrite / created by inheritance
+    _drop, _set = sb._sp_drop, sb._sp_set
+    def _cdrop(b, i):
+        CNT["drop"] += sum(len(b.nb[c].get(i, ())) for c in range(b.C)); return _drop(b, i)
+    def _cset(b, c, a, x, s_, n_):
+        CNT["set"] += 1; return _set(b, c, a, x, s_, n_)
+    sb._sp_drop, sb._sp_set = _cdrop, _cset
 OUT = os.path.join(ROOT, ".cache", os.environ.get("H26_DIR", "h26"))
 KEYS = ("succ", "q_pop", "q_avail", "q_team", "er", "er_best", "min_free", "cap_obs", "good_obs")
 
@@ -58,6 +69,9 @@ class Diag:
         self.nich = np.zeros((160, 3, 3, 4)); self.fb = np.full((3, 3), -1); self.nb = np.zeros((3, 3)); self.long = np.zeros(160)      # H34: per niche
         self.vict = np.zeros((160, 2, 4)); self.pop = np.zeros((160, 4)); self.prot = np.zeros((160, 4)); self.vn = np.zeros(160)
         self.vuse = np.zeros((160, 2)); self.vinh = np.zeros((160, 2))
+        self.fine = np.zeros((200, 7)); self.fine_t0 = None              # H35 stage A: 250-task bins for 50k tasks after the fork
+        self.evs = []; self.fs = None; self.gc = None; self.gfirst = {}; self.g16 = []      # H35 stage B
+        self.stat = np.zeros((160, 5)); self.c0 = dict(CNT)
 
     def __call__(self, t, tp, env, members, m, succ, q):
         b = t // BLK; k = env.ks[t]; sk = env.skill[k]; a = self.a
@@ -69,6 +83,8 @@ class Diag:
         a["er"][b] += ev[m]; a["er_best"][b] += ev.max(); a["min_free"][b] += free.min()
         c = 0 if not ex.all() else 1 if (free == 0).any() else 2 if not got.all() else 3      # absent | busy | routing | full team
         self.cat_n[b, c] += 1; self.cat_s[b, c] += succ
+        if self.fine_t0 is not None and t - self.fine_t0 < 50000:
+            self.fine[(t - self.fine_t0) // 250] += (1, succ, bp.prod(), ba.prod(), q, ev[m], ev.max())
         self.nich[b, k, :, 0] += 1; self.nich[b, k, :, 1] += ex; self.nich[b, k, :, 2] += free > 0; self.nich[b, k, :, 3] += got & (free > 0)      # H34
         self.role[b] += [(~ex).mean(), (ex & (free == 0)).mean(), ((free > 0) & ~got).mean(), got.mean()]
         if hasattr(tp, "b"):                                             # H30: where the routing loss sits (hidden type and ages; diagnostics only)
@@ -77,10 +93,30 @@ class Diag:
                 self.ep = tp.epoch.copy(); self.born = np.full(len(self.ep), -10 ** 9)
                 self.uses = np.zeros(len(self.ep)); self.isperf = (env.genes[:, None, None, :] == env.targets[None]).all(-1).any((1, 2))
             self.uses[members] += 1
+            if H35P:
+                if self.fs is None:
+                    self.fs = np.full(len(self.ep), -1); self.gc = {}
+                    for g_ in env.genes:
+                        self.gc[g_.tobytes()] = self.gc.get(g_.tobytes(), 0) + 1
+                    self.gold = [g_.tobytes() for g_ in env.genes]
+                if succ:
+                    for i_ in members:
+                        if self.fs[i_] < 0:
+                            self.fs[i_] = t - max(self.born[i_], 0)
             ch = tp.epoch != self.ep
             if ch.any():                                                 # H32: births, evictions, fate of perfect configurations (hidden; diagnostics)
                 pn = (env.genes[ch][:, None, None, :] == env.targets[None]).all(-1).any((1, 2)); po = self.isperf[ch]; u = self.uses[ch]
                 self.ev[b] += (ch.sum(), pn.sum(), (u == 0).sum(), u.sum(), po.sum(), (po & (t - self.born[ch] >= 5000)).sum())
+                if H35P:
+                    for i_ in np.where(ch)[0]:
+                        if t >= 400000:
+                            self.evs.append((t - max(self.born[i_], 0), self.uses[i_], self.fs[i_], self.isperf[i_], self.born[i_] < 0))
+                        self.fs[i_] = -1; old = self.gold[i_]; new = env.genes[i_].tobytes(); self.gold[i_] = new
+                        self.gc[old] -= 1; n_ = self.gc.get(new, 0) + 1; self.gc[new] = n_
+                        if new not in self.gfirst and n_ == 1:
+                            self.gfirst[new] = t
+                        if n_ == 16 and new in self.gfirst and self.gfirst[new] >= 0:
+                            self.g16.append((self.gfirst[new], t)); self.gfirst[new] = -1
                 self.long[b] += (t - self.born[ch] >= 5000).sum()                 # H34: evicted after at least 5000 tasks (any configuration)
                 if TSH[0] and t >= TSH[0]:                                         # H34: perfect configurations born after the target shift, per niche
                     eqn = (env.genes[ch][:, None, None, :] == env.targets[None]).all(-1).sum(0)
@@ -91,6 +127,25 @@ class Diag:
                 self.subs[b] += tp.n_sub - self.sub0; self.sub0 = tp.n_sub
             i = 0 if self.cum[cc].argmax() == k else 1; j = 2 if (t - self.born[members] < 5000).any() else 3
             self.split[b, i] += (rl, 1); self.split[b, j] += (rl, 1)
+        if H35P and (t + 1) % BLK == 0 and hasattr(tp, "ih_n"):          # H35 stage B: statistics turnover per block
+            self.stat[b] = (tp.ih_n.sum() / max(tp.in_.sum(), 1), tp.state_size, CNT["drop"] - self.c0["drop"], CNT["set"] - self.c0["set"], (tp.in_.sum(0) > 0).sum())
+            self.c0 = dict(CNT)
+        if H35F and self.tag == BASE and tp.t == H35F:                   # H35 stage A: frozen branches with a controlled perturbation
+            for kind in H35K:
+                pid = os.fork()
+                if pid == 0:
+                    self.tag = kind; self.kids = []; self.fine_t0 = t + 1; f_ = int(kind[1:]) / 100 if kind != "C0" else 0.0
+                    if kind[0] == "R":                                   # pair statistics of a share of the primitives forgotten
+                        for i_ in np.random.default_rng(SEED + 3500).choice(tp.N, size=int(round(f_ * tp.N)), replace=False):
+                            sb._sp_drop(tp.b, int(i_))
+                    if kind[0] in "GS":                                  # one generation of that size by the usual rules
+                        keep = copy.deepcopy((tp.b.idx, tp.b.nb, tp.b.A, tp.b.B, tp.b.s, tp.b.n, tp.b.m, tp.is_, tp.in_, tp.ih_s, tp.ih_n)) if kind[0] == "S" else None
+                        fr = tp.frac; tp.frac = f_; tp._generation(); tp.frac = fr
+                        if keep is not None:                             # S: the statistics of the rewritten slots stay as they were
+                            tp.b.idx, tp.b.nb, tp.b.A, tp.b.B, tp.b.s, tp.b.n, tp.b.m, tp.is_, tp.in_, tp.ih_s, tp.ih_n = keep
+                    tp.frozen = True
+                    break
+                self.kids.append(pid)
         if TSH[0] and t + 1 == TSH[0]:                                   # H33: environment event, not known to the algorithm
             rg = np.random.default_rng(SEED + 3300); K, J, L = env.targets.shape
             for f in rg.choice(K * J, size=TSH[1], replace=False):
@@ -148,7 +203,7 @@ class TrueType:
 
 
 def done(v, seed):
-    tags = [v] + ([f"{k}{f // 1000}" for f in FORKS for k in KMAP.get(str(f), KINDS)] if v == BASE else [])
+    tags = [v] + ([f"{k}{f // 1000}" for f in FORKS for k in KMAP.get(str(f), KINDS)] if v == BASE else []) + (H35K if v == BASE and H35F else [])
     return all(os.path.exists(os.path.join(OUT, f"{g}_{seed}.npz")) for g in tags)
 
 
@@ -163,7 +218,7 @@ if __name__ == "__main__":
     np.savez_compressed(f + ".tmp.npz", R=o["R"].reshape(160, -1).mean(1), q=o["q"].reshape(160, -1).mean(1), blk=BLK,
                         t=np.array([s[0] for s in tp.trace]), genes=np.array([s[1] for s in tp.trace]), lin=np.array([s[2] for s in tp.trace]),
                         epoch=np.array([s[3] for s in tp.trace]), targets=env.targets, genes0=np.random.default_rng(seed + 2900).integers(env.A, size=(N, env.L)),
-                        cat_n=d.cat_n, cat_s=d.cat_s, role=d.role / BLK, conf=d.conf, split=d.split, ev=d.ev, subs=d.subs, nich=d.nich, first_birth=d.fb, births_niche=d.nb, long_lived=d.long, n_xo=getattr(tp, "n_xo", 0),
+                        cat_n=d.cat_n, cat_s=d.cat_s, role=d.role / BLK, conf=d.conf, split=d.split, ev=d.ev, subs=d.subs, fine=d.fine, evs=np.array(d.evs, np.int32).reshape(-1, 5), g16=np.array(d.g16, np.int64).reshape(-1, 2), stat=d.stat, nich=d.nich, first_birth=d.fb, births_niche=d.nb, long_lived=d.long, n_xo=getattr(tp, "n_xo", 0),
                         age_end=(T - d.born) if d.born is not None else np.zeros(1), rho_log=np.array(getattr(tp, "rho_log", []), float), n_alarm=getattr(tp, "n_alarm", 0), targets0=targets0, n_skip=getattr(tp, "n_skip", 0), alive_perf_age=np.where(d.isperf, T - d.born, -1) if d.isperf is not None else np.zeros(1), vict=d.vict, pop=d.pop, prot=d.prot, vn=d.vn, vuse=d.vuse, vinh=d.vinh, wall=time.time() - d.t0, state=tp.state_size, births=tp.births,
                         **{k: x / BLK for k, x in d.a.items()})
     os.replace(f + ".tmp.npz", f + ".npz")
